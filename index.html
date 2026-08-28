@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>The Ledger — Group Ironman Tracker</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#161a1e;
+    --panel:#1e242b;
+    --panel-2:#242b33;
+    --stone:#2c343d;
+    --gold:#c9a227;
+    --gold-dim:#8a7327;
+    --ember:#b5522f;
+    --text:#e7e2d3;
+    --text-dim:#9aa0a8;
+    --line:#333c46;
+    --green:#5b8a4d;
+    --blue:#4d7a9b;
+  }
+  *{box-sizing:border-box}
+  html{color-scheme:dark}
+  body{
+    margin:0;
+    background:
+      radial-gradient(1200px 600px at 20% -10%, #22282f 0%, transparent 60%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    padding-bottom:80px;
+  }
+  h1,h2,h3,.display{font-family:'Cinzel',serif}
+
+  header{
+    padding:28px 20px 20px;
+    border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, #1c2127, #171b20);
+  }
+  header .eyebrow{
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-size:11px;
+    color:var(--gold-dim);
+    margin-bottom:6px;
+  }
+  header h1{
+    margin:0;
+    font-size:28px;
+    color:var(--gold);
+    letter-spacing:.03em;
+  }
+  header p{color:var(--text-dim);font-size:13px;margin:8px 0 0;max-width:640px;line-height:1.5}
+
+  .header-top{
+    display:flex;align-items:flex-start;gap:18px;flex-wrap:nowrap;
+  }
+  .header-text{flex:1 1 auto;min-width:0}
+  .header-art{
+    flex:0 0 auto;width:min(220px, 34vw);height:auto;
+    object-fit:contain;border-radius:10px;border:1px solid var(--line);
+    box-shadow:0 4px 16px rgba(0,0,0,.35);
+  }
+  @media (max-width:420px){
+    .header-top{flex-wrap:wrap;justify-content:center;text-align:center}
+    .header-art{width:min(220px, 60vw);margin:0 auto}
+  }
+
+  .members-bar{
+    display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center;
+  }
+  .member-chip{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:20px;
+    padding:6px 12px;font-size:13px;display:flex;align-items:center;gap:6px;
+  }
+  .member-chip input{
+    background:transparent;border:none;color:var(--text);font-size:13px;width:70px;
+    font-family:'Inter',sans-serif;outline:none;
+  }
+  .member-chip button{background:none;border:none;color:var(--ember);cursor:pointer;font-size:14px;padding:0}
+  .add-member-form{display:flex;gap:6px;align-items:center}
+  .add-member-form input{
+    background:var(--panel-2);border:1px dashed var(--gold-dim);border-radius:20px;
+    color:var(--text);padding:6px 12px;font-size:13px;width:140px;
+  }
+  .add-member-form button{
+    background:none;border:1px solid var(--gold-dim);color:var(--gold-dim);
+    border-radius:20px;padding:6px 12px;font-size:13px;cursor:pointer;
+  }
+
+  .whoami{margin-top:14px;font-size:13px;color:var(--text-dim);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .status-row{margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--text-dim)}
+  .whoami select{
+    background:var(--panel-2);color:var(--text);border:1px solid var(--line);
+    border-radius:6px;padding:4px 8px;font-size:13px;
+    color-scheme:dark;
+  }
+  .whoami select option{background:#242b33;color:#e7e2d3}
+
+  .import-box{margin-top:16px}
+  .import-toggle{
+    background:var(--panel-2);border:1px solid var(--gold-dim);color:var(--gold);
+    border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;
+  }
+  .import-panel{
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    padding:14px;margin-top:10px;max-width:640px;
+  }
+  .import-panel p{margin:0 0 10px;font-size:12px;color:var(--text-dim);line-height:1.5}
+  .import-row{display:flex;gap:8px}
+  .import-row input{flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:8px 10px;font-size:13px}
+  .import-row button, #parsePastedBtn{background:var(--gold-dim);border:none;color:#161a1e;font-weight:600;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer}
+  .import-status{font-size:12px;color:var(--text-dim);margin-top:8px}
+  #importFallback{margin-top:10px}
+  #importFallback a{color:var(--gold);font-size:12px;display:block;margin-bottom:8px;word-break:break-all}
+  #pasteJson{width:100%;min-height:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);font-size:12px;padding:8px;margin-bottom:8px;font-family:monospace}
+
+  nav.jumpnav{max-width:900px;margin:10px auto 0;padding:0 20px;display:flex;flex-wrap:wrap;gap:6px}
+  nav.jumpnav a{
+    font-size:11px;color:var(--text-dim);text-decoration:none;border:1px solid var(--line);
+    border-radius:14px;padding:4px 10px;
+  }
+  nav.jumpnav a:hover{color:var(--gold);border-color:var(--gold-dim)}
+
+  .tab-bar{
+    max-width:900px;margin:16px auto 0;padding:0 20px;
+    display:flex;flex-wrap:wrap;gap:8px;
+  }
+  .tab-btn{
+    background:var(--panel);border:1px solid var(--line);color:var(--text-dim);
+    border-radius:8px 8px 0 0;padding:10px 16px;font-size:13px;cursor:pointer;
+    border-bottom:2px solid transparent;
+  }
+  .tab-btn.active{
+    background:var(--panel-2);color:var(--gold);border-color:var(--gold-dim);
+    border-bottom:2px solid var(--gold);
+  }
+  .tab-btn:hover{color:var(--gold)}
+  .tab-pct{font-size:10px;color:var(--blue);font-weight:600}
+  .tab-btn.active .tab-pct{color:var(--gold)}
+
+  main{max-width:900px;margin:0 auto;padding:20px}
+
+  .category{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    margin-bottom:18px;
+    overflow:hidden;
+    scroll-margin-top:14px;
+  }
+  .category-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 16px;
+    background:var(--panel-2);
+    cursor:pointer;
+    border-bottom:1px solid var(--line);
+  }
+  .category-head h2{margin:0;font-size:15px;color:var(--gold);letter-spacing:.02em}
+  .category-head .sub{font-size:11px;color:var(--text-dim);margin-top:2px}
+  .category-head .count{color:var(--text-dim);font-size:12px}
+  .category-body{padding:6px 0}
+  .category.collapsed .category-body{display:none}
+  .category-head .chevron{transition:transform .15s;color:var(--gold-dim)}
+  .category.collapsed .chevron{transform:rotate(-90deg)}
+  .recur-badge{
+    font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--blue);
+    border:1px solid var(--blue);border-radius:10px;padding:1px 7px;margin-left:8px;
+  }
+
+  .task-row{
+    display:flex;align-items:flex-start;gap:10px;
+    padding:10px 16px;border-bottom:1px solid #262c33;
+  }
+  .task-row:last-child{border-bottom:none}
+  .task-row.done-all{opacity:.55}
+  .task-main{flex:1;min-width:0}
+  .task-name{font-size:14px;line-height:1.4}
+  .task-notes{font-size:12px;color:var(--text-dim);margin-top:3px;line-height:1.4;white-space:pre-line}
+  .task-notes[contenteditable], .task-name[contenteditable]{outline:none;border-bottom:1px dashed transparent}
+  .task-notes[contenteditable]:focus, .task-name[contenteditable]:focus{border-bottom:1px dashed var(--gold-dim)}
+  .task-link{font-size:11px;color:var(--blue);text-decoration:none;white-space:nowrap}
+  .task-materials{font-size:11px;color:var(--text-dim);margin-top:3px;opacity:.8;line-height:1.5}
+
+  .mat-card{margin-top:6px}
+  .mat-toggle{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--text-dim);
+    border-radius:6px;padding:4px 10px;font-size:11px;cursor:pointer;
+  }
+  .mat-card.mat-done .mat-toggle{border-color:var(--green);color:var(--green)}
+  .mat-toggle:hover{color:var(--gold);border-color:var(--gold-dim)}
+  .mat-body{
+    margin-top:6px;padding:8px 10px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:6px;display:flex;flex-direction:column;gap:6px;max-width:420px;
+  }
+  .mat-row{display:flex;align-items:center;gap:8px;font-size:12px}
+  .mat-name{flex:1;color:var(--text)}
+  .mat-input{
+    width:60px;background:var(--bg);border:1px solid var(--line);border-radius:4px;
+    color:var(--text);padding:3px 6px;font-size:12px;
+  }
+  .mat-needed{color:var(--text-dim);min-width:38px}
+  .mat-remaining{color:var(--ember);font-size:11px;min-width:50px;text-align:right}
+  .mat-remaining-done{color:var(--green)}
+
+  .cat-total-card{
+    margin:6px 16px 12px;padding:12px 14px;background:var(--panel-2);
+    border:1px solid var(--gold-dim);border-radius:8px;font-size:13px;color:var(--text);
+    line-height:1.6;
+  }
+  .cat-total-card strong{color:var(--gold)}
+  .task-link:hover{color:var(--gold)}
+
+  .checks{display:flex;gap:6px;flex-wrap:wrap}
+  .check-box{
+    width:26px;height:26px;border-radius:6px;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    font-size:13px;background:var(--panel-2);color:transparent;
+    flex-shrink:0;
+  }
+  .check-box.checked{background:var(--green);border-color:var(--green);color:#fff}
+  .check-box.recur-checked{background:var(--blue);border-color:var(--blue);color:#fff}
+  .check-label{font-size:9px;color:var(--text-dim);text-align:center;margin-top:2px;max-width:26px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .check-col{display:flex;flex-direction:column;align-items:center}
+
+  .row-actions{display:flex;flex-direction:column;gap:2px;margin-left:4px}
+  .row-actions button{
+    background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:11px;
+    padding:1px 4px;line-height:1;
+  }
+  .row-actions button:hover{color:var(--gold)}
+  .del-btn{color:var(--ember)!important}
+
+  .add-row{
+    display:flex;gap:8px;padding:12px 16px;flex-wrap:wrap;
+  }
+  .add-row input{
+    flex:1;min-width:160px;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:6px;color:var(--text);padding:8px 10px;font-size:13px;font-family:'Inter',sans-serif;
+  }
+  .add-row button{
+    background:var(--gold-dim);border:none;color:#161a1e;font-weight:600;
+    border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer;
+  }
+
+  .new-category-row{
+    max-width:900px;margin:0 auto 30px;padding:0 20px;
+  }
+  .new-category-row form{display:flex;gap:8px;}
+  .new-category-row input{
+    flex:1;background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    color:var(--text);padding:10px 12px;font-size:13px;
+  }
+  .new-category-row button{
+    background:none;border:1px dashed var(--gold-dim);color:var(--gold-dim);
+    border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;
+  }
+
+  .backup-row{max-width:900px;margin:0 auto 30px;padding:0 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+  .backup-btn{
+    background:var(--panel);border:1px solid var(--line);color:var(--text-dim);
+    border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;
+  }
+  .backup-btn:hover{color:var(--gold);border-color:var(--gold-dim)}
+  #restorePanel{
+    background:var(--panel);border:1px solid var(--ember);border-radius:8px;
+    padding:12px 14px;max-width:500px;flex-basis:100%;
+  }
+  #restorePanel p{margin:0 0 8px;font-size:12px;color:var(--text-dim);line-height:1.5}
+  #restoreConfirmBtn{background:var(--ember);border:none;color:#fff;font-weight:600;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer}
+
+  .status{
+    position:fixed;bottom:14px;left:50%;transform:translateX(-50%);
+    background:var(--panel-2);border:1px solid var(--line);color:var(--text-dim);
+    padding:6px 14px;border-radius:20px;font-size:12px;opacity:0;transition:opacity .3s;
+    pointer-events:none;
+  }
+  .status.show{opacity:1}
+
+  .empty-note{padding:14px 16px;color:var(--text-dim);font-size:13px;font-style:italic}
+  .info-note{padding:10px 16px;color:var(--text-dim);font-size:12px;font-style:italic;border-bottom:1px solid #262c33;line-height:1.5}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="header-text">
+      <div class="eyebrow">Group Ironman · Progress Ledger</div>
+      <h1>The Ledger</h1>
+      <p>Shared checklist for the crew, built from the RuneScape Wiki's Efficient Ironman Pathway Guide (Parts 1-6 plus the Dailies/Weeklies/Monthlies, Player-Owned Farm, Mining &amp; Smithing, and Archaeology miniguides). Every quest and skill milestone is summarized in our own words, not copied verbatim from the wiki. Tick off what your own account has already done, reorder with the arrows, and add anything the guide missed.</p>
+
+    <img class="header-art" src="data:image/jpeg;base64,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" alt="Best at Dadscape" />
+
+  <div class="members-bar" id="membersBar"></div>
+  <div class="whoami">
+    I'm checking things off as:
+    <select id="whoSelect"></select>
+    <span id="whoHint" style="color:var(--text-dim)"></span>
+    <label style="display:flex;align-items:center;gap:5px;margin-left:14px;cursor:pointer">
+      <input type="checkbox" id="hideDoneToggle" />
+      Hide steps I've already completed
+    </label>
+  </div>
+  <div class="status-row">
+    <span id="syncIndicator">●&nbsp;syncing…</span>
+    <span id="cloudIndicator">⬇ checking backup status…</span>
+  </div>
+
+  <div class="import-box" id="importBox">
+    <button class="import-toggle" id="importToggle">⟳ Import completed quests from RuneMetrics</button>
+    <div class="import-panel" id="importPanel" style="display:none">
+      <p>Checks off matching quests above for whichever name is selected in "checking things off as". Your account's RuneMetrics privacy setting needs to be Public. Only covers quests — not skill levels, diaries, or the recurring dailies/weeklies/monthlies below (those aren't exposed by this endpoint).</p>
+      <div class="import-row">
+        <input id="rsName" placeholder="RS3 display name" />
+        <button id="importBtn">Get my link</button>
+      </div>
+      <div id="importFallback" style="display:none">
+        <p>1. Open this link in a new tab (it'll show a page of raw text):</p>
+        <a id="fallbackLink" href="#" target="_blank" rel="noopener"></a>
+        <p>2. Select all, copy it, and paste it below:</p>
+        <textarea id="pasteJson" placeholder="Paste the JSON here"></textarea>
+        <button id="parsePastedBtn">Parse pasted JSON &amp; check off quests</button>
+      </div>
+      <div id="importStatus" class="import-status"></div>
+    </div>
+  </div>
+</div>
+</div>
+</header>
+
+<div class="tab-bar" id="tabBar"></div>
+<nav class="jumpnav" id="jumpNav"></nav>
+
+<main id="main"></main>
+
+<div class="new-category-row">
+  <form id="newCategoryForm">
+    <input id="newCategoryInput" placeholder="Add a new section" />
+    <button type="submit">+ Section</button>
+  </form>
+</div>
+
+<div class="backup-row">
+  <button id="exportBtn" class="backup-btn">⬇ Export backup (.json)</button>
+  <button id="importBackupToggle" class="backup-btn">⬆ Restore from backup</button>
+  <input type="file" id="importFile" accept=".json,application/json" style="display:none" />
+  <div id="restorePanel" style="display:none">
+    <p>This replaces every member, task, and checkmark currently in the shared board with whatever is in the file you pick. Click twice to confirm.</p>
+    <button id="restoreConfirmBtn" data-armed="false">Choose file &amp; restore</button>
+    <span id="restoreStatus" class="import-status"></span>
+  </div>
+</div>
+
+<div class="status" id="status">Saved</div>
+
+<script>
+const STORAGE_KEY = 'tasks-v2';
+const MEMBERS_KEY = 'members-v1';
+const ME_KEY = 'me-name-v1';
+
+const CLOUD_URL = 'https://script.google.com/macros/s/AKfycbx4kAh1lonDbG9TH7h2RzqI9q4Iga5qbCXzpEUZUhMOabfG0A8SfS39OxxvGC1tDG8DTw/exec';
+const CLOUD_SECRET = '3bigonesbigonesbigones';
+
+// ---- Shared data (members + tasks) now lives in the Google Sheet, not Claude storage ----
+async function cloudLoad(){
+  try{
+    const res = await fetch(CLOUD_URL + '?secret=' + encodeURIComponent(CLOUD_SECRET));
+    const data = await res.json();
+    if(!data || data.status === 'empty' || data.status === 'error') return null;
+    if(!Array.isArray(data.tasks) || !Array.isArray(data.members)) return null;
+    return data;
+  }catch(e){
+    console.error('cloudLoad failed', e);
+    return null;
+  }
+}
+async function cloudSave(members, tasks){
+  try{
+    await fetch(CLOUD_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'text/plain;charset=utf-8'},
+      body: JSON.stringify({ secret: CLOUD_SECRET, payload: { members, tasks } })
+    });
+    return true;
+  }catch(e){
+    console.error('cloudSave failed', e);
+    return false;
+  }
+}
+
+// ---- Personal-only data (which name you are, your tab, your prefs) — the browser's own
+// localStorage, since we're no longer running inside Claude's sandbox where that's blocked ----
+function localGet(key){
+  try{ return localStorage.getItem(key); }catch(e){ return null; }
+}
+function localSet(key, value){
+  try{ localStorage.setItem(key, value); }catch(e){}
+}
+
+const PERIOD_MS = { daily: 24*3600*1000, weekly: 7*24*3600*1000, monthly: 30*24*3600*1000 };
+
+let state = { members: [], tasks: [] };
+let me = null;
+let hideDone = false;
+const expandedMatCards = new Set(); // session-only (not persisted) — which materials cards are expanded
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+function seedData(){
+  const members = ['Player 1','Player 2','Player 3'];
+  // item: string, or {n:name, q:RuneMetrics quest title, lvl:'level note'}
+  const cats = [
+    {
+      name: 'Part 1 — Getting Started (Quests & Unlocks)',
+      note: 'Runs through T70 Necromancy gear at the end of Part 1. If the wiki adds or reorders anything after an update, just paste the new section and I\'ll fold it in.',
+      tasks: [
+        'Create your character as female — older versions of this guide called this out for Recruitment Drive; the current wiki text doesn\'t mention it, so it may no longer matter, but there\'s no downside to doing it just in case',
+        'Skip Tutorial Island, unlock Surge & Escape at the Circus',
+        'Get the Dwarven Army Axe (Major Mary Rancour)',
+        'Get the Wicked Hood (Tam McGrubor) — Runecrafting altar teleports',
+        'Activate early lodestones (Burthorpe, Taverley, Al Kharid, Lumbridge, Varrock)',
+        'Complete Archaeology tutorial at the Varrock Dig Site',
+        'Set up the Anachronia base camp & build its lodestone',
+        {n:"Complete One Piercing Note (unlocks Transfigure/Sacrifice/Devotion)", q:"One Piercing Note"},
+        {n:'Complete The Blood Pact', q:'The Blood Pact'},
+        {n:'Complete The Restless Ghost', q:'The Restless Ghost'},
+        {n:"Complete Cook's Assistant", q:"Cook's Assistant"},
+        'Level Crafting to 15 via pottery',
+        {n:'Complete Death Plateau', q:'Death Plateau'},
+        {n:"Complete What's Mine is Yours (Gofannon amulet)", q:"What's Mine is Yours"},
+        {n:'Complete Necromancy! (unlocks the Necromancy skill)', q:'Necromancy!'},
+        'Train Necromancy to 24 in the City of Um troll cave',
+        {n:'Complete Rune Mythos', q:'Rune Mythos'},
+        {n:"Complete Gunnar's Ground", q:"Gunnar's Ground"},
+        {n:'Complete Demon Slayer', q:'Demon Slayer'},
+        {n:'Complete Swept Away', q:'Swept Away'},
+        {n:'Complete New Foundations (unlocks Fort Forinthry)', q:'New Foundations'},
+        'Build the Fort Forinthry lodestone',
+        'Train Magic to 55 & Ranged to 45 in Shattered Worlds',
+        {n:"Complete The Knight's Sword", q:"The Knight's Sword"},
+        {n:'Complete Murder on the Border', q:'Murder on the Border'},
+        {n:'Complete Unwelcome Guests', q:'Unwelcome Guests'},
+        'Unlock Reaper assignments (Slayer 45 / Combat 50)',
+        {n:'Complete Goblin Diplomacy', q:'Goblin Diplomacy'},
+        {n:"Complete Monk's Friend", q:"Monk's Friend"},
+        'Train Runecrafting to 50 (Runespan)',
+        {n:'Complete Missing, Presumed Death', q:'Missing, Presumed Death'},
+        "Start growing Gertrude's Cat",
+        {n:'Complete Priest in Peril (Canifis access)', q:'Priest in Peril'},
+        {n:'Complete Sheep Herder', q:'Sheep Herder'},
+        {n:'Complete Hazeel Cult', q:'Hazeel Cult'},
+        {n:'Complete Waterfall Quest', q:'Waterfall Quest'},
+        "Repair the Water Filtration System at Het's Oasis",
+        {n:"Complete Merlin's Crystal", q:"Merlin's Crystal"},
+        {n:'Complete Holy Grail', q:'Holy Grail'},
+        {n:'Complete Stolen Hearts', q:'Stolen Hearts'},
+        {n:'Complete Diamond in the Rough', q:'Diamond in the Rough'},
+        {n:'Complete The Jack of Spades (Menaphos access)', q:'The Jack of Spades'},
+        {n:'Complete Dead and Buried', q:'Dead and Buried'},
+        {n:"Complete Icthlarin's Little Helper", q:"Icthlarin's Little Helper"},
+        {n:'Complete Once Upon a Slime', q:'Once Upon a Slime'},
+        {n:'Complete Tribal Totem', q:'Tribal Totem'},
+        {n:'Complete Jungle Potion', q:'Jungle Potion'},
+        {n:'Complete The Dig Site', q:'The Dig Site'},
+        {n:"Complete Witch's House", q:"Witch's House"},
+        {n:'Complete The Lost Tribe', q:'The Lost Tribe'},
+        {n:'Complete The Tourist Trap', q:'The Tourist Trap'},
+        {n:'Complete Murder Mystery', q:'Murder Mystery'},
+        {n:'Complete Plague City', q:'Plague City'},
+        {n:'Complete Biohazard', q:'Biohazard'},
+        {n:'Complete Fight Arena', q:'Fight Arena'},
+        {n:'Complete Tree Gnome Village', q:'Tree Gnome Village'},
+        {n:'Complete The Grand Tree', q:'The Grand Tree'},
+        {n:'Complete Observatory Quest', q:'Observatory Quest'},
+        {n:"Complete Recipe for Disaster: Another Cook's Quest", q:"Recipe for Disaster: Another Cook's Quest"},
+        {n:'Complete Nature Spirit', q:'Nature Spirit'},
+        {n:'Complete Creature of Fenkenstrain', q:'Creature of Fenkenstrain'},
+        {n:'Complete Elemental Workshop I', q:'Elemental Workshop I'},
+        {n:'Complete Elemental Workshop II', q:'Elemental Workshop II'},
+        {n:'Complete Sea Slug', q:'Sea Slug'},
+        {n:'Complete Fishing Contest', q:'Fishing Contest'},
+        {n:'Complete Recruitment Drive', q:'Recruitment Drive'},
+        'Activate the Yanille lodestone',
+        'If you didn\'t get a Fruit Blast from The Dig Site, buy the ingredients from Funch\'s Fine Groceries (2 lemon, 1 orange, 1 pineapple, 1 cocktail glass, 1 cocktail shaker, 1 vodka)',
+        {n:'Complete Shilo Village', q:'Shilo Village'},
+        'Train Fishing to 53 (fish inside Shilo Village)',
+        'Cook all your Trout and Salmon at the Fort Forinthry Kitchen (Cooking 55)',
+        {n:'Complete Shades of Mort\'ton (World 88 isn\'t always active — you may need alts or other players; make 20 Flamtaer bracelets to speed up wall-building; make an extra Sacred oil for Legacy of Seergaze)', q:'Shades of Mort\'ton'},
+        {n:'Complete Big Chompy Bird Hunting (get 3 extra Raw chompy for As a First Resort and Recipe for Disaster)', q:'Big Chompy Bird Hunting'},
+        'Activate the Oo\'glog lodestone',
+        {n:'Complete Zogre Flesh Eaters', q:'Zogre Flesh Eaters'},
+        'Purchase a house from the Varrock Estate Agent',
+        {n:'Complete The Golem', q:'The Golem'},
+        {n:'Complete Shadow of the Storm', q:'Shadow of the Storm'},
+        {n:'Complete Recipe for Disaster: Freeing Evil Dave', q:'Recipe for Disaster: Freeing Evil Dave'},
+        {n:"Complete Evil Dave's Big Day Out", q:"Evil Dave's Big Day Out"},
+        {n:'Complete Beneath Cursed Tides', q:'Beneath Cursed Tides'},
+        'Buy a Mystic wand and Mystic orb from Marvellous Mysticism',
+        'Progress Dragon Slayer up to the point of obtaining the Anti-dragon shield (Champions\' Guild guildmaster → Oziach north of Edgeville lodestone → back to the guildmaster → Duke Horacio in Lumbridge Castle)',
+        'Train Prayer to 37 (50 dragon bones from green/blue dragons — blue for HCIM; equip an anti-dragon shield; offer bones at the Chaos Temple altar in the Wilderness)',
+        {n:'Complete Dragon Slayer (buy a rune battleaxe from Scavvo\'s Rune Store and adamant armour from Horvik\'s Armour Shop first, to make the Elvarg fight easy)', q:'Dragon Slayer'},
+        'Train Slayer to 35 (train with the Raptor at Fort Forinthry using Magic; buy Earmuffs and a Face Mask from a Slayer master)',
+        {n:'Complete Smoking Kills', q:'Smoking Kills'},
+        'Train Slayer to 45 (use Magic, needs at least Magic 60 — you\'ll need Magic 66 later)',
+        'Get a reaper assignment from Death (before combat 60 or completing Visions of Havenhythe, it\'s always a Croesus assignment — competitive GIM should wait until combat 60; if Death won\'t assign a task, enable "group assignments" and "skilling assignments" in the Slayer settings menu)',
+        'Complete the Mage Arena miniquest (use a lever for quick access and to skip the Wilderness monsters)',
+        'Enter the Sparkling Pool and claim the Guthix cape (pray at the Statue of Guthix) and Guthix staff (talk to the Chamber guardian)',
+        "Buy 100 Law runes, 100 Cosmic runes, and 500 Air runes from Lundail's Arena-side Rune Shop",
+        'Cast Divine Storm on the Battle mage inside the Mage Arena 100 times (full manual: equip Mystic wand + orb, withdraw 500 Air runes and food, autocast Divine Storm)',
+        {n:'Complete A Shadow over Ashdale (use 1 black pearl on Herblore)', q:'A Shadow over Ashdale'},
+        {n:'Complete In Search of the Myreque', q:'In Search of the Myreque'},
+        {n:'Complete In Aid of the Myreque (craft an extra Silvthril rod at the end for an Ivandis flail)', q:'In Aid of the Myreque'},
+        {n:'Complete Buyers and Cellars', q:'Buyers and Cellars'},
+        {n:'Complete From Tiny Acorns (miniquest)', q:'From Tiny Acorns'},
+        {n:'Complete The Feud', q:'The Feud'},
+        "Build all 4 flower baskets at Het's Oasis (chop 20 teak logs SW of Castle Wars, make 40 steel nails, turn into planks at Fort Forinthry)",
+        "Train Thieving to 41 (open the Northern Cell Doors in the Thieves' Guild, world hop, repeat)",
+        {n:'Complete Lost Her Marbles (miniquest)', q:'Lost Her Marbles'},
+        'Train Thieving to 53 (pickpocket Druids at Garden of Kharid)',
+        {n:'Complete Carnillean Rising (bank the 10 mahogany planks reward; use the 2 XP lamps on Crafting)', q:'Carnillean Rising'},
+        {n:'Complete Dimension of Disaster: Coin of the Realm', q:'Dimension of Disaster: Coin of the Realm'},
+        {n:'Complete Dimension of Disaster: Demon Slayer (buy 10 iron ore from Sani, smith an off-hand iron warhammer + iron platelegs, equip with silverlight; buy 10 chocolate cake from Gertrude; sell zombie loot for Zemomarks)', q:'Dimension of Disaster: Demon Slayer'},
+        'Complete the Memorial to Guthix tutorial (train Divination, collect 450 Bright energy, charge the Sword of Edicts engram, activate the echo — unlocks Memory shards while training Hunter, used for Sign of the Porter IV)',
+        'Train Hunter to 29 (buy bird snares from Ayleth Beaststalker; hunt Crimson Swift in Taverley to 11, Cerulean Twitch in Rellekka to 19, Tropical Wagtail north of Oo\'glog to 29)',
+        {n:"Complete Eagles' Peak", q:"Eagles' Peak"},
+        'Train Hunter to 45 (see the Hunter training page for the best method)',
+        {n:'Complete Cold War (mahogany planks & swamp tar are in your bank; make an extra clockwork suit; unlocks the Fremennik Province lodestone)', q:'Cold War'},
+        {n:'Complete Hunt for Red Raktuber', q:'Hunt for Red Raktuber'},
+        'Train Fletching to 25 (chop oak logs, fletch into oak shortbows (u))',
+        {n:'Complete The Fremennik Trials (raw shark from Temple Trekking, or the Swarm fishing spot at 68 Fishing)', q:'The Fremennik Trials'},
+        {n:'Complete Monkey Madness (grab 2 Monkey Dentures and 3 Monkey Talismans during the quest; HCIM can buy antipoison from Anachronia or Jiminua\'s; choose Attack & Defence XP when enrolling in the royal guard)', q:'Monkey Madness'},
+        {n:'Complete Haunted Mine (Glowing fungus + Underworld Grimoire 1 is a great way to bank ashes)', q:'Haunted Mine'},
+        {n:"Complete Lair of Tarn Razorlor (miniquest — use Tarn's diary on your Salve amulet for the best Necromancy necklace vs. undead)", q:'Lair of Tarn Razorlor'},
+        {n:'Complete The Darkness of Hallowvale (3 XP Tome on Herblore)', q:'The Darkness of Hallowvale'},
+        'Train Firemaking to 50 (chop and burn willow logs)',
+        {n:'Complete Troll Stronghold (2 XP lamp on Herblore)', q:'Troll Stronghold'},
+        {n:'Complete Troll Romance', q:'Troll Romance'},
+        "Buy an Adamant pickaxe and Rune pickaxe from Nurmof's Pickaxe Shop",
+        'Obtain 2,000 Dungeoneering tokens (high-complexity small floors with a group recommended)',
+        'Buy a Gem bag from the Dungeoneering rewards shop (2,000 tokens)',
+        "Train Mining to 60 & Crafting to 61 (mine uncommon gems at Al Kharid into your gem bag, bank via War's Retreat or the Archaeology journal teleport, then cut the gems)",
+        {n:'Complete Shield of Arrav', q:'Shield of Arrav'},
+        {n:'Complete Lost City (chop a second Dramen branch for Recipe for Disaster: Freeing Sir Amik Varze)', q:'Lost City'},
+        {n:"Complete Heroes' Quest", q:"Heroes' Quest"},
+        {n:'Complete Throne of Miscellania', q:'Throne of Miscellania'},
+        {n:'Complete Royal Trouble (unlocks the Managing Miscellania weekly — distribute workers: full bar to Mahogany, leftovers to Maple)', q:'Royal Trouble'},
+        {n:'Complete Tears of Guthix (quest)', q:'Tears of Guthix'},
+        {n:"Complete Pirate's Treasure", q:"Pirate's Treasure"},
+        'Complete the Easy Wilderness Achievements and claim the reward from Mr Ex in Edgeville (use the XP lamps on Herblore — unlocks 100% bonus XP at the Chaos Altar)',
+        'Train Prayer to 47 (dragon bones from green/blue dragons — blue for HCIM — offered at the Chaos Temple altar in the Wilderness)',
+        {n:'Complete Ghosts Ahoy', q:'Ghosts Ahoy'},
+        {n:'Complete Rum Deal', q:'Rum Deal'},
+        'Train Smithing to 50 — see the Mining & Smithing miniguide',
+        'Train Necromancy to 60 (upgrade armour and weapons every 10 levels; train on Banshees, Fetid zombies, Flesh crawlers, or Ghosts)',
+        {n:'Complete Vessel of the Harbinger', q:'Vessel of the Harbinger'},
+        {n:'Complete Cabin Fever', q:'Cabin Fever'},
+        {n:'Complete Legacy of Seergaze (3 XP Tome on Herblore)', q:'Legacy of Seergaze'},
+        {n:'Complete Underground Pass', q:'Underground Pass'},
+        {n:'Complete Death to the Dorgeshuun (1 XP lamp on Ranged)', q:'Death to the Dorgeshuun'},
+        {n:'Complete The Giant Dwarf', q:'The Giant Dwarf'},
+        {n:'Complete Another Slice of H.A.M.', q:'Another Slice of H.A.M.'},
+        {n:'Complete Land of the Goblins (clean toadflax from the Brimhaven Agility Arena Ticket Exchange for 1 ticket, or by killing Croesus)', q:'Land of the Goblins'},
+        {n:'Complete The Chosen Commander', q:'The Chosen Commander'},
+        {n:'Complete Family Crest', q:'Family Crest'},
+        {n:'Complete Temple of Ikov', q:'Temple of Ikov'},
+        'Train Thieving to 62 (low-level pickpocket targets — much faster than Thieves\' Guild doors since the rework)',
+        {n:'Complete A Guild of Our Own (miniquest — grimy irit spawns in the Edgeville Dungeon chaos druids area, or drops from Croesus)', q:'A Guild of Our Own'},
+        "Train Thieving to 90 (train via Safecracking; consider spending Plunder Points on the Master thief's lockpick for Desert Treasure)",
+        {n:'Complete One Small Favour (2 XP lamp on Herblore)', q:'One Small Favour'},
+        {n:"Complete King's Ransom (get as many hair clips as possible for Desert Treasure by dropping and re-asking Merlin)", q:"King's Ransom"},
+        {n:'Complete Desert Treasure (magic logs: kill Croesus, kill King Black Dragon, or catch Nature implings in Puro-Puro; train Magic to 65-66 first)', q:'Desert Treasure'},
+        {n:'Complete Ancient Awakening', q:'Ancient Awakening'},
+        "Build the Botanist's Workbench (Tier 1) at Fort Forinthry (Construction 61)",
+        {n:'Complete Lunar Diplomacy', q:'Lunar Diplomacy'},
+        'Get 6,000 Menaphos reputation in the Port district (set Port faction active; join the "Soulobby" friends chat and interact with soul obelisks for the fastest reputation)',
+        'Train Fishing to 68 in the Menaphos Port district (deposit fish in the deposit box; optional: build a Prawn broker for Baitless Fishing at 63 Construction, or 61 with a white Cup of tea boost)',
+        'Cook all the raw food from Menaphos Fishing (use Cooking gauntlets + Dwarven Army Axe — Menaphos fish don\'t get the player-bonfire XP bonus)',
+        {n:'Complete Housing of Parliament', q:'Housing of Parliament'},
+        {n:'Complete Some Like It Cold', q:'Some Like It Cold'},
+        {n:'Complete Back to the Freezer (come back for the Invention lamp after the Invention Tutorial)', q:'Back to the Freezer'},
+        {n:'Complete Rune Mysteries', q:'Rune Mysteries'},
+        {n:'Complete Rune Memories', q:'Rune Memories'},
+        {n:'Complete Enter the Abyss (miniquest)', q:'Enter the Abyss'},
+        "Train Agility to 56 (Wilderness Agility Course with a Demonic Skull; under 52 Agility or HCIM: Northern Anachronia Course)",
+        {n:'Complete Regicide', q:'Regicide'},
+        'Train Hunter to 50 (solo Croesus Hunter trash runs recommended — 25 logs, farm the glowing Hunter node, rot fungal spores on a hotkey, relog when depleted, ~30-50k XP/hr; or catch Tropical Wagtail / Gliding Whirligigs)',
+        'Train Hunter to 62 (catch Swift Whirligigs at Het\'s Oasis using the flower-basket/crocodile chaining technique)',
+        'Train Hunter to 63 (catch Grey chinchompas north of Eagles\' Peak, bank them for Ranged training later; activate the Eagles\' Peak lodestone)',
+        'Train Hunter to 70 (catch Red chinchompas north of Oo\'glog, bank them for Ranged training; alternative: whirligigs)',
+        'Optional: Train Hunter to 99 (catch the best whirligigs available; Big Game Hunter)',
+        'Optional: assemble tier-70 Necromancy armour and weapons (needs ensouled cloth, ensouled thread, and flesh runes — check current amounts on the wiki)',
+      ]
+    },
+    {
+      name: 'Part 2 — Mid-Game Combat Training',
+      note: 'Train combat via Abyss combat training, Shattered Worlds, or Arc contracts — whichever you prefer.',
+      tasks: [
+        'Buy Off-hand adamant crossbow & Off-hand rune crossbow (Crossbow shop, Keldagrim)',
+        'Buy Rune halberd & Dragon halberd (Quartermaster\'s Stores)',
+        'Obtain Vanquish from May',
+        'Train Magic to 80 (Guthix Staff 65-75, Vanquish 75-80; return to Terry Balando at the Dig Site Exam Centre at 75 Magic for Tendril abilities)',
+        'Train Defence to 80 (Guthix Staff 50-75, Vanquish 75-80)',
+        'Train Ranged to 80 (Grey Chinchompa + off-hand adamant crossbow 45-55, Red Chinchompa + off-hand rune crossbow 55-80)',
+        'Train Attack to 80 (Rune Halberd 50-60, Dragon Halberd 60-75, Vanquish 75-80)',
+        'Train Strength to 80 (Vanquish 50-80)',
+        'Train Summoning to 37 (charms from Waterbirth Dagannoths or Slayer)',
+        'Obtain 63,000,000 Shattered anima & unlock Bladed Dive in Shattered Worlds',
+      ]
+    },
+    {
+      name: 'Part 3 — Mid-Game Questing',
+      note: 'The repeatable Daily/Weekly/Monthly activities this guide part lists live in the Dailies/Weeklies/Monthlies sections below so they can be tracked with timestamps instead of duplicated here.',
+      tasks: [
+        {n:'Complete Visions of Havenhythe (start at the Rusty Anchor Tavern, Port Sarim — unlocks Havenhythe and Ivar, King of Bones, a great Prayer-training farm target)', q:'Visions of Havenhythe'},
+        {n:'Complete Hearts of Sanguine (unlocks Silverquill, the Dreadhog — spines craft into havensilver bolts)', q:'Hearts of Sanguine'},
+        {n:'Complete Roving Elves', q:'Roving Elves'},
+        {n:"Complete Mourning's End Part I", q:"Mourning's End Part I"},
+        {n:"Complete Mourning's End Part II", q:"Mourning's End Part II"},
+        {n:'Complete Impressing the Locals', q:'Impressing the Locals'},
+        {n:'Complete Bringing Home the Bacon', q:'Bringing Home the Bacon'},
+        {n:"Complete Legends' Quest", q:"Legends' Quest"},
+        {n:'Complete Recipe for Disaster: Freeing the Goblin Generals', q:'Recipe for Disaster: Freeing the Goblin Generals'},
+        {n:'Complete Recipe for Disaster: Freeing the Lumbridge Sage', q:'Recipe for Disaster: Freeing the Lumbridge Sage'},
+        {n:'Complete Recipe for Disaster: Freeing the Mountain Dwarf', q:'Recipe for Disaster: Freeing the Mountain Dwarf'},
+        {n:'Complete Recipe for Disaster: Freeing Pirate Pete', q:'Recipe for Disaster: Freeing Pirate Pete'},
+        {n:'Complete Recipe for Disaster: Freeing Skrach Uglogwee', q:'Recipe for Disaster: Freeing Skrach Uglogwee'},
+        {n:'Complete Recipe for Disaster: Freeing King Awowogei', q:'Recipe for Disaster: Freeing King Awowogei'},
+        {n:'Complete Recipe for Disaster: Freeing Sir Amik Varze (farm a sweetcorn first)', q:'Recipe for Disaster: Freeing Sir Amik Varze'},
+        {n:'Complete Bar Crawl (miniquest)', q:'Bar Crawl'},
+        {n:'Complete Horror from the Deep', q:'Horror from the Deep'},
+        {n:'Complete Recipe for Disaster: Defeating the Culinaromancer', q:'Recipe for Disaster: Defeating the Culinaromancer'},
+        {n:"Complete Eadgar's Ruse", q:"Eadgar's Ruse"},
+        {n:'Complete Dream Mentor', q:'Dream Mentor'},
+        {n:"Complete My Arm's Big Adventure (super compost from pineapples north of Karamja lodestone)", q:"My Arm's Big Adventure"},
+        {n:'Complete Smoking Kills, if not done earlier', q:'Smoking Kills'},
+        {n:'Complete The Eyes of Glouphrie', q:'The Eyes of Glouphrie'},
+        {n:'Complete The Path of Glouphrie (farm a mith grapple from Dried zombie)', q:'The Path of Glouphrie'},
+        'Complete Knight Waves training ground',
+        {n:'Complete What Lies Below', q:'What Lies Below'},
+        {n:'Complete The Hunt for Surok (miniquest)', q:'The Hunt for Surok'},
+        {n:'Complete The Hand in the Sand', q:'The Hand in the Sand'},
+        {n:'Complete Garden of Tranquillity', q:'Garden of Tranquillity'},
+        {n:'Complete The Tale of the Muspah', q:'The Tale of the Muspah'},
+        {n:'Complete Missing My Mummy', q:'Missing My Mummy'},
+        {n:'Complete A Tail of Two Cats', q:'A Tail of Two Cats'},
+        {n:'Complete The Great Brain Robbery', q:'The Great Brain Robbery'},
+        {n:"Complete A Fairy Tale I - Growing Pains", q:"A Fairy Tale I - Growing Pains"},
+        {n:"Complete A Fairy Tale II - Cure a Queen", q:"A Fairy Tale II - Cure a Queen"},
+        {n:"Complete A Fairy Tale III - Battle at Ork's Rift", q:"A Fairy Tale III - Battle at Ork's Rift"},
+        {n:"Complete Enakhra's Lament", q:"Enakhra's Lament"},
+        {n:'Complete All Fired Up', q:'All Fired Up'},
+        {n:'Complete The World Wakes (destroy reward lamps — they can be reclaimed later)', q:'The World Wakes'},
+        {n:'Complete Making History', q:'Making History'},
+        {n:'Complete Meeting History', q:'Meeting History'},
+        {n:'Complete Dishonour among Thieves', q:'Dishonour among Thieves'},
+        {n:'Complete You Are It', q:'You Are It'},
+        {n:'Complete The Needle Skips', q:'The Needle Skips'},
+        {n:'Complete Desperate Times', q:'Desperate Times'},
+        {n:'Complete Imp Catcher', q:'Imp Catcher'},
+        {n:'Complete Wanted!', q:'Wanted!'},
+        {n:'Complete Quiet Before the Swarm', q:'Quiet Before the Swarm'},
+        {n:'Complete Heart of Stone', q:'Heart of Stone'},
+        {n:'Complete Tai Bwo Wannai Trio', q:'Tai Bwo Wannai Trio'},
+        {n:'Complete Dwarf Cannon', q:'Dwarf Cannon'},
+        {n:'Complete The Death of Chivalry', q:'The Death of Chivalry'},
+      ]
+    },
+    {
+      name: 'Part 4 — Endgame Combat Training',
+      note: 'Train via Slayer, Abyss combat training, Shattered Worlds, or Arc contracts. Note: as of April 2026 all auras were removed — use Vampyrism (Ancient Magicks, 69 Magic) or Penance for sustain instead of the old auras.',
+      tasks: [
+        'Obtain 128,500 Dungeoneering tokens (or via ED1 token farming)',
+        'Buy from the Dungeoneering rewards shop: Charming imp, Bonecrusher, Twisted bird skull necklace, Gem bag (upgraded)',
+        'Train Magic to 90',
+        'Train Defence to 90',
+        'Train Necromancy to 90 (optionally level Smithing/Crafting alongside to upgrade Necromancy gear)',
+        'Train Ranged to 90',
+        'Train Attack to 90',
+        'Train Strength to 90',
+        'Train Summoning to 75 (charms from Waterbirth Dagannoths or Slayer)',
+        'Train Prayer to 75 (noted dragon bones from Vindicta & Gorvek; regular: Chaos Temple altar in the Wilderness; HCIM: Ectofuntus)',
+      ]
+    },
+    {
+      name: 'Part 5 — End-Game Skilling & Quests',
+      note: 'The longest stretch — mixes skill training blocks with the remaining major questline.',
+      tasks: [
+        'Train Woodcutting to 61 (chop Acadia trees in Menaphos, bank via the Imperial district deposit box)',
+        {n:'Complete As a First Resort', q:'As a First Resort'},
+        'Train Fletching to 52 (14,250 arrow shafts → headless arrows, smelt 190 steel bars, smith 14,250 steel arrowheads, fletch 14,250 steel arrows)',
+        {n:'Complete Catapult Construction', q:'Catapult Construction'},
+        {n:'Complete A Void Dance', q:'A Void Dance'},
+        'Obtain a Dragon hatchet by killing Dagannoth Rex',
+        'Train Woodcutting to 79 (Acadia trees in Menaphos, or gather logs for Fort Forinthry / War\'s Retreat campfire)',
+        'Train Firemaking to 75 (burn banked Maple and Acadia logs)',
+        'Train Smithing to 80 if not already done — see the Mining & Smithing miniguide',
+        {n:'Complete Defender of Varrock', q:'Defender of Varrock'},
+        {n:'Complete Devious Minds', q:'Devious Minds'},
+        'Train Crafting to 76 (mine uncommon gems at Al Kharid with an upgraded gem bag, bank via War\'s Retreat teleport, 17,000 uncut gems total, then cut them)',
+        'Train Agility to 77 (regular: Wilderness Agility Course 56-77 with a Demonic Skull; HCIM: Northern Anachronia 56-65, then Het\'s Oasis 65-77)',
+        'Train Slayer to 67 (optional: unlock Tuska\'s Wrath at Anima Islands; get 300 Slayer points — boost by completing every 10th task at your highest master and every other task at Jacquelyn)',
+        'Unlock broad arrow crafting from a Slayer master',
+        'Train Fletching to 75 (fletch 68,000 broad arrows)',
+        'Complete Easy Wilderness achievements (HCIM can skip)',
+        'Complete Medium Wilderness achievements (HCIM can skip)',
+        {n:'Complete The Branches of Darkmeyer', q:'The Branches of Darkmeyer'},
+        {n:'Complete Kindred Spirits', q:'Kindred Spirits'},
+        {n:'Complete While Guthix Sleeps', q:'While Guthix Sleeps'},
+        {n:'Complete Spirit of Summer', q:'Spirit of Summer'},
+        {n:"Complete Summer's End", q:"Summer's End"},
+        'Complete Hard Wilderness achievements (HCIM can skip)',
+        {n:'Complete The Curse of Arrav', q:'The Curse of Arrav'},
+        {n:'Complete The Temple at Senntisten', q:'The Temple at Senntisten'},
+        {n:'Complete Rocking Out (optional: keepsake the Prisoner outfit)', q:'Rocking Out'},
+        {n:'Complete The Slug Menace', q:'The Slug Menace'},
+        {n:'Complete Ritual of the Mahjarrat', q:'Ritual of the Mahjarrat'},
+        'Reclaim the 3 Ancient lamps from Guthix\'s Cave',
+        'Train Construction to 70 (smelt 300 steel + 60 rune bars, smith 4,500 rune nails, buy 200 white candles, do Construction Contracts — or upgrade Fort Forinthry instead)',
+        'Train Construction to 79 (smelt 300 adamant bars, make 1,900 mahogany planks, Construction Contracts — or upgrade Fort Forinthry instead)',
+        {n:'Complete Within the Light', q:'Within the Light'},
+        'Train Dungeoneering to 75 (alt: ED1 token farming into the Dungeoneering rewards shop)',
+        {n:"Complete Plague's End", q:"Plague's End"},
+        'Train Hunter to 76 (solo Croesus Hunter trash runs recommended, or catch Black salamanders)',
+        {n:'Complete One of a Kind (post-quest: talk to the Submerged Statue on Entrana for 25,000 bonus XP)', q:'One of a Kind'},
+        'Train Slayer to 78 (at 70 Slayer, reclaim the Glossy lamp from Guthix\'s Cave for 111,000 Slayer XP)',
+        {n:'Complete The Lord of Vampyrium', q:'The Lord of Vampyrium'},
+        'Reclaim the 30,000 XP lamp from Sliske inside the Empyrean Citadel',
+        'Train Herblore to 80 (Penguin Points recommended, or kill Helwyr for grimy lantadyme for Antifire/Super magic potions)',
+        {n:'Complete River of Blood', q:'River of Blood'},
+        'Train Archaeology to 74 — see the Archaeology miniguide',
+        {n:'Complete The Vault of Shadows', q:'The Vault of Shadows'},
+        {n:'Complete Desperate Measures', q:'Desperate Measures'},
+        {n:'Complete Desperate Creatures', q:'Desperate Creatures'},
+        {n:'Complete Raksha, the Shadow Colossus', q:'Raksha, the Shadow Colossus'},
+        {n:"Complete Azzanadra's Quest", q:"Azzanadra's Quest"},
+        'Complete Battle of the Monolith (miniquest — you can skill at the bank inside the Digsite Exam Centre)',
+        {n:'Complete City of Senntisten', q:'City of Senntisten'},
+        {n:'Complete Eye of Het I', q:'Eye of Het I'},
+        {n:'Complete Eye of Het II', q:'Eye of Het II'},
+        {n:'Complete Sins of the Father (needs 85 Smithing, Runecrafting, Invention, or Crafting — Smithing is fastest)', q:'Sins of the Father'},
+        {n:'Complete Extinction (get a Ring of vigour via 50,000 Dungeoneering tokens, combine with the warped gem for a passive effect)', q:'Extinction'},
+        {n:'Complete The Void Stares Back', q:'The Void Stares Back'},
+        {n:'Complete The Mighty Fall', q:'The Mighty Fall'},
+        {n:"Complete Nomad's Requiem (needs 70 Zeal in Prayer)", q:"Nomad's Requiem"},
+        {n:"Complete Nomad's Elegy", q:"Nomad's Elegy"},
+        'Complete Barbarian Training',
+        {n:"Complete Hero's Welcome", q:"Hero's Welcome"},
+        {n:'Complete Fate of the Gods', q:'Fate of the Gods'},
+        'Train Crafting to 83 (play Harps in Prifddinas)',
+        'Upgrade the Tears of Guthix bowl',
+        'Train Agility to 80 (regular: Wilderness Agility Course with a Demonic Skull; HCIM: Het\'s Oasis)',
+        'Train Prayer to 80 (noted dragon bones from Vindicta & Gorvek, Sunspear on Vyres, or cleansing crystals in Prifddinas)',
+        'Reclaim the 250,000 XP Prayer lamp from the Guthixian High Druid (needs 80 Prayer)',
+        'Train Slayer to 80',
+        {n:'Complete The Light Within', q:'The Light Within'},
+        {n:'Complete Children of Mah', q:'Children of Mah'},
+        {n:"Complete Sliske's Endgame (5 Herblore XP lamps — destroy and reclaim later from Relomia, Emissary of Sliske, if under 85 Herblore)", q:"Sliske's Endgame"},
+      ]
+    },
+    {
+      name: 'Part 6 — Final Bossing Preparation',
+      note: 'Short section — the last unlocks before you\'re ready to boss. See also the wiki\'s PvM unlock guide.',
+      tasks: [
+        'Complete the Invention Tutorial (claim the free 10,000 Invention XP for Back to the Freezer by talking to Chuck at the Ardougne Zoo)',
+        'Augment 2 Black salamanders, level them to item level 5, then disassemble them',
+        'Train Prayer to 95 (dragon bones from Vindicta & Gorvek; Sunspear on Vyres; cleansing crystals in Prifddinas; or Ivar, King of Bones on Havenhythe for Colossal bones)',
+        'Train Summoning to 99 (charms from 1-mechanic Arch-Glacor Flurry-only kills [recommended], Waterbirth Dagannoths, Slayer, or Croesus)',
+        'Obtain 2 dragon mattocks via Big Game Hunter (prioritize Bagrada rex — needed later for Player-Owned Farm vuln bombs)',
+        'Create 3,000 Sign of the Porter IV',
+        'Train Archaeology to 95 — see the Archaeology miniguide',
+      ]
+    },
+    {
+      name: 'Dailies',
+      recurring: 'daily',
+      note: 'Mark done when you complete it — it auto-clears 24 hours later so you know when it\'s back up.',
+      tasks: [
+        'Player-owned Ports',
+        'Player-Owned Farm — Beehives + check animals',
+        'Nemi Forest',
+        'Daily Challenges (put combat challenge XP into Ranged)',
+        'Soul Obelisk',
+        'Guthixian Cache (opens after depositing 800 memories at a rift, needs 35 Divination — no daily cap otherwise)',
+        "Rapid growth — Het's Oasis bushes (4 bushes, 2x each, 88 Magic)",
+      ]
+    },
+    {
+      name: 'Weeklies',
+      recurring: 'weekly',
+      note: 'Mark done when you complete it — it auto-clears 7 days later.',
+      tasks: [
+        'Herby Werby',
+        'Penguin Hide and Seek',
+        'Tears of Guthix',
+        'Circus',
+        'Managing Miscellania (Mahogany → Maple)',
+        'Agoroth',
+        'Familiarisation (Outfit → Double Charms)',
+        'Fort Forinthry XP Claim',
+        "Thalmund's Wares (Wednesday only)",
+        'Water Filtration System',
+        "Meg's Questions",
+        'Dream of Iaia',
+        'Potato Cactus',
+        'Shop Run — insulated boots; black/mithril/adamant scimitars; broad arrowheads (up to 400k total); bloodweed seeds (once training Slayer); meat boxes from Oo\'glog; runes (Mage of Zamorak/Magic Guild/Lunar Isle/Pest Control); vials of water + Herblore secondaries (Taverley/Prifddinas/Granny Rowan)',
+        'Crystal tree blossom (94 Farming — now banks up to 30 days of charges)',
+        "Geoffrey Flax (Seers achievements)",
+        'City of Um Free Supplies (Underworld diaries)',
+        'Reaper Task (no daily cap, up to 300 pts/week, needs 45 Slayer + 50 Combat, reroll costs 30 Slayer points)',
+        'Advance Time (3 casts/week, 93 Magic)',
+      ]
+    },
+    {
+      name: 'Monthlies',
+      recurring: 'monthly',
+      note: 'Mark done when you complete it — it auto-clears 30 days later.',
+      tasks: [
+        'Troll Invasion',
+        'Giant Oyster',
+        'God Statues',
+        'Effigy Incubator',
+      ]
+    },
+    {
+      name: 'Player-Owned Farm — Before Level 64 Farming',
+      tasks: [
+        'Breeding Pen: breed a pair of Rellekkan cream rabbits (or normal rabbits)',
+        'Small Pens: move bred rabbits here; sell all but the breeding pair (preferably adolescent)',
+        'Medium Pens: keep 4 sheep each; sell all sheep (preferably adolescent)',
+        'Large Pens: keep 3 bulls each; sell all bulls (preferably adolescent)',
+        'Optional: grow common green frogs on Anachronia instead',
+      ]
+    },
+    {
+      name: 'Player-Owned Farm — After Level 64 Farming',
+      tasks: [
+        'Unlock order: Adam Antite → Medium Pen Breeding → Small Pen Breeding → Large Pen Breeding → Master farmer outfit blueprint → Master farmer fragment pack',
+        'Keep sending off Adam Antite until you have breeding pairs of red chinchompas, yaks, and dragons',
+        'Breeding Pen: get a breeding pair of spiders from the Lumbridge Catacombs at 64 Farming (main bean source); swap in yaks/dragons once you have bred pairs',
+        'Small Pens: (preferably red) chinchompas',
+        'Medium Pens: move bred spiders here (no food until Medium Pen Breeding is unlocked), sell bred spiders (preferably adolescent); once unlocked, one medium pen can hold a zygomite breeding pair (not gloomshrooms)',
+        'Large Pens: yaks, then dragons once you have them',
+        'Once all the shop unlocks above are obtained, stop selling as adolescent — let animals grow to elders for max XP',
+        'Bank any strawberry/vanilla/chocolate cow from Adam Antite — needed for the Contract Claws Archaeology mystery',
+      ]
+    },
+    {
+      name: 'Mining & Smithing Training',
+      note: 'Do all Smithing training at the Artisans\' Workshop, ideally world 70.',
+      tasks: [
+        'Levels 40-50: mine 248 Adamantite + 248 Luminite, smith 5 Adamant burial sets + 1 adamant full helm +2',
+        'Levels 50-70: mine 1,750 Runite + 1,750 Luminite, smith 18 Runite burial sets',
+        'Levels 70-80: mine 1,536 Necronium + 1,536 Phasmatite, smith 8-9 Necronium burial sets',
+        'Past 80: mix Bane smithing with corrupted ores',
+        "Reward shop order: Solemn Smith I (60 Smithing) → Golden Cannon (71 Smithing) → Royale Cannon (79 Smithing)",
+        "Going for 99/110: Blacksmith's outfit → Solemn Smith upgrades → Quick repairs & Repair expert (if actively smithing) → Ceremonial sword orders → Ceremonial swordsmith I-V → Dwarven cannon upgrades → Cosmetic armour sets",
+      ]
+    },
+    {
+      name: 'Archaeology Training — Mysteries (in order)',
+      tasks: [
+        {n:'Breaking the Seal', lvl:'12 Archaeology'},
+        {n:'Prison Break', lvl:'12 Archaeology'},
+        {n:'Eyes in Their Stars', lvl:'24 Archaeology'},
+        {n:'Embrace the Chaos', lvl:'29 Archaeology'},
+        {n:'Contract Claws', lvl:'29 Archaeology'},
+        {n:'Secrets of the Monolith', lvl:'40 Archaeology'},
+        {n:'Fallen Angels', lvl:'42 Archaeology'},
+        {n:'Queen of the Icyene', lvl:'42 Archaeology'},
+        {n:'Time Served', lvl:'47 Archaeology'},
+        {n:'Fall and Rise', lvl:'61 Archaeology'},
+        {n:'Dagon Bye', lvl:'68 Archaeology'},
+        {n:'Atonement', lvl:'70 Archaeology'},
+        {n:'Leap of Faith', lvl:'70 Archaeology'},
+        {n:'The Dour of Bable', lvl:'72 Archaeology'},
+        {n:'The Spy Who Loved Metal', lvl:'76 Archaeology'},
+        {n:'Wing Out', lvl:'76 Archaeology'},
+        {n:'The First Commander', lvl:'76 Archaeology'},
+        {n:'Into the Forge', lvl:'83 Archaeology'},
+        {n:'Out of the Crucible', lvl:'83 Archaeology'},
+        {n:"Howl's Floating Workshop", lvl:'95 Archaeology'},
+      ]
+    },
+    {
+      name: 'Archaeology Training — Collections (in order)',
+      tasks: [
+        {n:'Zarosian I', lvl:'25 Archaeology'},
+        {n:'Museum - Zarosian I', lvl:'25 Archaeology'},
+        {n:'Zamorakian I', lvl:'36 Archaeology'},
+        {n:'Museum - Zamorakian I', lvl:'36 Archaeology'},
+        {n:'Saradominist I', lvl:'56 Archaeology'},
+        {n:'Museum - Saradominist I', lvl:'56 Archaeology'},
+        {n:'Museum - Zarosian V', lvl:'62 Archaeology'},
+        {n:'Museum - Zarosian VI', lvl:'64 Archaeology'},
+        {n:'Finery of the Inquisition', lvl:'64 Archaeology'},
+        {n:'Museum - Zarosian VII', lvl:'67 Archaeology'},
+        {n:'Entertaining the Masses', lvl:'67 Archaeology'},
+        {n:'Religious Iconography', lvl:'67 Archaeology'},
+        {n:'Urns of the Empire', lvl:'67 Archaeology'},
+        {n:'Blingy Fings', lvl:'69 Archaeology'},
+        {n:'Saradominist II', lvl:'72 Archaeology'},
+        {n:'Museum - Saradominist II', lvl:'72 Archaeology'},
+        {n:'Smoky Fings', lvl:'81 Archaeology'},
+        {n:'Zarosian II', lvl:'81 Archaeology'},
+        {n:'Museum - Zarosian II', lvl:'81 Archaeology'},
+        {n:'Zamorakian II', lvl:'81 Archaeology'},
+        {n:'Museum - Zamorakian II', lvl:'81 Archaeology'},
+        {n:'Armadylean I', lvl:'81 Archaeology'},
+        {n:'Museum - Armadylean I', lvl:'81 Archaeology'},
+        {n:'Green Gobbo Goodies I', lvl:'83 Archaeology'},
+        {n:'Red Rum Relics I', lvl:'94 Archaeology'},
+      ]
+    },
+    {
+      name: 'Archaeology Training — Methods By Level',
+      tasks: [
+        'Levels 1-76: train at the best available Excavation hotspot (only if no Mysteries/Collections are available)',
+        'Levels 76-83: complete 46 Green Gobbo Goodies I collections',
+        "Levels 83+: complete 7 Armadylean I collections (enough Howl's Workshop fragments for all ancient Archaeology rewards)",
+        'Levels 83-99: complete 100 Red Rum Relics I collections',
+      ]
+    },
+    {
+      name: 'Archaeology — Artefact Farming Route (Levels 1-42)',
+      note: 'Straight from the wiki\'s Archaeology training guide — real hotspots, exact quantities, and links to each. This covers levels 1-42 so far; paste the guide\'s 42-99+ sections the same way you did for the quest guide and I\'ll add the rest the same way. Each hotspot\'s materials card tracks what you\'ve personally banked toward that hotspot\'s total — checking the hotspot off assumes you\'ve got everything and fills it in for you.',
+      tasks: [
+        {n:'Levels 1-5: Complete the Archaeology tutorial', l:'https://runescape.wiki/w/Archaeology_tutorial', note:'Talk to Acting Guildmaster Reiniger at the Archaeology Campus. Gets you to level 5 and into Kharid-et.'},
+        {n:'Levels 5-12: Venator remains — need 2x Venator dagger, 2x Venator light crossbow', l:'https://runescape.wiki/w/Venator_remains', note:'Kharid-et. Hand restored copies to Soran and Velucia for their collection logs.', matList:[{m:'Third Age iron',n:56},{m:'Zarosian insignia',n:56}]},
+        {n:'Levels 12-17: Legionary remains — need 2x Primis Elementis standard, 2x Legionary gladius, 2x Legionary square shield', l:'https://runescape.wiki/w/Legionary_remains', note:'Kharid-et Barracks (need the Breaking the Seal mystery first). Also drops Custodian\'s log pages toward the Prison Break mystery.', matList:[{m:'Third Age iron',n:60},{m:'Samite silk',n:32},{m:'Zarosian insignia',n:28},{m:'Imperial steel',n:48}]},
+        {n:'Levels 17-24: Castra debris — need 2x Zaros effigy, 3x Zarosian training dummy', l:'https://runescape.wiki/w/Castra_debris', note:'Kharid-et Barracks. The 3rd training dummy unlocks Katarina as a researcher once you have a research team.', matList:[{m:'Third Age iron',n:48},{m:'Samite silk',n:16},{m:'White oak',n:62},{m:'Zarosian insignia',n:24}]},
+        {n:'Level 24-25: Lodge art storage — need 7x Crest of Dagon total, 3x \'Disorder\' painting', l:'https://runescape.wiki/w/Lodge_art_storage', note:'Infernal Source, Star Lodge cellar. 3 of the 7 crests go toward the Eyes in Their Stars mystery.', matList:[{m:'Goldrune',n:98},{m:'Orthenglass',n:126},{m:'Samite silk',n:18},{m:'White oak',n:18},{m:'Vellum',n:18},{m:'Cadmium red',n:42}]},
+        {n:'Level 24-25: Lodge bar storage — need 3x Hookah pipe, 4x Opulent wine goblet', l:'https://runescape.wiki/w/Lodge_bar_storage', note:'Infernal Source. The 4th wine goblet unlocks Dorian as a researcher at level 40. Complete Eyes in Their Stars here once you have your crests.', matList:[{m:'Third Age iron',n:86},{m:'Goldrune',n:100},{m:'Orthenglass',n:24}]},
+        {n:'Levels 25-29: Administratum debris — need 4x Legatus Maximus figurine, 3x \'Solem in Umbra\' painting', l:'https://runescape.wiki/w/Administratum_debris', note:'Kharid-et Barracks. Last spot for Custodian\'s log pages — finish the Prison Break mystery here. This completes Museum - Zarosian I and Zarosian I.', matList:[{m:'Goldrune',n:32},{m:'Zarosian insignia',n:56},{m:'Ancient vis',n:40},{m:'Samite silk',n:24},{m:'White oak',n:30},{m:'Tyrian purple',n:42}]},
+        {n:'Levels 29-36: Cultist footlocker — need 3x Imp mask, 3x Lesser demon mask, 3x Greater demon mask', l:'https://runescape.wiki/w/Cultist_footlocker', note:'Infernal Source, Dungeon of Disorder. Collect 4 cultist\'s diary journal pages for the Embrace the Chaos mystery; Contract Claws unlocks after.', matList:[{m:'Third Age iron',n:18},{m:'Leather scraps',n:66},{m:'Chaotic brimstone',n:78},{m:'Demonhide',n:108},{m:'Cadmium red',n:18}]},
+        {n:'Levels 36-42: Sacrificial altar — need 2x Order of Dis robes, 3x Ritual dagger', l:'https://runescape.wiki/w/Sacrificial_altar', note:'Infernal Source. Completes Museum - Zamorakian I and Zamorakian I. At 40 Archaeology you can unlock the assistant qualification (also completes Secrets of the Monolith).', matList:[{m:'Samite silk',n:32},{m:'Goldrune',n:48},{m:'Cadmium red',n:20},{m:'Eye of Dagon',n:28},{m:'Hellfire metal',n:72},{m:'Ruby',n:3}]},
+      ]
+    },
+    {
+      name: 'Archaeology — Artefact Farming Route (Levels 42-70)',
+      note: 'Continues straight on from the 1-42 route. Alongside this, send out your highest-level general research as often as you can (costs chronotes, buyable on the GE) — and note you likely won\'t have restored enough artefacts to unlock the associate qualification the moment you hit 70; backtrack to a fast low-level spot like Venator remains to catch up on restore count if needed.',
+      tasks: [
+        {n:'Levels 42-45: Prodromoi remains — need 3x \'Frying pan\', 4x Hallowed lantern', l:'https://runescape.wiki/w/Prodromoi_remains', note:'Everlight. Collect 1 extra frying pan + 2 extra lanterns for the Fallen Angels and Queen of the Icyene mysteries (4 queen\'s journal pages found here too).', matList:[{m:'Third Age iron',n:140},{m:'White marble',n:72},{m:'Keramos',n:96},{m:'White candle',n:4}]},
+        {n:'Levels 45-47: Dis dungeon debris — need 2x Branding iron, 2x Manacles', l:'https://runescape.wiki/w/Dis_dungeon_debris', note:'Infernal Source, Dungeon of Disorder. Last spot for cultist\'s diary pages — finish Embrace the Chaos here if you haven\'t already.', matList:[{m:'Third Age iron',n:56},{m:'Eye of Dagon',n:52},{m:'Hellfire metal',n:40},{m:'Chaotic brimstone',n:36}]},
+        {n:'Levels 47-48: Praesidio remains — need 5x Ancient timepiece, 4x Legatus pendant', l:'https://runescape.wiki/w/Praesidio_remains', note:'Kharid-et - Carcerem excavation site (needs Prison Break completed to enter). The pendant unlocks the legatus barrier for more of the site.', matList:[{m:'Third Age iron',n:64},{m:'Goldrune',n:132},{m:'Imperial steel',n:80},{m:'Ancient vis',n:138},{m:'Dragonstone',n:4}]},
+        {n:'Levels 48-51: Monoceros remains — need 4x Ceremonial unicorn ornament, 2x Ceremonial unicorn saddle', l:'https://runescape.wiki/w/Monoceros_remains', note:'Everlight, Mass grave site. Finish Queen of the Icyene / Fallen Angels here if you haven\'t. 4th ornament unlocks Eduardo as a researcher.', matList:[{m:'Keramos',n:104},{m:'Cobalt blue',n:124},{m:'Leather scraps',n:48}]},
+        {n:'Levels 51-52: Amphitheatre debris — need 4x Everlight harp, 5x Everlight trumpet, 3x Everlight violin', l:'https://runescape.wiki/w/Amphitheatre_debris', note:'Everlight, Amphitheatre site.', matList:[{m:'Everlight silvthril',n:260},{m:'White oak',n:148},{m:'Goldrune',n:120},{m:'Star of Saradomin',n:48},{m:'Samite silk',n:48}]},
+        {n:'Levels 52-56: Lunar wheel debris — need 2x Lunar calendar, 2x Wolf statuette, 2x Ivory sickle', l:'https://runescape.wiki/w/Lunar_wheel_debris', note:'Moonrise, Temple periphery. Requires the Secrets of Amberfell quest to access Moonrise at all.', matList:[{m:'Banded limestone',n:108},{m:'Triskelion',n:96},{m:'Ivory',n:108}]},
+        {n:'Levels 56-58: Ceramics studio debris — need 2x Folded-arm figurine (female), 2x Folded-arm figurine (male)', l:'https://runescape.wiki/w/Ceramics_studio_debris', note:'Everlight, Amphitheatre site. Completes Museum - Saradominist I and Saradominist I for the first time.', matList:[{m:'White marble',n:120},{m:'Goldrune',n:96}]},
+        {n:'Levels 58-59: Carcerem debris — need 5x Pontifex signet ring, 5x \'Incite Fear\' spell scroll', l:'https://runescape.wiki/w/Carcerem_debris', note:'Kharid-et, past the legatus barrier. A signet ring unlocks the pontifex barrier for further hotspots; another can build a pontifex observation ring.', matList:[{m:'Third Age iron',n:80},{m:'Goldrune',n:90},{m:'Ancient vis',n:200},{m:'Dragonstone',n:5},{m:'Vellum',n:100},{m:'Blood of Orcus',n:90}]},
+        {n:'Levels 59-60: Arbour rubble — need 2x Nakkirian seal, 2x Royal Game of Ba', l:'https://runescape.wiki/w/Arbour_rubble', note:'Moonrise, Temple periphery.', matList:[{m:'White oak',n:120},{m:'Ivory',n:68},{m:'Triskelion',n:60},{m:'Soft clay',n:2}]},
+        {n:'Levels 60-61: Ministry remains — need 2x Apex cap, 2x Curse tablet, 3x Funerary urn of shadow', l:'https://runescape.wiki/w/Ministry_remains', note:'Senntisten, Cathedral site. 1st Inquisitor\'s Memoirs page found here (Secrets of the Inquisition mystery). Ancient glass shards found around the whole site repair stained-glass windows for the Pane in the Glass achievement.', matList:[{m:'Samite silk',n:56},{m:'Leather scraps',n:24},{m:'Ancient vis',n:100},{m:'Imperial steel',n:32},{m:'Zarosian insignia',n:24},{m:'Soapstone',n:118},{m:'Blood of Orcus',n:24},{m:'Tyrian purple',n:42}]},
+        {n:'Levels 61-62: Stadio debris — need 2x Dominion discus, 2x Dominion javelin, 2x Dominion pelte shield', l:'https://runescape.wiki/w/Stadio_debris', note:'Everlight, Dominion Games stadium. 5 athlete\'s journal pages here complete the Fall and Rise mystery.', matList:[{m:'Keramos',n:132},{m:'Star of Saradomin',n:124},{m:'Third Age iron',n:60},{m:'Samite silk',n:56}]},
+        {n:'Levels 62-63: Cathedral debris — need 2x Infula robes, 3x Funerary urn of smoke, 2x Hand of the Ancients', l:'https://runescape.wiki/w/Cathedral_debris', note:'Senntisten, Cathedral site. 2nd Inquisitor\'s Memoirs page. Completes Museum - Zarosian V for the first time.', matList:[{m:'Samite silk',n:52},{m:'Leather scraps',n:24},{m:'Goldrune',n:60},{m:'Tyrian purple',n:66},{m:'Soapstone',n:84},{m:'Ancient vis',n:88},{m:'Blood of Orcus',n:24},{m:'White oak',n:36}]},
+        {n:'Levels 63-64: Marketplace debris — need 2x Decorative amphora, 3x Funerary urn of ice, 2x Loarnab rod', l:'https://runescape.wiki/w/Marketplace_debris', note:'Senntisten, Marketplace site.', matList:[{m:'Tyrian purple',n:74},{m:'Ancient vis',n:96},{m:'Soapstone',n:140},{m:'White oak',n:56},{m:'Blood of Orcus',n:32},{m:'Imperial steel',n:36}]},
+        {n:'Levels 64-65: Inquisitor remains — need 2x Inquisitor\'s seal, 2x Inquisitor\'s ceremonial mask, 2x Inquisitor\'s ceremonial armour', l:'https://runescape.wiki/w/Inquisitor_remains', note:'Senntisten, Marketplace site. Pages 3 & 4 of the Inquisitor\'s Memoirs found here. Completes Finery of the Inquisition and Museum - Zarosian VI for the first time.', matList:[{m:'Tyrian purple',n:64},{m:'Zarosian insignia',n:40},{m:'Ancient vis',n:56},{m:'Goldrune',n:28},{m:'Leather scraps',n:52},{m:'Blood of Orcus',n:28},{m:'Samite silk',n:104}]},
+        {n:'Levels 65-66: Infernal art — need 3x \'Lust\' metal sculpture, 3x \'The Lake of Fire\' painting', l:'https://runescape.wiki/w/Infernal_art', note:'Infernal Source, Vestibule of Futility south.', matList:[{m:'Third Age iron',n:48},{m:'Eye of Dagon',n:72},{m:'Goldrune',n:72},{m:'Ruby',n:3},{m:'Samite silk',n:30},{m:'White oak',n:30},{m:'Vellum',n:30},{m:'Cadmium red',n:102}]},
+        {n:'Levels 66-67: Gladiator remains — need 2x Gladiator sword, 2x Gladiator helmet, 3x Funerary urn of blood', l:'https://runescape.wiki/w/Gladiator_remains', note:'Senntisten, Marketplace site. 4th Inquisitor\'s Memoirs page — completes Secrets of the Inquisition.', matList:[{m:'Imperial steel',n:120},{m:'Goldrune',n:36},{m:'Zarosian insignia',n:32},{m:'Blood of Orcus',n:92},{m:'Leather scraps',n:36},{m:'Soapstone',n:90},{m:'Tyrian purple',n:42}]},
+        {n:'Levels 66-67: Weaver\'s hut debris — need 2x Backstrap loom, 2x Animal doll, 2x Initiate\'s kaunake', l:'https://runescape.wiki/w/Weaver%27s_hut_debris', note:'Moonrise, Temple periphery. Completes Guthixian I and Museum - Guthixian I.', matList:[{m:'White oak',n:108},{m:'Burnt umber',n:76},{m:'Cashmere',n:140},{m:'Ivory',n:32},{m:'Leather scraps',n:28}]},
+        {n:'Levels 67-68: Citizen remains — need 2x \'The Serpent\'s Fall\' carving, 2x Model chariot, 2x Funerary urn of miasma', l:'https://runescape.wiki/w/Citizen_remains', note:'Senntisten, Bridge site (needs Crossing that Bridge research done). Pages 6 & 7 of the Inquisitor\'s Memoirs and the 5th critic\'s review article are found here.', matList:[{m:'Vellum',n:56},{m:'Tyrian purple',n:76},{m:'Blood of Orcus',n:24},{m:'White oak',n:24},{m:'Imperial steel',n:36},{m:'Goldrune',n:40},{m:'Zarosian insignia',n:28},{m:'Soapstone',n:60},{m:'Ancient vis',n:40}]},
+        {n:'Levels 68-69: Shakroth remains — need 4x Chaos star, 2x Spiked dog collar', l:'https://runescape.wiki/w/Shakroth_remains', note:'Infernal Source, Vestibule of Futility north-east. A tool-belt chaos star completes the Dagon Bye mystery; finishing it unlocks Movario as a researcher.', matList:[{m:'Chaotic brimstone',n:144},{m:'Hellfire metal',n:144},{m:'Third Age iron',n:48},{m:'Leather scraps',n:48}]},
+        {n:'Levels 69-70: Dominion Games podium — need 3x Bronze Dominion medal, 3x Silver Dominion medal, 5x Dominion torch', l:'https://runescape.wiki/w/Dominion_Games_podium', note:'Everlight, Dominion Games stadium. Completes Blingy Fings for the first time.', matList:[{m:'Everlight silvthril',n:316},{m:'Star of Saradomin',n:246},{m:'Bronze bar',n:3},{m:'Silver bar',n:3},{m:'Goldrune',n:60},{m:'Orthenglass',n:60}]},
+        {n:'Level 70: Unlock the associate qualification', note:'Needs 5 collections, 250 artefacts restored, 10 mysteries solved, and 24 hours of research sent out — talk to Acting Guildmaster Reiniger. Unlocks Guild Shop upgrades (soil box, material storage, base precision), the archaeologist\'s outfit, and the auto-screener v1.080 blueprints (needs 67 Invention to craft).'},
+      ]
+    },
+    {
+      name: 'Archaeology — Artefact Farming Route (Levels 70-90)',
+      note: 'Stormguard Citadel, Warforge, and Daemonheim open up in this range. If you\'re only chasing the associate qualification, park on Zarosian I / Museum - Zarosian I collections for XP instead of pushing further — everything else here is for the professor/guildmaster path.',
+      tasks: [
+        {n:'Levels 70-72: Ikovian memorial — need 4x Ikovian gerege, 2x Toy glider, 2x Toy war golem', l:'https://runescape.wiki/w/Ikovian_memorial', note:'Stormguard Citadel (enter via the Temple of Ikov archway). The gerege unlocks a Stormguard portal teleport. Boots of flight and the exile\'s vow are random finds here — grab them for the Leap of Faith and Atonement mysteries.', matList:[{m:'Third Age iron',n:216},{m:'Wings of War',n:120},{m:'Stormguard steel',n:72},{m:'White oak',n:120},{m:'Clockwork',n:2}]},
+        {n:'Levels 72-73: Oikos studio debris — need 2x Decorative vase, 2x Patera bowl, 3x Kantharos cup', l:'https://runescape.wiki/w/Oikos_studio_debris', note:'Everlight, Oikoi site. Keep a psiloi buckler + kantharos cup for The Everlight mystery later. 4 Archon\'s journal pages found here or at level 84 — collect for The Dour of Bable. Completes Museum - Saradominist II and Saradominist II for the first time.', matList:[{m:'White marble',n:72},{m:'Cobalt blue',n:60},{m:'Keramos',n:72},{m:'Goldrune',n:60},{m:'Sapphire',n:5},{m:'Everlight silvthril',n:90},{m:'Orthenglass',n:108}]},
+        {n:'Levels 73-74: Castle hall rubble — need 2x Castle gatestone, 2x Engraved ring of kinship', l:'https://runescape.wiki/w/Castle_hall_rubble', note:'Daemonheim Dig Site, Castle site (needs Skaldrun freed via frozen Dungeoneering floors to access at all). Balarak\'s and Tokshak\'s rings here are needed for A New Home later.', matList:[{m:'Orgone',n:72},{m:'Orthenglass',n:64},{m:'Goldrune',n:56},{m:'Dragon metal',n:80}]},
+        {n:'Levels 74-75: Kharid-et chapel debris — need 3x Ceremonial mace, 3x Pontifex Maximus figurine, 3x \'Consensus ad Idem\' painting', l:'https://runescape.wiki/w/Kharid-et_chapel_debris', note:'3 pater\'s log pages start appearing here — toward The Cult of Orcus mystery.', matList:[{m:'Imperial steel',n:60},{m:'Third Age iron',n:60},{m:'Goldrune',n:168},{m:'Zarosian insignia',n:72},{m:'Ancient vis',n:48},{m:'Dragonstone',n:3},{m:'White oak',n:30},{m:'Samite silk',n:30},{m:'Tyrian purple',n:150}]},
+        {n:'Levels 75-76: Shrine debris — need 4x Offering bowl, 2x Incense burner', l:'https://runescape.wiki/w/Shrine_debris', note:'Moonrise, Temple periphery.', matList:[{m:'Banded limestone',n:136},{m:'Triskelion',n:80},{m:'Burnt umber',n:80},{m:'White oak',n:36},{m:'Cashmere',n:40}]},
+        {n:'Levels 76-77: Keshik ger — need 3x Avian song-egg player, 3x Keshik drum, 3x Morin khuur', l:'https://runescape.wiki/w/Keshik_ger', note:'Stormguard Citadel, Keshik memorial site. Boots of Flight become a guaranteed drop at 76 — upgrade the wingsuit v1→v2 (2 lightning conductors)→v3 (2 gravitron repulsors) and complete Wing Out. Mission reports for The Spy Who Loved Metal may start appearing.', matList:[{m:'Stormguard steel',n:108},{m:'Armadylean yellow',n:204},{m:'Diamond',n:3},{m:'Wings of War',n:48},{m:'Animal furs',n:48},{m:'White oak',n:156},{m:'Leather scraps',n:48}]},
+        {n:'Levels 76-77: Gladiatorial goblin remains — need 3x Ekeleshuun blinder mask, 2x Narogoshuun \'Hob-da-Gob\' ball, 2x Rekeshuun war tether', l:'https://runescape.wiki/w/Gladiatorial_goblin_remains', note:'Warforge, Crucible arena (talk to Zanik first for the intro cutscene). The First Commander mystery pages may start appearing here.', matList:[{m:'Vulcanised rubber',n:188},{m:'Malachite green',n:60},{m:'Vellum',n:72},{m:'Mark of the Kyzaj',n:64},{m:'Warforged bronze',n:40},{m:'Leather scraps',n:52}]},
+        {n:'Levels 77-78: Tunnelling equipment repository — need 2x Exploratory totem, 2x Excavator portal mine', l:'https://runescape.wiki/w/Tunnelling_equipment_repository', note:'Daemonheim, Castle site. Halak\'s ring (A New Home mystery) is only found here. Completes Dragonkin V and Museum - Dragonkin V for the first time.', matList:[{m:'Dragon metal',n:68},{m:'Compass rose',n:72},{m:'Orgone',n:72},{m:'Orthenglass',n:68}]},
+        {n:'Levels 78-81: Botanical reserve — need 2x Storage totem, 2x Plant seed satchel, 2x Snuff box', l:'https://runescape.wiki/w/Botanical_reserve', note:'Daemonheim, 2nd floor. Yorga\'s pipe (A New Home mystery) is only found here.', matList:[{m:'Dragon metal',n:72},{m:'Compass rose',n:96},{m:'Felt',n:96},{m:'Carbon black',n:116},{m:'Soapstone',n:40}]},
+        {n:'Levels 81-82: Animal trophies — need 2x Larupia trophy, 2x Lion trophy, 2x She-wolf trophy', l:'https://runescape.wiki/w/Animal_trophies', note:'Infernal Source, Vestibule of Futility SE. Completes Zamorakian II and Museum - Zamorakian II.', matList:[{m:'Cadmium red',n:108},{m:'Animal furs',n:168},{m:'Orthenglass',n:52},{m:'White oak',n:52},{m:'Chaotic brimstone',n:52}]},
+        {n:'Levels 81-82: Tailory debris — need 3x Aviansie dreamcoat, 3x Ceremonial plume, 2x Peacocking parasol', l:'https://runescape.wiki/w/Tailory_debris', note:'Stormguard Citadel, Relay station. Last spot for Spy Who Loved Metal mission reports. Give the dreamcoat to Armadyl for the Ring of Solomon. Completes Armadylean I and Museum - Armadylean I for the first time.', matList:[{m:'Armadylean yellow',n:218},{m:'Samite silk',n:150},{m:'Animal furs',n:66},{m:'Goldrune',n:102},{m:'Phoenix feather',n:3},{m:'White oak',n:40}]},
+        {n:'Levels 81-82: Pontifex remains — need 3x Pontifex censer, 3x Pontifex crozier, 3x Pontifex mitre', l:'https://runescape.wiki/w/Pontifex_remains', note:'Kharid-et, Chapel site. Completes Zarosian II, Museum - Zarosian II, and Smoky Fings for the first time.', matList:[{m:'Third Age iron',n:60},{m:'Ancient vis',n:120},{m:'Goldrune',n:192},{m:'Dragonstone',n:3},{m:'Imperial steel',n:60},{m:'Zarosian insignia',n:120},{m:'Samite silk',n:96}]},
+        {n:'Levels 81-82: Crucible stands debris — need 2x Ogre Kyzaj axe, 2x Ork cleaver sword', l:'https://runescape.wiki/w/Crucible_stands_debris', note:'Warforge. Stay here through level 83 to maximize your odds of finding all 4 imcando metal pieces.', matList:[{m:'Warforged bronze',n:128},{m:'Mark of the Kyzaj',n:40},{m:'Fossilised bone',n:120}]},
+        {n:'Levels 82-83: Cauldron debris — need 2x Bloodwine, 2x Reagent jar, 2x Ninbaradari mural', l:'https://runescape.wiki/w/Cauldron_debris', note:'Moonrise, Temple depths.', matList:[{m:'Leather scraps',n:104},{m:'Triskelion',n:80},{m:'Cashmere',n:40},{m:'Grapes',n:2},{m:'Banded limestone',n:88},{m:'Burnt umber',n:120}]},
+        {n:'Level 83: Clear the Warforge barricade & complete Into the Forge', note:'Fully clearing the barricade completes Out of the Crucible and opens the South goblin tunnels. Investigate Thalmund\'s Forge doors to start Into the Forge — find all 11 keys (needs 35 Dungeoneering, 28 Fishing) to complete it, then craft an imcando mattock once you have all 4 imcando metal pieces.'},
+        {n:'Levels 83-84: Goblin dorm debris — need 3x Thorobshuun battle standard, 2x Yurkolgokh stink grenade', l:'https://runescape.wiki/w/Goblin_dorm_debris', note:'Warforge, South goblin tunnels. Your first Green Gobbo Goodies I completion is possible here.', matList:[{m:'Mark of the Kyzaj',n:48},{m:'Malachite green',n:66},{m:'White oak',n:48},{m:'Samite silk',n:60},{m:'Yu\'biusk clay',n:76},{m:'Vulcanised rubber',n:72},{m:'Weapon poison (3)',n:2}]},
+        {n:'Levels 84-85: Oikos fishing hut remnants — need 3x Dominarian device, 3x Fishing trident', l:'https://runescape.wiki/w/Oikos_fishing_hut_remnants', note:'Everlight, Oikoi site. Last spot for Archon\'s journal pages — finish The Dour of Bable here if you haven\'t.', matList:[{m:'Everlight silvthril',n:90},{m:'Keramos',n:66},{m:'Third Age iron',n:156},{m:'Clockwork',n:3},{m:'Star of Saradomin',n:66},{m:'Goldrune',n:66}]},
+        {n:'Levels 85-86: Weapons research debris — need 2x Hawkeye lens multi-vision scope, 2x Talon-3 razor wing', l:'https://runescape.wiki/w/Weapons_research_debris', note:'Stormguard Citadel, R&D north-west. Project pages for A Study in Aether start appearing here. Optional: with 70 Divination (91 Archaeology to excavate the quintessence yourself), 20 unnoted quintessence activates a Stormguard portal shortcut.', matList:[{m:'Stormguard steel',n:80},{m:'Orthenglass',n:68},{m:'Aetherium alloy',n:80},{m:'Wings of War',n:68},{m:'Rope',n:2}]},
+        {n:'Levels 86-87: Orcus altar — need 5x Necromantic focus, 5x \'Exsanguinate\' spell scroll', l:'https://runescape.wiki/w/Orcus_altar', note:'Kharid-et, Chapel site. Grab an extra spell scroll if you plan to do The Vault of Shadows (one is consumed). Necromantic focus is also needed for Tomes of the Warlock. Last spot for pater\'s log pages — finish The Cult of Orcus here.', matList:[{m:'Imperial steel',n:100},{m:'Blood of Orcus',n:310},{m:'Ancient vis',n:150},{m:'Vellum',n:200}]},
+        {n:'Levels 87-88: Communal space — need 2x Spent summoning charm, 3x \'Friendship bracelet\', 2x Homely totem', l:'https://runescape.wiki/w/Communal_space', note:'Daemonheim, Castle 2nd floor. A friendship bracelet unlocks the Daemonheim - Depths site. The tarnished plaque (A New Home mystery) is only found here. Completes Dragonkin VI and Museum - Dragonkin VI.', matList:[{m:'Orgone',n:92},{m:'Felt',n:278},{m:'Soapstone',n:162}]},
+        {n:'Levels 88-89: Blood altar — need 2x Bloodletting dagger, 3x Fang of Kayazu', l:'https://runescape.wiki/w/Blood_altar_(excavation_hotspot)', note:'Moonrise, Temple depths.', matList:[{m:'Ivory',n:170},{m:'Cashmere',n:48},{m:'Soapstone',n:112},{m:'Burnt umber',n:60}]},
+        {n:'Levels 89-90: Dis overspill — need 2x \'Torment\' metal sculpture, 3x \'Pandemonium\' tapestry', l:'https://runescape.wiki/w/Dis_overspill', note:'Infernal Source, The Harrowing SE.', matList:[{m:'Eye of Dagon',n:40},{m:'Third Age iron',n:40},{m:'Hellfire metal',n:76},{m:'White oak',n:36},{m:'Samite silk',n:36},{m:'Vellum',n:36},{m:'Cadmium red',n:126}]},
+        {n:'Levels 89-90: Big High War God shrine — need 3x High priest crozier, 4x High priest mitre, 3x High priest orb', l:'https://runescape.wiki/w/Big_High_War_God_shrine', note:'Warforge, North goblin tunnels. The Forge War! page may appear here. Completes Museum - Bandosian I, Hitty Fings, and Anarchic Abstraction.', matList:[{m:'Mark of the Kyzaj',n:260},{m:'Malachite green',n:240},{m:'Goldrune',n:168},{m:'Samite silk',n:112}]},
+        {n:'Level 90: Unlock the professor qualification', note:'Needs 20 unique collections, 500 artefacts excavated & restored, 15 mysteries solved, and 72 hours of research — talk to Acting Guildmaster Reiniger. If you\'ve done everything above you\'ll already have enough collections/mysteries; you likely still need more artefact restores — Green Gobbo Goodies I/II are fast for that. Unlocks another round of Guild Shop upgrades, an extra relic loadout slot, and 4x material manual/hi-spec monocle/tarpaulin sheet/archaeologist\'s tea.'},
+      ]
+    },
+    {
+      name: 'Archaeology — Artefact Farming Route (Levels 90-99)',
+      note: 'Orthen (Anachronia) opens up here — its dig site works like the Kharid-et pylon: banking rex skeleton fragments repairs a shared skeleton, and a full repair grants a server-wide 25% XP / 10% material-chance buff on Anachronia for 65 minutes.',
+      tasks: [
+        {n:'Levels 90-91: Varanusaur remains — need 3x Pasaha, 2x Ritual bell', l:'https://runescape.wiki/w/Varanusaur_remains', note:'Orthen, Crypt of Varanus (first visit: talk to Mr Mordaut, activate the teleport device east of base camp). May find Crypt o\' Zoology pages and Archaeology potion recipe fragments. Know Thy Measure completable at 90.', matList:[{m:'Felt',n:120},{m:'Goldrune',n:194},{m:'Compass rose',n:76}]},
+        {n:'Levels 90-91: Orthen rubble — need 1x Ceremonial dragonkin tablet (one-time only)', l:'https://runescape.wiki/w/Orthen_rubble', note:'Orthen, Nodon hibernatorium (needs Desperate Measures + 90 Archaeology). Hand in with the dragonkin remains item below to Giles for Desperate for Artefacts — rewards a cosmic pyramid (combine with a cosmic focus for a cosmic accumulator).', matList:[{m:'Orthenglass',n:79}]},
+        {n:'Levels 90-91: Dragonkin remains — need 1x Ceremonial dragonkin device (one-time only)', l:'https://runescape.wiki/w/Dragonkin_remains', note:'Same site as Orthen rubble — pairs with the tablet above for Desperate for Artefacts.', matList:[{m:'Orthenglass',n:66}]},
+        {n:'Levels 91-92: Gravitron research debris — need 2x Prototype gravimeter, 3x Songbird recorder', l:'https://runescape.wiki/w/Gravitron_research_debris', note:'Stormguard Citadel, R&D north-west. Completes Wise Am the Music Man. ~117k XP/hr with an imcando/elder rune mattock, full upgrades, and the archaeologist\'s outfit.', matList:[{m:'Quintessence',n:68},{m:'Leather scraps',n:40},{m:'Third Age iron',n:52},{m:'Stormguard steel',n:132},{m:'Orthenglass',n:108},{m:'Diamond',n:3}]},
+        {n:'Levels 92-93: Acropolis debris — need 2x Amphora, 4x Rod of Asclepius', l:'https://runescape.wiki/w/Acropolis_debris', note:'Everlight, Acropolis. Completes Showy Fings for the first time. Restore the Statue of Tromple (10 white marble, 40 Construction) for the \'Tromple\'s Troubling Tales\' book (50,000 XP) and No Secrets Left to Steal. 5 Epic of Hebe excerpts may start appearing here (also findable at level 109).', matList:[{m:'Everlight silvthril',n:68},{m:'Keramos',n:92},{m:'White marble',n:120},{m:'Star of Saradomin',n:96},{m:'Goldrune',n:104}]},
+        {n:'Levels 93-94: Armarium debris — need 2x Zarosian ewer, 2x Zarosian stein', l:'https://runescape.wiki/w/Armarium_debris', note:'Kharid-et, Culinarum. ~120-130k XP/hr, plus pylon battery bonus XP.', matList:[{m:'Third Age iron',n:136},{m:'Zarosian insignia',n:120},{m:'Imperial steel',n:72}]},
+        {n:'Levels 94-95: Yu\'biusk animal pen — need 3x Beastkeeper helm, 2x Idithuun horn ring, 2x \'Nosorog!\' sculpture', l:'https://runescape.wiki/w/Yu%27biusk_animal_pen', note:'Warforge, Animal pens. Completes Red Rum Relics I for the first time. ~125k XP/hr.', matList:[{m:'Warforged bronze',n:108},{m:'Vulcanised rubber',n:160},{m:'Animal furs',n:60},{m:'Fossilised bone',n:72},{m:'Yu\'biusk clay',n:140},{m:'Malachite green',n:48}]},
+        {n:'Levels 95-96: Keshik tower debris — need 2x Dayguard shield, 3x Stormguard gerege', l:'https://runescape.wiki/w/Keshik_tower_debris', note:'Stormguard Citadel, Dayguard tower — very remote, bring signs of the porter or magic notepaper. A restored gerege completes Howl\'s Floating Workshop, unlocking Ancient Invention blueprint crafting. ~143-150k XP/hr.', matList:[{m:'Stormguard steel',n:180},{m:'Wings of War',n:140},{m:'White oak',n:40},{m:'Goldrune',n:60}]},
+        {n:'Levels 96-97: Dragonkin reliquary — need 2x Vazara, 2x Kilaya', l:'https://runescape.wiki/w/Dragonkin_reliquary', note:'Orthen, Crypt of Varanus. More Crypt o\' Zoology pages and Archaeology potion recipe fragments possible here.', matList:[{m:'Dragon metal',n:152},{m:'Compass rose',n:136},{m:'Goldrune',n:56}]},
+        {n:'Levels 97-98: Goblin trainee remains — need 3x Garagorshuun anchor, 3x Ourg megahitter, 2x Ourg tower/goblin cower shield', l:'https://runescape.wiki/w/Goblin_trainee_remains', note:'Warforge, North goblin tunnels. An Ourg megahitter is needed to recruit Asgarnia Smith later. Completes Green Gobbo Goodies II for the first time. ~152k XP/hr.', matList:[{m:'Warforged bronze',n:96},{m:'Mark of the Kyzaj',n:118},{m:'Third Age iron',n:142},{m:'White oak',n:100},{m:'Leather scraps',n:104},{m:'Orthenglass',n:78},{m:'Malachite green',n:66}]},
+        {n:'Levels 98-99: Byzroth remains — need 2x Hellfire haladie, 4x Hellfire katar, 2x Hellfire zaghnal', l:'https://runescape.wiki/w/Byzroth_remains', note:'Infernal Source, The Harrowing NW. 2 katars are needed for The Rings of Razulei.', matList:[{m:'Hellfire metal',n:364},{m:'Third Age iron',n:52},{m:'Leather scraps',n:200},{m:'White oak',n:52},{m:'Orthenglass',n:52}]},
+        {n:'Levels 98-99: Destroyed golem — need 3x Golem heart, 5x Golem instruction', l:'https://runescape.wiki/w/Destroyed_golem', note:'Stormguard Citadel, R&D south-west. Golem instructions are needed to recruit Elissa Giovanni later. Completes Museum - Armadylean II and Armadylean II. ~172k XP/hr.', matList:[{m:'Aetherium alloy',n:102},{m:'Quintessence',n:302},{m:'Orthenglass',n:48},{m:'Soapstone',n:48},{m:'Vellum',n:220},{m:'Black mushroom ink',n:5}]},
+        {n:'Level 99: Unlock the guildmaster qualification', note:'Needs 25 unique collections, 1,000 artefacts excavated & restored, 20 mysteries solved, and 168 hours of research. Likely still short on restores at this point — Green Gobbo Goodies II is the recommended fast fill. Unlocks the final base mattock precision upgrade, the master archaeologist\'s outfit, the energised meteorite shard (for the Mattock of Time and Space), and 5x material manual/hi-spec monocle/tarpaulin sheet/archaeologist\'s tea.'},
+      ]
+    },
+    {
+      name: 'Archaeology — Artefact Farming Route (Levels 99-120+)',
+      note: 'The final stretch — Orthen\'s Xolo City and Daemonheim\'s Depths open up progressively. Past 120 the guide considers Saurthen debris at Orthen - Xolo city the practical endpoint for now.',
+      tasks: [
+        {n:'Levels 99-100: Dragonkin coffin — need 3x Death mask, 2x Dragonkin calendar, 2x Dragonkin staff', l:'https://runescape.wiki/w/Dragonkin_coffin', note:'Orthen, Crypt of Varanus. Completes Museum - Dragonkin I and Dragonkin I. Last spot for Crypt o\' Zoology pages. May find Summoning renewal recipe fragments.', matList:[{m:'Orgone',n:348},{m:'Soapstone',n:102},{m:'Carbon black',n:56},{m:'Compass rose',n:124}]},
+        {n:'Levels 100-101: Kyzaj champion\'s boudoir — need 3x Dorgeshuun spear, 3x \'Forged in War\' sculpture', l:'https://runescape.wiki/w/Kyzaj_champion%27s_boudoir', note:'Warforge, South goblin tunnels (study Bandos\'s throne first for the Power Behind the Throne research). Completes You Have Chosen... and Museum - Bandosian II for the first time.', matList:[{m:'Warforged bronze',n:300},{m:'White oak',n:126},{m:'Yu\'biusk clay',n:126},{m:'Emerald',n:3}]},
+        {n:'Levels 100-101: Icyene weapon rack — need 2x Kopis dagger, 2x Xiphos short sword', l:'https://runescape.wiki/w/Icyene_weapon_rack', note:'Everlight, Dominion Games stadium. Completes Museum - Saradominist III and Saradominist III for the first time.', matList:[{m:'Everlight silvthril',n:192},{m:'Leather scraps',n:176}]},
+        {n:'Levels 100-101: Culinarum debris — need 5x \'Smoke Cloud\' spell scroll, 2x Vigorem vial', l:'https://runescape.wiki/w/Culinarum_debris', note:'Kharid-et, Culinarum. Save 1 spell scroll for The Vault of Shadows. ~183k XP/hr with a Mattock of Time and Space, full master outfit, and pylon battery bonus.', matList:[{m:'Vellum',n:200},{m:'Ancient vis',n:176},{m:'Blood of Orcus',n:160},{m:'Imperial steel',n:108},{m:'Molten glass',n:2}]},
+        {n:'Levels 101-102: Autopsy table — need 3x Dragon scalpel, 3x Protective goggles', l:'https://runescape.wiki/w/Autopsy_table', note:'Orthen, Observation outpost. Repair the Orthen teleportation device here if not done (70 Runecrafting, 20 unnoted ancient vis). May find Summoning renewal recipe pieces.', matList:[{m:'Dragon metal',n:156},{m:'Felt',n:252},{m:'Orthenglass',n:156}]},
+        {n:'Levels 102-103: Experiment workbench — need 6x Dragon burner, 4x Orthenglass flask', l:'https://runescape.wiki/w/Experiment_workbench', note:'Same site. Complete Death Watch (4 pages from 2 site types) before moving on. Completes Dragonkin II and Museum - Dragonkin II for the first time.', matList:[{m:'Dragon metal',n:448},{m:'Orgone',n:252},{m:'Orthenglass',n:240}]},
+        {n:'Levels 103-104: Keshik weapon rack — need 2x Blackfire lance, 2x Nightguard shield', l:'https://runescape.wiki/w/Keshik_weapon_rack', note:'Stormguard Citadel, Nightguard tower.', matList:[{m:'Aetherium alloy',n:100},{m:'Quintessence',n:92},{m:'Stormguard steel',n:60},{m:'Wings of War',n:72},{m:'White oak',n:60}]},
+        {n:'Levels 103-104: Projection space — need 2x Projection attuner, 2x Golden projection \'needle\'', l:'https://runescape.wiki/w/Projection_space', note:'Daemonheim - Depths (needs 95 Dungeoneering; complete On the Threshold of the Mind research first, then enter the imposing door). Completes Dragonkin VII and Museum - Dragonkin VII.', matList:[{m:'Goldrune',n:128},{m:'Orthenglass',n:56},{m:'Dragon metal',n:200}]},
+        {n:'Levels 104-105: Warforge scrap pile — need 3x Huzamogaarb chaos crown, 3x Saragorgak star crown', l:'https://runescape.wiki/w/Warforge_scrap_pile', note:'Warforge, North goblin tunnels.', matList:[{m:'Warforged bronze',n:264},{m:'Third Age iron',n:204},{m:'Eye of Dagon',n:60},{m:'Star of Saradomin',n:60}]},
+        {n:'Levels 104-105: Hellfire forge — need 2x \'Possession\' metal sculpture, 2x Trishula, 2x Tsutsaroth piercing', l:'https://runescape.wiki/w/Hellfire_forge', note:'Infernal Source, The Harrowing NE — recommended over the Warforge scrap pile since its artefacts don\'t need cross-site materials. Completes Zamorakian III and Museum - Zamorakian III. ~210k XP/hr with bonuses.', matList:[{m:'Eye of Dagon',n:108},{m:'Chaotic brimstone',n:120},{m:'Third Age iron',n:128},{m:'Hellfire metal',n:184},{m:'Cadmium red',n:48}]},
+        {n:'Levels 105-106: Stockpiled art — need 3x \'The Pride of Padosan\' painting, 3x \'Hallowed Be the Everlight\' painting, 3x \'The Lord of Light\' painting', l:'https://runescape.wiki/w/Stockpiled_art', note:'Everlight, Underwater cave (progress Hallowed Be... to unlock access if needed). Collect 300 mosaic pieces to complete Hallowed Be... itself (painting not consumed). Completes Radiant Renaissance for the first time.', matList:[{m:'Cobalt blue',n:468},{m:'White oak',n:144},{m:'Samite silk',n:144},{m:'Vellum',n:144}]},
+        {n:'Levels 106-107: Aughra remains — need 2x Meditation pipe, 2x Singing bowl, 2x Personal totem', l:'https://runescape.wiki/w/Aughra_remains', note:'Orthen, Moksha ritual site (complete Incomplete Portal Network II + Know Thy Measure to unlock; repair the Orthen teleport device with 20 unnoted orthenglass). May find Free Your Mind mystery pages.', matList:[{m:'Orgone',n:336},{m:'Dragon metal',n:160},{m:'Carbon black',n:52},{m:'Compass rose',n:52}]},
+        {n:'Levels 107-108: Security booth — need 2x Comfort gatestone, 2x Halak\'s cube', l:'https://runescape.wiki/w/Security_booth', note:'Daemonheim - Depths. Grab the chunk of primal alloy here — only source, needed for A New Form. May find a strange token for A New Age.', matList:[{m:'Orthenglass',n:80},{m:'Orgone',n:124},{m:'Compass rose',n:132},{m:'Carbon black',n:80}]},
+        {n:'Levels 107-108: Ancient magick munitions — need 3x Ancient magic tablet, 4x Portable phylactery, 5x \'Animate Dead\' spell scroll', l:'https://runescape.wiki/w/Ancient_magick_munitions', note:'Kharid-et, Praetorium. 1 spell scroll needed for The Vault of Shadows. Commander\'s log (6 pages, Decimation) and Praetorian\'s log (5 pages, Shadow Fall) start appearing here. Completes Museum - Zarosian III, Zarosian III, and Imperial Sorcery for the first time.', matList:[{m:'Ancient vis',n:320},{m:'Blood of Orcus',n:536},{m:'Imperial steel',n:192},{m:'Vellum',n:200}]},
+        {n:'Levels 108-109: Moksha device — need 3x Lingam stone, 3x Master control', l:'https://runescape.wiki/w/Moksha_device', note:'Orthen, Moksha ritual site. Completes Fragmented Memories (unlocks Xolo City access) and Dragonkin III / Museum - Dragonkin III for the first time.', matList:[{m:'Orgone',n:222},{m:'Carbon black',n:186},{m:'Compass rose',n:228}]},
+        {n:'Levels 109-110: Bibliotheke debris — need 3x \'The Enlightened Soul\' scroll, 3x \'The Eudoxian Elements\' tablet', l:'https://runescape.wiki/w/Bibliotheke_debris', note:'Everlight, Acropolis.', matList:[{m:'Star of Saradomin',n:150},{m:'Vellum',n:180},{m:'White marble',n:180},{m:'Goldrune',n:150}]},
+        {n:'Levels 110-111: Chthonian trophies — need 2x Chaos Elemental trophy, 2x Virius trophy', l:'https://runescape.wiki/w/Chthonian_trophies', note:'Infernal Source, Dagon Overlook north.', matList:[{m:'Chaotic brimstone',n:104},{m:'White oak',n:128},{m:'Hellfire metal',n:60},{m:'Demonhide',n:88},{m:'Orthenglass',n:68}]},
+        {n:'Levels 110-111: Warforge weapon rack — need 2x Drogokishuun hook sword, 2x Hobgoblin mansticker', l:'https://runescape.wiki/w/Warforge_weapon_rack', note:'Warforge, Thalmund\'s forge. Completes Red Rum Relics II for the first time. May find Heart of the Forge mystery pages.', matList:[{m:'Warforged bronze',n:220},{m:'Malachite green',n:72},{m:'Fossilised bone',n:156}]},
+        {n:'Levels 111-112: Flight research debris — need 3x Flat cap, 2x Night owl flight goggles', l:'https://runescape.wiki/w/Flight_research_debris', note:'Stormguard Citadel, R&D south-east.', matList:[{m:'Armadylean yellow',n:268},{m:'Samite silk',n:162},{m:'Leather scraps',n:80},{m:'Orthenglass',n:60}]},
+        {n:'Levels 112-113: Aetherium forge — need 2x Prototype godbow, 3x Prototype godsword, 2x Prototype godstaff', l:'https://runescape.wiki/w/Aetherium_forge', note:'Stormguard Citadel, Howl\'s workshop. A damaged prototype godsword can be used for That\'s Not How it Works (not consumed).', matList:[{m:'Aetherium alloy',n:350},{m:'Quintessence',n:136},{m:'Wings of War',n:238},{m:'Goldrune',n:102}]},
+        {n:'Levels 113-114: Xolo mine — need 2x Xolo hard hat, 2x Xolo pickaxe', l:'https://runescape.wiki/w/Xolo_mine', note:'Orthen, Xolo City (needs Fragmented Memories to enter). Complete Incomplete Portal Network III + repair the teleport device (20 unnoted quintessence) to finish Teleport Node On. May find I Am Become Death pages and powerburst of opportunity recipe fragments.', matList:[{m:'Goldrune',n:180},{m:'Dragon metal',n:232},{m:'Orgone',n:68}]},
+        {n:'Levels 113-114: Traveller\'s station — need 2x Portable portal generator, 2x Warped trinket', l:'https://runescape.wiki/w/Traveller%27s_station', note:'Daemonheim - Depths (complete Thought Process research first). Completes Dragonkin VII / Museum - Dragonkin VII. Cracked totem + mangled trinket only here — completes A New Form. Last spot for the strange token — finish A New Age here.', matList:[{m:'Dragon metal',n:160},{m:'Orthenglass',n:132},{m:'Goldrune',n:128},{m:'Soapstone',n:60}]},
+        {n:'Levels 114-115: Praetorian remains — need 3x Praetorian hood, 2x Praetorian robes, 3x Praetorian staff', l:'https://runescape.wiki/w/Praetorian_remains', note:'Kharid-et, Praetorium. A staff can be used to craft your own inquisitor staff. Completes Hat Problem for the first time.', matList:[{m:'Ancient vis',n:342},{m:'Samite silk',n:252},{m:'Zarosian insignia',n:290},{m:'Death rune',n:490},{m:'Imperial steel',n:108}]},
+        {n:'Levels 115-116: Bandos\'s sanctum debris — need 3x Kal-i-kra chieftain crown, 2x Kal-i-kra mace, 2x Kal-i-kra warhorn', l:'https://runescape.wiki/w/Bandos%27s_sanctum_debris', note:'Warforge, Bandos\'s sanctum.', matList:[{m:'Yu\'biusk clay',n:198},{m:'Animal furs',n:260},{m:'Vulcanised rubber',n:172},{m:'Third Age iron',n:88},{m:'Fossilised bone',n:164}]},
+        {n:'Levels 116-117: Tsutsaroth remains — need 3x Tsutsaroth helm, 2x Tsutsaroth pauldron, 2x Tsutsaroth urumi', l:'https://runescape.wiki/w/Tsutsaroth_remains', note:'Infernal Source, Dagon Overlook south-west. Completes Zamorakian IV, Museum - Zamorakian IV, and Hat Hoarder.', matList:[{m:'Hellfire metal',n:330},{m:'Eye of Dagon',n:280},{m:'Goldrune',n:220},{m:'Third Age iron',n:80}]},
+        {n:'Levels 117-118: Optimatoi remains — need 2x Kontos lance, 2x Doru spear', l:'https://runescape.wiki/w/Optimatoi_remains', note:'Everlight, Underwater cave. Completes Saradominist IV and Museum - Saradominist IV for the first time.', matList:[{m:'Everlight silvthril',n:280},{m:'Samite silk',n:124},{m:'White oak',n:124}]},
+        {n:'Levels 118-119: Howl\'s workshop debris — need 4x Chuluu stone, 2x Quintessence counter, 2x Spherical astrolabe', l:'https://runescape.wiki/w/Howl%27s_workshop_debris', note:'Stormguard Citadel, Howl\'s workshop. Completes Armadylean III, Museum - Armadylean III, and Magic Man for the first time.', matList:[{m:'Aetherium alloy',n:252},{m:'Quintessence',n:228},{m:'Soapstone',n:160},{m:'Goldrune',n:96},{m:'Stormguard steel',n:80},{m:'White oak',n:80},{m:'Armadylean yellow',n:80},{m:'Orthenglass',n:96}]},
+        {n:'Levels 118-119: War table debris — need 2x Ancient globe, 2x Battle plans, 3x \'Prima Legio\' painting', l:'https://runescape.wiki/w/War_table_debris', note:'Kharid-et, Praetorium. Last spot for commander\'s/praetorian\'s log pages — finish Decimation and Shadow Fall here. Completes Zarosian IV, Museum - Zarosian IV, and Imperial Impressionism.', matList:[{m:'White oak',n:100},{m:'Tyrian purple',n:450},{m:'Ancient vis',n:188},{m:'Vellum',n:80},{m:'Samite silk',n:60},{m:'Zarosian insignia',n:60}]},
+        {n:'Levels 119-120: Xolo remains — need 2x Xolo shield, 2x Xolo spear', l:'https://runescape.wiki/w/Xolo_remains', note:'Orthen, Xolo City.', matList:[{m:'Goldrune',n:104},{m:'Orgone',n:216},{m:'Felt',n:84},{m:'Dragon metal',n:148}]},
+        {n:'Levels 119-120: Makeshift pie oven — need 2x Horogothgar cooking pot, 4x \'Da Boss Man\' sculpture', l:'https://runescape.wiki/w/Makeshift_pie_oven', note:'Warforge, Thalmund\'s forge. Completes Museum - Bandosian III, Green Gobbo Goodies III, Red Rum Relics III, and Knowledge is Power.', matList:[{m:'Yu\'biusk clay',n:320},{m:'Malachite green',n:252},{m:'Soapstone',n:256}]},
+        {n:'Level 120+: Saurthen debris — need 3x Gold dish, 3x \'Raksha\' idol', l:'https://runescape.wiki/w/Saurthen_debris', note:'Orthen, Xolo City — the highest-level site. One of each completes Mysterious City. Completes the final Dragonkin IV and Museum - Dragonkin IV. Last spot for I Am Become Death pages if not already done.', matList:[{m:'Goldrune',n:378},{m:'Dragon metal',n:294},{m:'Orgone',n:168}]},
+      ]
+    },
+    {
+      name: 'Testing',
+      note: 'Not part of the guide — just here to verify the merge/save/sync pipeline is actually working.',
+      tasks: [
+        'Test task — check this off, confirm it shows up for everyone, then we can delete this whole section',
+      ]
+    },
+  ];
+
+  const tasks = [];
+  let order = 0;
+  for(const cat of cats){
+    for(const item of cat.tasks){
+      const isObj = typeof item === 'object';
+      let name = isObj ? item.n : item;
+      if(isObj && item.lvl) name = name + ' (' + item.lvl + ')';
+      tasks.push({
+        id: uid(),
+        category: cat.name,
+        name,
+        quest: isObj ? (item.q || null) : null,
+        materials: isObj ? (item.mat || null) : null,
+        matList: isObj ? (item.matList || null) : null,
+        banked: {},
+        link: isObj ? (item.l || null) : null,
+        notes: (isObj && item.note) ? item.note : '',
+        order: order++,
+        solo: false,
+        owner: null,
+        recurring: cat.recurring || null,
+        checks: {}
+      });
+    }
+  }
+  const catNotes = {};
+  cats.forEach(c => { if(c.note) catNotes[c.name] = c.note; });
+  return { members, tasks, catNotes, catOrder: cats.map(c=>c.name) };
+}
+
+let CAT_NOTES = {};
+let CAT_ORDER = [];
+
+async function load(){
+  const seedRef = seedData();
+  CAT_NOTES = seedRef.catNotes;
+  CAT_ORDER = seedRef.catOrder;
+
+  const cloud = await cloudLoad();
+  if(cloud){
+    state.members = (Array.isArray(cloud.members) && cloud.members.length > 0) ? cloud.members : seedRef.members;
+    state.tasks = Array.isArray(cloud.tasks) ? cloud.tasks : [];
+  } else {
+    state.members = seedRef.members;
+    state.tasks = [];
+  }
+
+  // Deliberately deprecated categories — removed from a past update at the person's request.
+  // This is the only kind of automatic deletion this tool ever does: explicit, named, and one-directional.
+  const DEPRECATED_CATEGORIES = ['Archaeology — Excavation Sites Reference', 'Archaeology — Materials Needed (Levels 1-42)', 'Archaeology — Materials Needed (Levels 42-70)'];
+  const beforeRemoveCount = state.tasks.length;
+  state.tasks = state.tasks.filter(t => !DEPRECATED_CATEGORIES.includes(t.category));
+  const removedCount = beforeRemoveCount - state.tasks.length;
+
+  // One-time correction: an earlier update mistakenly put per-single-item material costs
+  // directly on the farming-route rows (not accounting for needing multiple of an artefact).
+  // That data now lives correctly in the separate "Materials Needed" categories instead,
+  // so clear the old field if any farming-route task still has it.
+  let materialsClearedCount = 0;
+  state.tasks.forEach(t=>{
+    if(t.category.startsWith('Archaeology — Artefact Farming Route') && t.materials){
+      t.materials = null;
+      materialsClearedCount++;
+    }
+  });
+
+  // Merge in anything new from seedData (new categories, new tasks added by an update)
+  // without touching or duplicating anything that already exists. Matched by
+  // category + exact task name, so renaming a task "adopts" it as fully custom.
+  // For tasks that already exist, we also backfill brand-new system fields (currently
+  // just "materials") since those didn't exist in older saved data — but we never
+  // touch name, notes, checks, or order on an existing task, since those are yours.
+  const existingByKey = {};
+  state.tasks.forEach(t => { existingByKey[t.category + '::' + t.name] = t; });
+  const existingKeys = new Set(Object.keys(existingByKey));
+  const maxOrderByCat = {};
+  state.tasks.forEach(t=>{
+    maxOrderByCat[t.category] = Math.max(maxOrderByCat[t.category] ?? -1, t.order ?? -1);
+  });
+  let addedCount = 0;
+  let materialsFilledCount = 0;
+  seedRef.tasks.forEach(seedTask=>{
+    const key = seedTask.category + '::' + seedTask.name;
+    if(!existingKeys.has(key)){
+      const nextOrder = (maxOrderByCat[seedTask.category] ?? -1) + 1;
+      maxOrderByCat[seedTask.category] = nextOrder;
+      state.tasks.push(Object.assign({}, seedTask, { id: uid(), order: nextOrder, checks: {}, banked: {} }));
+      existingKeys.add(key);
+      addedCount++;
+    } else {
+      const existing = existingByKey[key];
+      if(!existing.banked) existing.banked = {};
+      if(seedTask.materials && existing.materials !== seedTask.materials){
+        existing.materials = seedTask.materials;
+        materialsFilledCount++;
+      }
+      const seedMatListStr = seedTask.matList ? JSON.stringify(seedTask.matList) : null;
+      const existingMatListStr = existing.matList ? JSON.stringify(existing.matList) : null;
+      if(seedMatListStr && seedMatListStr !== existingMatListStr){
+        existing.matList = seedTask.matList;
+        materialsFilledCount++;
+      }
+    }
+  });
+  if(addedCount > 0 || removedCount > 0 || materialsFilledCount > 0 || materialsClearedCount > 0 || state.tasks.length === 0){
+    await cloudSave(state.members, state.tasks);
+  }
+  if(addedCount > 0){
+    setTimeout(()=>flashStatus('Added ' + addedCount + ' new item(s) from the latest update'), 600);
+  } else if(removedCount > 0){
+    setTimeout(()=>flashStatus('Removed ' + removedCount + ' item(s) from a deprecated section'), 600);
+  } else if(materialsFilledCount > 0){
+    setTimeout(()=>flashStatus('Filled in materials for ' + materialsFilledCount + ' item(s)'), 600);
+  }
+
+  me = localGet(ME_KEY);
+  if(!me || !state.members.includes(me)){
+    me = state.members[0] || null;
+  }
+}
+
+let saveTimer = null;
+function scheduleSave(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveNow, 350);
+}
+async function saveNow(){
+  const ok = await cloudSave(state.members, state.tasks);
+  flashStatus(ok ? 'Saved' : 'Save failed — try again');
+}
+async function saveMembers(){
+  const ok = await cloudSave(state.members, state.tasks);
+  flashStatus(ok ? 'Saved' : 'Save failed — try again');
+}
+async function saveMe(){
+  if(me) localSet(ME_KEY, me);
+}
+
+// ---- Cloud backup (Google Apps Script Web App) ----
+// Independent of Claude's own storage, so it survives things like a republish
+// Automatic backup to an external service (Google Sheets, a webhook, anything) is not
+// possible from inside this artifact — the sandbox's Content Security Policy only allows
+// outbound requests to a fixed list of CDN domains, and there's no way to add to that list
+// from here. So instead: track when you last exported a backup, and nudge you if it's been
+// a while, since that's the real safety net available to us.
+function recordBackupExport(){
+  localSet('last-export-v1', new Date().toISOString());
+  updateBackupReminder(new Date());
+}
+function loadBackupReminder(){
+  let last = null;
+  const v = localGet('last-export-v1');
+  if(v) last = new Date(v);
+  updateBackupReminder(last);
+}
+function updateBackupReminder(last){
+  const el = document.getElementById('cloudIndicator');
+  if(!el) return;
+  if(!last){
+    el.textContent = '⬇ no backup exported yet';
+    el.title = 'Use the Export backup button below to save a copy you can restore from.';
+    return;
+  }
+  const days = (Date.now() - last.getTime()) / 86400000;
+  const label = days < 1 ? 'today' : days < 2 ? 'yesterday' : Math.round(days) + ' days ago';
+  el.textContent = '⬇ last backup: ' + label;
+  el.title = last.toLocaleString();
+  if(days >= 3){
+    el.style.color = 'var(--ember)';
+    el.textContent += ' — consider exporting a fresh one';
+  } else {
+    el.style.color = 'var(--text-dim)';
+  }
+}
+
+function flashStatus(msg){
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 1200);
+}
+
+function isRecurDone(task, member){
+  const ts = task.checks[member];
+  if(!ts) return false;
+  return (Date.now() - new Date(ts).getTime()) < PERIOD_MS[task.recurring];
+}
+function timeAgoLabel(ts){
+  const diffMs = Date.now() - new Date(ts).getTime();
+  const h = diffMs / 3600000;
+  if(h < 1) return Math.round(h*60) + 'm ago';
+  if(h < 48) return Math.round(h) + 'h ago';
+  return Math.round(h/24) + 'd ago';
+}
+
+function renderMembers(){
+  const bar = document.getElementById('membersBar');
+  bar.innerHTML = '';
+  state.members.forEach((name, i)=>{
+    const chip = document.createElement('div');
+    chip.className = 'member-chip';
+    const input = document.createElement('input');
+    input.value = name;
+    input.addEventListener('change', ()=>{
+      const old = state.members[i];
+      state.members[i] = input.value.trim() || old;
+      state.tasks.forEach(t=>{
+        if(t.owner === old) t.owner = state.members[i];
+        if(t.checks[old] !== undefined){ t.checks[state.members[i]] = t.checks[old]; delete t.checks[old]; }
+      });
+      if(me === old) { me = state.members[i]; saveMe(); }
+      saveMembers();
+      scheduleSave();
+      renderAll();
+    });
+    const del = document.createElement('button');
+    del.textContent = '✕';
+    del.title = 'Remove member';
+    del.dataset.armed = 'false';
+    del.addEventListener('click', ()=>{
+      if(del.dataset.armed !== 'true'){
+        del.dataset.armed = 'true';
+        del.textContent = 'sure?';
+        setTimeout(()=>{ del.dataset.armed='false'; del.textContent='✕'; }, 2500);
+        return;
+      }
+      state.members.splice(i,1);
+      saveMembers();
+      renderAll();
+    });
+    chip.appendChild(input);
+    chip.appendChild(del);
+    bar.appendChild(chip);
+  });
+
+  const addForm = document.createElement('form');
+  addForm.className = 'add-member-form';
+  addForm.innerHTML = '<input class="add-member-input" placeholder="New teammate name" /><button type="submit">+ Add</button>';
+  addForm.addEventListener('submit', e=>{
+    e.preventDefault();
+    const input = addForm.querySelector('.add-member-input');
+    const name = input.value.trim();
+    if(!name) return;
+    state.members.push(name);
+    saveMembers();
+    renderAll();
+  });
+  bar.appendChild(addForm);
+
+  const who = document.getElementById('whoSelect');
+  who.innerHTML = '';
+  if(state.members.length === 0){
+    const opt = document.createElement('option');
+    opt.textContent = 'No members yet — add one above';
+    opt.disabled = true;
+    who.appendChild(opt);
+  } else {
+    state.members.forEach(name=>{
+      const opt = document.createElement('option');
+      opt.value = name; opt.textContent = name;
+      if(name === me) opt.selected = true;
+      who.appendChild(opt);
+    });
+  }
+  who.onchange = ()=>{ me = who.value; saveMe(); renderAll(); };
+  document.getElementById('whoHint').textContent = '(controls which "solo goals" section you add to)';
+}
+
+function categoriesInOrder(){
+  const seen = [];
+  CAT_ORDER.forEach(c=>{ if(state.tasks.some(t=>t.category===c) && !seen.includes(c)) seen.push(c); });
+  state.tasks.forEach(t=>{ if(!seen.includes(t.category)) seen.push(t.category); });
+  return seen;
+}
+
+const TAB_DEFS = [
+  {id:'part1', label:'Part 1', match:['Part 1 — Getting Started (Quests & Unlocks)']},
+  {id:'part2', label:'Part 2', match:['Part 2 — Mid-Game Combat Training']},
+  {id:'part3', label:'Part 3', match:['Part 3 — Mid-Game Questing']},
+  {id:'part4', label:'Part 4', match:['Part 4 — Endgame Combat Training']},
+  {id:'part5', label:'Part 5', match:['Part 5 — End-Game Skilling & Quests']},
+  {id:'part6', label:'Part 6', match:['Part 6 — Final Bossing Preparation']},
+  {id:'recurring', label:'Dailies/Weeklies/Monthlies', match:['Dailies','Weeklies','Monthlies']},
+  {id:'farm', label:'Player-Owned Farm', match:['Player-Owned Farm — Before Level 64 Farming','Player-Owned Farm — After Level 64 Farming']},
+  {id:'mining', label:'Mining & Smithing', match:['Mining & Smithing Training']},
+  {id:'arch', label:'Archaeology', match:['Archaeology Training — Mysteries (in order)','Archaeology Training — Collections (in order)','Archaeology Training — Methods By Level','Archaeology — Artefact Farming Route (Levels 1-42)','Archaeology — Artefact Farming Route (Levels 42-70)','Archaeology — Artefact Farming Route (Levels 70-90)','Archaeology — Artefact Farming Route (Levels 90-99)','Archaeology — Artefact Farming Route (Levels 99-120+)']},
+  {id:'solo', label:'Solo Goals', match:null},
+  {id:'custom', label:'Custom', match:null},
+];
+
+function getTabForCat(catName){
+  if(catName.startsWith('Solo Goals —')) return 'solo';
+  for(const t of TAB_DEFS){
+    if(t.match && t.match.includes(catName)) return t.id;
+  }
+  return 'custom';
+}
+
+let activeTab = 'part1';
+
+function tabPercentForMe(tabId, cats){
+  if(!me) return null;
+  const catsInTab = cats.filter(c=>getTabForCat(c)===tabId);
+  let total = 0, done = 0;
+  catsInTab.forEach(catName=>{
+    const isSolo = catName.startsWith('Solo Goals —');
+    const catTasks = state.tasks.filter(t=>t.category===catName);
+    catTasks.forEach(t=>{
+      if(isSolo && t.owner !== me) return; // only count my own solo goals
+      total++;
+      if(t.recurring ? isRecurDone(t, me) : !!t.checks[me]) done++;
+    });
+  });
+  if(total===0) return null;
+  return Math.round((done/total)*100);
+}
+
+function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+
+function renderAll(){
+  renderMembers();
+  const main = document.getElementById('main');
+  const nav = document.getElementById('jumpNav');
+  const tabBar = document.getElementById('tabBar');
+  main.innerHTML = '';
+  nav.innerHTML = '';
+  tabBar.innerHTML = '';
+
+  const allCats = categoriesInOrder();
+  const presentTabIds = TAB_DEFS.map(t=>t.id).filter(id => allCats.some(c=>getTabForCat(c)===id));
+  if(!presentTabIds.includes(activeTab)) activeTab = presentTabIds[0] || 'part1';
+
+  presentTabIds.forEach(tabId=>{
+    const def = TAB_DEFS.find(t=>t.id===tabId);
+    const pct = tabPercentForMe(tabId, allCats);
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (tabId===activeTab ? ' active' : '');
+    btn.innerHTML = def.label + (pct!==null ? ' <span class="tab-pct">'+pct+'%</span>' : '');
+    btn.addEventListener('click', ()=>{
+      activeTab = tabId;
+      localSet('active-tab-v1', activeTab);
+      renderAll();
+    });
+    tabBar.appendChild(btn);
+  });
+
+  const cats = allCats.filter(c => getTabForCat(c) === activeTab);
+  cats.forEach(catName=>{
+    const isSolo = catName.startsWith('Solo Goals —');
+    const allItems = state.tasks.filter(t=>t.category===catName).sort((a,b)=>a.order-b.order);
+    const recurType = allItems.length ? allItems[0].recurring : null;
+
+    function isDoneForMe(t){
+      if(!me) return false;
+      if(recurType) return isRecurDone(t, me);
+      return !!t.checks[me];
+    }
+    const items = (hideDone && me) ? allItems.filter(t=>!isDoneForMe(t)) : allItems;
+
+    const navLink = document.createElement('a');
+    navLink.href = '#' + slugify(catName);
+    navLink.textContent = catName.replace(/^Part \d+ — /,'').replace(/^Player-Owned Farm — /,'POF: ').replace(/^Archaeology Training — /,'Arch: ');
+    nav.appendChild(navLink);
+
+    const catEl = document.createElement('div');
+    catEl.className = 'category';
+    catEl.id = slugify(catName);
+
+    const doneCount = allItems.filter(t=>{
+      if(isSolo){ return t.checks[t.owner]; }
+      if(recurType){ return state.members.length>0 && state.members.every(m=>isRecurDone(t,m)); }
+      return state.members.length>0 && state.members.every(m=>t.checks[m]);
+    }).length;
+
+    const head = document.createElement('div');
+    head.className = 'category-head';
+    head.innerHTML =
+      '<div><h2>' + catName + (recurType ? '<span class="recur-badge">'+recurType+'</span>' : '') + '</h2></div>' +
+      '<div style="display:flex;align-items:center;gap:10px">' +
+        '<span class="count">' + doneCount + '/' + allItems.length + '</span>' +
+        '<span class="chevron">▾</span>' +
+      '</div>';
+    head.addEventListener('click', ()=>{ catEl.classList.toggle('collapsed'); });
+    catEl.appendChild(head);
+
+    const body = document.createElement('div');
+    body.className = 'category-body';
+
+    if(CAT_NOTES[catName]){
+      const note = document.createElement('div');
+      note.className = 'info-note';
+      note.textContent = CAT_NOTES[catName];
+      body.appendChild(note);
+    }
+
+    if(items.length===0){
+      const empty = document.createElement('div');
+      empty.className = 'empty-note';
+      empty.textContent = allItems.length > 0 ? 'All done here — nice work! (toggle "Hide completed" off to see them)' : (isSolo ? 'No solo goals yet for this section.' : 'Nothing here yet.');
+      body.appendChild(empty);
+    }
+
+    items.forEach((task)=>{
+      const idx = allItems.indexOf(task);
+      const row = document.createElement('div');
+      row.className = 'task-row';
+      const allDone = isSolo ? task.checks[task.owner]
+        : recurType ? (state.members.length>0 && state.members.every(m=>isRecurDone(task,m)))
+        : (state.members.length>0 && state.members.every(m=>task.checks[m]));
+      if(allDone) row.classList.add('done-all');
+
+      const main_ = document.createElement('div');
+      main_.className = 'task-main';
+      const nameRow = document.createElement('div');
+      nameRow.style.display = 'flex';
+      nameRow.style.alignItems = 'baseline';
+      nameRow.style.gap = '8px';
+      nameRow.style.flexWrap = 'wrap';
+      const nameEl = document.createElement('div');
+      nameEl.className = 'task-name';
+      nameEl.contentEditable = true;
+      nameEl.textContent = task.name;
+      nameEl.addEventListener('blur', ()=>{
+        task.name = nameEl.textContent.trim() || task.name;
+        scheduleSave();
+      });
+      nameRow.appendChild(nameEl);
+      if(task.link){
+        const linkEl = document.createElement('a');
+        linkEl.href = task.link;
+        linkEl.target = '_blank';
+        linkEl.rel = 'noopener';
+        linkEl.className = 'task-link';
+        linkEl.textContent = '↗ site';
+        nameRow.appendChild(linkEl);
+      }
+      const notesEl = document.createElement('div');
+      notesEl.className = 'task-notes';
+      notesEl.contentEditable = true;
+      notesEl.textContent = task.notes || 'add a note…';
+      notesEl.style.opacity = task.notes ? '1':'0.5';
+      notesEl.addEventListener('focus', ()=>{ if(!task.notes){ notesEl.textContent=''; notesEl.style.opacity='1';} });
+      notesEl.addEventListener('blur', ()=>{
+        task.notes = notesEl.textContent.trim();
+        if(!task.notes){ notesEl.textContent='add a note…'; notesEl.style.opacity='0.5'; }
+        scheduleSave();
+      });
+      main_.appendChild(nameRow);
+      main_.appendChild(notesEl);
+      if(task.materials){
+        const matEl = document.createElement('div');
+        matEl.className = 'task-materials';
+        matEl.textContent = 'Materials: ' + task.materials;
+        main_.appendChild(matEl);
+      }
+      if(task.matList && task.matList.length){
+        const cardKey = task.id;
+        const isExpanded = expandedMatCards.has(cardKey);
+        const myBanked = (me && task.banked[me]) ? task.banked[me] : {};
+        const totalNeeded = task.matList.reduce((s,x)=>s+x.n, 0);
+        const totalRemaining = task.matList.reduce((s,x)=>s + Math.max(0, x.n - (myBanked[x.m]||0)), 0);
+        const matDone = totalRemaining === 0;
+
+        const matCard = document.createElement('div');
+        matCard.className = 'mat-card' + (matDone ? ' mat-done' : '');
+
+        const matToggle = document.createElement('button');
+        matToggle.className = 'mat-toggle';
+        matToggle.textContent = (isExpanded ? '▾' : '▸') + ' Materials' + (me ? (matDone ? ' — all banked' : ' — ' + totalRemaining + '/' + totalNeeded + ' still needed') : ' (pick your name to track)');
+        matToggle.addEventListener('click', ()=>{
+          if(expandedMatCards.has(cardKey)) expandedMatCards.delete(cardKey);
+          else expandedMatCards.add(cardKey);
+          renderAll();
+        });
+        matCard.appendChild(matToggle);
+
+        if(isExpanded){
+          const matBody = document.createElement('div');
+          matBody.className = 'mat-body';
+          task.matList.forEach(({m,n})=>{
+            const row = document.createElement('div');
+            row.className = 'mat-row';
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'mat-name';
+            nameSpan.textContent = m;
+            const bankedInput = document.createElement('input');
+            bankedInput.type = 'number';
+            bankedInput.min = '0';
+            bankedInput.className = 'mat-input';
+            bankedInput.value = myBanked[m] || 0;
+            bankedInput.disabled = !me;
+            bankedInput.addEventListener('change', ()=>{
+              const val = Math.max(0, parseInt(bankedInput.value,10) || 0);
+              if(!task.banked[me]) task.banked[me] = {};
+              task.banked[me][m] = val;
+              scheduleSave();
+              renderAll();
+            });
+            const neededSpan = document.createElement('span');
+            neededSpan.className = 'mat-needed';
+            neededSpan.textContent = '/ ' + n;
+            const remSpan = document.createElement('span');
+            const remaining = Math.max(0, n - (myBanked[m]||0));
+            remSpan.className = 'mat-remaining' + (remaining===0 ? ' mat-remaining-done' : '');
+            remSpan.textContent = remaining===0 ? 'done' : remaining + ' left';
+            row.appendChild(nameSpan);
+            row.appendChild(bankedInput);
+            row.appendChild(neededSpan);
+            row.appendChild(remSpan);
+            matBody.appendChild(row);
+          });
+          matCard.appendChild(matBody);
+        }
+        main_.appendChild(matCard);
+      }
+
+      const checksWrap = document.createElement('div');
+      checksWrap.className = 'checks';
+
+      function buildBox(member){
+        const col = document.createElement('div');
+        col.className = 'check-col';
+        const box = document.createElement('div');
+        const done = recurType ? isRecurDone(task, member) : !!task.checks[member];
+        box.className = 'check-box' + (done ? (recurType ? ' recur-checked' : ' checked') : '');
+        box.textContent = '✓';
+        if(recurType && task.checks[member]) box.title = 'Last done ' + timeAgoLabel(task.checks[member]);
+        box.addEventListener('click', ()=>{
+          if(recurType){
+            if(isRecurDone(task, member)){ delete task.checks[member]; }
+            else { task.checks[member] = new Date().toISOString(); }
+          } else {
+            task.checks[member] = !task.checks[member];
+            if(task.checks[member] && task.matList){
+              if(!task.banked[member]) task.banked[member] = {};
+              task.matList.forEach(({m,n})=>{ task.banked[member][m] = n; });
+            }
+          }
+          scheduleSave();
+          renderAll();
+        });
+        const label = document.createElement('div');
+        label.className='check-label';
+        label.textContent = member;
+        col.appendChild(box); col.appendChild(label);
+        return col;
+      }
+
+      if(isSolo){
+        checksWrap.appendChild(buildBox(task.owner));
+      } else {
+        state.members.forEach(m=> checksWrap.appendChild(buildBox(m)));
+      }
+
+      const actions = document.createElement('div');
+      actions.className = 'row-actions';
+      const up = document.createElement('button'); up.textContent='▲';
+      up.addEventListener('click', ()=>{
+        if(idx>0){
+          const prev = allItems[idx-1];
+          const tmp = task.order; task.order = prev.order; prev.order = tmp;
+          scheduleSave(); renderAll();
+        }
+      });
+      const down = document.createElement('button'); down.textContent='▼';
+      down.addEventListener('click', ()=>{
+        if(idx<allItems.length-1){
+          const next = allItems[idx+1];
+          const tmp = task.order; task.order = next.order; next.order = tmp;
+          scheduleSave(); renderAll();
+        }
+      });
+      const del = document.createElement('button'); del.textContent='✕'; del.className='del-btn';
+      del.addEventListener('click', ()=>{
+        state.tasks = state.tasks.filter(t=>t.id!==task.id);
+        scheduleSave(); renderAll();
+      });
+      actions.appendChild(up); actions.appendChild(down); actions.appendChild(del);
+
+      row.appendChild(main_);
+      row.appendChild(checksWrap);
+      row.appendChild(actions);
+      body.appendChild(row);
+    });
+
+    const matBearingTasks = allItems.filter(t=>t.matList && t.matList.length);
+    if(matBearingTasks.length){
+      const totals = {};
+      let anyRemaining = false;
+      matBearingTasks.forEach(t=>{
+        const done = me ? !!t.checks[me] : false;
+        const myBanked = (me && t.banked[me]) ? t.banked[me] : {};
+        t.matList.forEach(({m,n})=>{
+          const remaining = done ? 0 : Math.max(0, n - (myBanked[m]||0));
+          if(remaining > 0) anyRemaining = true;
+          totals[m] = (totals[m]||0) + remaining;
+        });
+      });
+      const totalCard = document.createElement('div');
+      totalCard.className = 'cat-total-card';
+      if(!me){
+        totalCard.textContent = 'Pick your name above to see your total materials still needed for this whole section.';
+      } else if(!anyRemaining){
+        totalCard.innerHTML = '<strong>All materials for this section are banked.</strong>';
+      } else {
+        const parts = Object.entries(totals).filter(([,v])=>v>0).map(([m,v])=>v+'x '+m);
+        totalCard.innerHTML = '<strong>Still need for this whole section:</strong> ' + parts.join(', ');
+      }
+      body.appendChild(totalCard);
+    }
+
+    const addRow = document.createElement('div');
+    addRow.className = 'add-row';
+    const input = document.createElement('input');
+    input.placeholder = isSolo ? 'Add a solo goal for '+ (catName.replace('Solo Goals — ','')) + '…' : 'Add a step to this section…';
+    const btn = document.createElement('button');
+    btn.textContent = 'Add';
+    const addFn = ()=>{
+      const val = input.value.trim();
+      if(!val) return;
+      const maxOrder = allItems.length ? Math.max(...allItems.map(t=>t.order)) : 0;
+      const owner = isSolo ? catName.replace('Solo Goals — ','') : null;
+      state.tasks.push({
+        id: uid(), category: catName, name: val, notes:'',
+        order: maxOrder+1, solo: isSolo, owner, recurring: recurType || null, checks:{}
+      });
+      input.value='';
+      scheduleSave(); renderAll();
+    };
+    btn.addEventListener('click', addFn);
+    input.addEventListener('keydown', e=>{ if(e.key==='Enter') addFn(); });
+    addRow.appendChild(input); addRow.appendChild(btn);
+    body.appendChild(addRow);
+
+    catEl.appendChild(body);
+    main.appendChild(catEl);
+  });
+}
+
+document.getElementById('newCategoryForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const input = document.getElementById('newCategoryInput');
+  const val = input.value.trim();
+  if(!val) return;
+  const maxOrder = state.tasks.length ? Math.max(...state.tasks.map(t=>t.order)) : 0;
+  state.tasks.push({ id: uid(), category: val, name: 'New step — edit me', notes:'', order:maxOrder+1, solo:false, owner:null, recurring:null, checks:{} });
+  input.value='';
+  scheduleSave(); renderAll();
+});
+
+function ensureSoloSections(){
+  state.members.forEach(m=>{
+    const catName = 'Solo Goals — ' + m;
+    const exists = state.tasks.some(t=>t.category===catName);
+    if(!exists){
+      state.tasks.push({
+        id: uid(), category: catName, name: 'Example: hit 99 Farming',
+        notes:'', order:0, solo:true, owner:m, recurring:null, checks:{}
+      });
+      CAT_ORDER.push(catName);
+    }
+  });
+}
+
+function normQuest(s){
+  return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+}
+
+function applyQuestData(questArray){
+  if(!me){ flashStatus('Pick your name first'); return {matched:0, completed:0}; }
+  const completedTitles = new Set(
+    questArray
+      .filter(q => (q.status||'').toUpperCase().indexOf('COMPLET') !== -1)
+      .map(q => normQuest(q.title))
+  );
+  let matched = 0, completed = 0;
+  state.tasks.forEach(t=>{
+    if(!t.quest) return;
+    matched++;
+    if(completedTitles.has(normQuest(t.quest))){
+      if(!t.checks[me]){ t.checks[me] = true; completed++; }
+    }
+  });
+  scheduleSave();
+  renderAll();
+  return {matched, completed};
+}
+
+document.getElementById('importToggle').addEventListener('click', ()=>{
+  const p = document.getElementById('importPanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+});
+
+document.getElementById('importBtn').addEventListener('click', ()=>{
+  const name = document.getElementById('rsName').value.trim();
+  const statusEl = document.getElementById('importStatus');
+  const fallback = document.getElementById('importFallback');
+  if(!name){ statusEl.textContent = 'Enter your RS3 display name first.'; return; }
+  const url = 'https://apps.runescape.com/runemetrics/quests?user=' + encodeURIComponent(name);
+  document.getElementById('fallbackLink').href = url;
+  document.getElementById('fallbackLink').textContent = url;
+  fallback.style.display = 'block';
+  statusEl.textContent = '';
+});
+
+document.getElementById('parsePastedBtn').addEventListener('click', ()=>{
+  const raw = document.getElementById('pasteJson').value.trim();
+  const statusEl = document.getElementById('importStatus');
+  if(!raw){ statusEl.textContent = 'Paste the JSON first.'; return; }
+  try{
+    const data = JSON.parse(raw);
+    if(!data.quests) throw new Error('No "quests" array found in that JSON');
+    const r = applyQuestData(data.quests);
+    statusEl.textContent = 'Done — checked off ' + r.completed + ' newly-completed quest(s) out of ' + r.matched + ' tracked, for ' + me + '.';
+  }catch(e){
+    statusEl.textContent = 'Could not parse that JSON: ' + e.message;
+  }
+});
+
+document.getElementById('exportBtn').addEventListener('click', async ()=>{
+  flashStatus('Fetching latest data…');
+  const cloud = await cloudLoad();
+  if(cloud){
+    if(Array.isArray(cloud.tasks)) state.tasks = cloud.tasks;
+    if(Array.isArray(cloud.members) && cloud.members.length>0) state.members = cloud.members;
+  } // else: fall back to whatever is currently in memory
+  renderAll();
+
+  const payload = { exportedAt: new Date().toISOString(), members: state.members, tasks: state.tasks };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = 'ironman-ledger-backup-' + stamp + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  flashStatus('Backup downloaded (fresh data)');
+  recordBackupExport();
+});
+
+document.getElementById('importBackupToggle').addEventListener('click', ()=>{
+  const p = document.getElementById('restorePanel');
+  p.style.display = p.style.display === 'none' ? 'block' : 'none';
+});
+
+document.getElementById('restoreConfirmBtn').addEventListener('click', function(){
+  if(this.dataset.armed !== 'true'){
+    this.dataset.armed = 'true';
+    this.textContent = 'Click again to pick file & confirm';
+    setTimeout(()=>{ this.dataset.armed='false'; this.textContent='Choose file & restore'; }, 4000);
+    return;
+  }
+  this.dataset.armed = 'false';
+  this.textContent = 'Choose file & restore';
+  document.getElementById('importFile').click();
+});
+
+document.getElementById('importFile').addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  const statusEl = document.getElementById('restoreStatus');
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    try{
+      const data = JSON.parse(reader.result);
+      if(!Array.isArray(data.tasks) || !Array.isArray(data.members)) throw new Error('File is missing "tasks" or "members" arrays');
+      state.members = data.members;
+      state.tasks = data.tasks;
+      await saveMembers();
+      await saveNow();
+      // Immediately re-run the merge so anything added since this backup was taken
+      // (new tasks, categories, materials) shows up right away instead of waiting
+      // for the next auto-sync.
+      await load();
+      renderAll();
+      markSynced();
+      statusEl.textContent = 'Restored ' + data.tasks.length + ' tasks and ' + data.members.length + ' members, and merged in anything new since this backup.';
+    }catch(err){
+      statusEl.textContent = 'Could not restore: ' + err.message;
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+async function init(){
+  await load();
+  ensureSoloSections();
+  await saveNow();
+  hideDone = localGet('hide-done-v1') === 'true';
+  activeTab = localGet('active-tab-v1') || 'part1';
+  document.getElementById('hideDoneToggle').checked = hideDone;
+  document.getElementById('hideDoneToggle').addEventListener('change', (e)=>{
+    hideDone = e.target.checked;
+    localSet('hide-done-v1', String(hideDone));
+    renderAll();
+  });
+  renderAll();
+  markSynced();
+  loadBackupReminder();
+}
+init();
+
+// Live sync: pull in teammates' changes automatically, without needing a manual reload.
+// Skipped whenever the person is actively typing in a name/notes field, an input,
+// or the restore-file picker is open, so a background sync never eats an in-progress edit.
+function isUserActivelyEditing(){
+  const el = document.activeElement;
+  if(!el) return false;
+  const tag = (el.tagName || '').toLowerCase();
+  return el.isContentEditable || tag==='input' || tag==='textarea' || tag==='select';
+}
+function markSynced(){
+  const el = document.getElementById('syncIndicator');
+  if(el) el.textContent = '● synced ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+}
+async function backgroundSync(){
+  if(isUserActivelyEditing()) return;
+  await load();
+  renderAll();
+  markSynced();
+}
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'visible') backgroundSync();
+});
+setInterval(backgroundSync, 45000);
+</script>
+</body>
+</html>
