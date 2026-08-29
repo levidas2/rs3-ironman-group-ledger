@@ -46,6 +46,12 @@
   }
   h1,h2,h3,.display{font-family:'Cinzel',serif}
 
+  #loadFailedBanner{
+    background:#5a1f1f;border-bottom:2px solid var(--ember);color:#fff;
+    padding:14px 20px;font-size:14px;line-height:1.5;text-align:center;
+  }
+  #loadFailedBanner strong{color:#ffcf9e}
+
   header{
     padding:28px 20px 20px;
     border-bottom:1px solid var(--line);
@@ -120,7 +126,7 @@
   nav.jumpnav{max-width:900px;margin:10px auto 0;padding:0 20px;display:flex;flex-wrap:wrap;gap:6px}
   nav.jumpnav a{
     font-size:11px;color:var(--text-dim);text-decoration:none;border:1px solid var(--line);
-    border-radius:14px;padding:4px 10px;
+    border-radius:14px;padding:4px 10px;background:var(--panel-2);
   }
   nav.jumpnav a:hover{color:var(--gold);border-color:var(--gold-dim)}
 
@@ -179,8 +185,8 @@
   .task-main{flex:1;min-width:0}
   .task-name{font-size:14px;line-height:1.4}
   .task-notes{font-size:12px;color:var(--text-dim);margin-top:3px;line-height:1.4;white-space:pre-line}
-  .task-notes[contenteditable], .task-name[contenteditable]{outline:none;border-bottom:1px dashed transparent}
-  .task-notes[contenteditable]:focus, .task-name[contenteditable]:focus{border-bottom:1px dashed var(--gold-dim)}
+  .task-notes[contenteditable]{outline:none;border-bottom:1px dashed transparent}
+  .task-notes[contenteditable]:focus{border-bottom:1px dashed var(--gold-dim)}
   .task-link{font-size:11px;color:var(--blue);text-decoration:none;white-space:nowrap}
   .task-materials{font-size:11px;color:var(--text-dim);margin-top:3px;opacity:.8;line-height:1.5}
 
@@ -285,6 +291,7 @@
 </head>
 <body>
 
+<div id="loadFailedBanner" style="display:none"></div>
 <header>
   <div class="header-top">
     <div class="header-text">
@@ -334,13 +341,6 @@
 
 <main id="main"></main>
 
-<div class="new-category-row">
-  <form id="newCategoryForm">
-    <input id="newCategoryInput" placeholder="Add a new section" />
-    <button type="submit">+ Section</button>
-  </form>
-</div>
-
 <div class="backup-row">
   <button id="exportBtn" class="backup-btn">⬇ Export backup (.json)</button>
   <button id="importBackupToggle" class="backup-btn">⬆ Restore from backup</button>
@@ -366,16 +366,29 @@ const CLOUD_SECRET = '3bigonesbigonesbigones';
 async function cloudLoad(){
   try{
     const res = await fetch(CLOUD_URL + '?secret=' + encodeURIComponent(CLOUD_SECRET));
-    const data = await res.json();
-    if(!data || data.status === 'empty' || data.status === 'error') return null;
-    if(!Array.isArray(data.tasks) || !Array.isArray(data.members)) return null;
-    return data;
+    if(!res.ok) return { error: true, reason: 'HTTP ' + res.status };
+    const text = await res.text();
+    if(!text) return { error: true, reason: 'empty response body' };
+    let data;
+    try{ data = JSON.parse(text); }catch(e){ return { error: true, reason: 'bad JSON' }; }
+    if(!data) return { error: true, reason: 'no data' };
+    if(data.status === 'error') return { error: true, reason: data.message || 'server error' };
+    if(data.status === 'empty') return { empty: true };
+    if(!Array.isArray(data.tasks) || !Array.isArray(data.members)) return { error: true, reason: 'bad shape' };
+    return { members: data.members, tasks: data.tasks };
   }catch(e){
     console.error('cloudLoad failed', e);
-    return null;
+    return { error: true, reason: e.message };
   }
 }
-async function cloudSave(members, tasks){
+async function cloudSave(members, tasks, force){
+  // Hard safety floor: never let a suspiciously small payload overwrite real shared
+  // data. The seed guide alone is 500+ tasks, so anything drastically smaller is far
+  // more likely a failed/partial load than a real, intentional state to save.
+  if(!force && (!Array.isArray(tasks) || tasks.length < 50)){
+    console.error('cloudSave refused: payload looks too small to be real (' + (tasks ? tasks.length : 0) + ' tasks). Not sending.');
+    return false;
+  }
   try{
     await fetch(CLOUD_URL, {
       method: 'POST',
@@ -781,7 +794,6 @@ function seedData(){
         'Nemi Forest',
         'Daily Challenges (put combat challenge XP into Ranged)',
         'Soul Obelisk',
-        'Guthixian Cache (opens after depositing 800 memories at a rift, needs 35 Divination — no daily cap otherwise)',
         "Rapid growth — Het's Oasis bushes (4 bushes, 2x each, 88 Magic)",
       ]
     },
@@ -1097,12 +1109,26 @@ async function load(){
   CAT_ORDER = seedRef.catOrder;
 
   const cloud = await cloudLoad();
-  if(cloud){
-    state.members = (Array.isArray(cloud.members) && cloud.members.length > 0) ? cloud.members : seedRef.members;
-    state.tasks = Array.isArray(cloud.tasks) ? cloud.tasks : [];
-  } else {
+
+  if(cloud.error){
+    // We could not confirm what's actually in the shared store. Refusing to touch
+    // anything — no seeding, no saving — rather than risk what happened before:
+    // a failed load silently getting treated as "empty" and overwriting real data.
+    state.loadFailed = true;
     state.members = seedRef.members;
     state.tasks = [];
+    showLoadFailedBanner(cloud.reason);
+    return;
+  }
+  state.loadFailed = false;
+  hideLoadFailedBanner();
+
+  if(cloud.empty){
+    state.members = seedRef.members;
+    state.tasks = [];
+  } else {
+    state.members = (cloud.members && cloud.members.length > 0) ? cloud.members : seedRef.members;
+    state.tasks = cloud.tasks;
   }
 
   // Deliberately deprecated categories — removed from a past update at the person's request.
@@ -1110,7 +1136,16 @@ async function load(){
   const DEPRECATED_CATEGORIES = ['Archaeology — Excavation Sites Reference', 'Archaeology — Materials Needed (Levels 1-42)', 'Archaeology — Materials Needed (Levels 42-70)'];
   const beforeRemoveCount = state.tasks.length;
   state.tasks = state.tasks.filter(t => !DEPRECATED_CATEGORIES.includes(t.category));
-  const removedCount = beforeRemoveCount - state.tasks.length;
+  let removedCount = beforeRemoveCount - state.tasks.length;
+
+  // Same idea, but for individual tasks within a category we're otherwise keeping —
+  // e.g. a real game-mechanics change (Guthixian Cache is no longer a plain daily).
+  const DEPRECATED_TASKS = [
+    { category: 'Dailies', name: 'Guthixian Cache (opens after depositing 800 memories at a rift, needs 35 Divination — no daily cap otherwise)' },
+  ];
+  const beforeTaskRemoveCount = state.tasks.length;
+  state.tasks = state.tasks.filter(t => !DEPRECATED_TASKS.some(d => d.category === t.category && d.name === t.name));
+  removedCount += beforeTaskRemoveCount - state.tasks.length;
 
   // One-time correction: an earlier update mistakenly put per-single-item material costs
   // directly on the farming-route rows (not accounting for needing multiple of an artefact).
@@ -1233,6 +1268,20 @@ function updateBackupReminder(last){
   }
 }
 
+function showLoadFailedBanner(reason){
+  const el = document.getElementById('loadFailedBanner');
+  if(!el) return;
+  el.style.display = 'block';
+  el.innerHTML = '<strong>⚠ Could not load the shared data'
+    + (reason ? ' (' + reason + ')' : '') + '.</strong> '
+    + 'Showing nothing rather than risk overwriting anyone\'s progress. '
+    + 'Nothing has been saved. Please reload the page — if this keeps happening, stop and tell Brandon before making any changes here.';
+}
+function hideLoadFailedBanner(){
+  const el = document.getElementById('loadFailedBanner');
+  if(el) el.style.display = 'none';
+}
+
 function flashStatus(msg){
   const el = document.getElementById('status');
   el.textContent = msg;
@@ -1345,7 +1394,6 @@ const TAB_DEFS = [
   {id:'mining', label:'Mining & Smithing', match:['Mining & Smithing Training']},
   {id:'arch', label:'Archaeology', match:['Archaeology Training — Mysteries (in order)','Archaeology Training — Collections (in order)','Archaeology Training — Methods By Level','Archaeology — Artefact Farming Route (Levels 1-42)','Archaeology — Artefact Farming Route (Levels 42-70)','Archaeology — Artefact Farming Route (Levels 70-90)','Archaeology — Artefact Farming Route (Levels 90-99)','Archaeology — Artefact Farming Route (Levels 99-120+)']},
   {id:'solo', label:'Solo Goals', match:null},
-  {id:'custom', label:'Custom', match:null},
 ];
 
 function getTabForCat(catName){
@@ -1353,7 +1401,7 @@ function getTabForCat(catName){
   for(const t of TAB_DEFS){
     if(t.match && t.match.includes(catName)) return t.id;
   }
-  return 'custom';
+  return 'solo'; // fallback for any leftover/unrecognized category — no more Custom tab
 }
 
 let activeTab = 'part1';
@@ -1478,12 +1526,7 @@ function renderAll(){
       nameRow.style.flexWrap = 'wrap';
       const nameEl = document.createElement('div');
       nameEl.className = 'task-name';
-      nameEl.contentEditable = true;
       nameEl.textContent = task.name;
-      nameEl.addEventListener('blur', ()=>{
-        task.name = nameEl.textContent.trim() || task.name;
-        scheduleSave();
-      });
       nameRow.appendChild(nameEl);
       if(task.link){
         const linkEl = document.createElement('a');
@@ -1697,17 +1740,6 @@ function renderAll(){
   });
 }
 
-document.getElementById('newCategoryForm').addEventListener('submit', e=>{
-  e.preventDefault();
-  const input = document.getElementById('newCategoryInput');
-  const val = input.value.trim();
-  if(!val) return;
-  const maxOrder = state.tasks.length ? Math.max(...state.tasks.map(t=>t.order)) : 0;
-  state.tasks.push({ id: uid(), category: val, name: 'New step — edit me', notes:'', order:maxOrder+1, solo:false, owner:null, recurring:null, checks:{} });
-  input.value='';
-  scheduleSave(); renderAll();
-});
-
 function ensureSoloSections(){
   state.members.forEach(m=>{
     const catName = 'Solo Goals — ' + m;
@@ -1848,8 +1880,10 @@ document.getElementById('importFile').addEventListener('change', (e)=>{
 
 async function init(){
   await load();
-  ensureSoloSections();
-  await saveNow();
+  if(!state.loadFailed){
+    ensureSoloSections();
+    await saveNow();
+  }
   hideDone = localGet('hide-done-v1') === 'true';
   activeTab = localGet('active-tab-v1') || 'part1';
   document.getElementById('hideDoneToggle').checked = hideDone;
@@ -1859,8 +1893,10 @@ async function init(){
     renderAll();
   });
   renderAll();
-  markSynced();
-  loadBackupReminder();
+  if(!state.loadFailed){
+    markSynced();
+    loadBackupReminder();
+  }
 }
 init();
 
@@ -1881,7 +1917,7 @@ async function backgroundSync(){
   if(isUserActivelyEditing()) return;
   await load();
   renderAll();
-  markSynced();
+  if(!state.loadFailed) markSynced();
 }
 document.addEventListener('visibilitychange', ()=>{
   if(document.visibilityState === 'visible') backgroundSync();
