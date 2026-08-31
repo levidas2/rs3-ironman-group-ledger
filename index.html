@@ -130,6 +130,37 @@
   }
   nav.jumpnav a:hover{color:var(--gold);border-color:var(--gold-dim)}
 
+  .celebration-toast{
+    position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);
+    background:var(--gold);color:#161a1e;font-weight:700;font-size:15px;
+    padding:14px 26px;border-radius:30px;box-shadow:0 8px 24px rgba(0,0,0,.4);
+    z-index:1000;opacity:0;transition:opacity .3s, transform .3s;pointer-events:none;
+  }
+  .celebration-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .confetti-piece{
+    position:fixed;top:-10px;width:8px;height:14px;z-index:999;
+    pointer-events:none;animation:confetti-fall linear forwards;
+  }
+  @keyframes confetti-fall{ to { transform: translateY(105vh) rotate(360deg); } }
+
+  .search-row{max-width:900px;margin:16px auto 0;padding:0 20px}
+  .search-row input{
+    width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    color:var(--text);padding:10px 14px;font-size:14px;
+  }
+  .search-row input:focus{outline:none;border-color:var(--gold-dim)}
+
+  .search-results-wrap{max-width:900px;margin:0 auto;padding:20px}
+  .search-results-heading{color:var(--gold);font-size:14px;margin-bottom:10px}
+  .search-result-row{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    background:var(--panel);border:1px solid var(--line);border-radius:8px;
+    padding:10px 14px;margin-bottom:8px;
+  }
+  .search-result-info{flex:1;min-width:0}
+  .search-result-cat{font-size:10px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+  .search-result-name-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:14px}
+
   .tab-bar{
     max-width:900px;margin:16px auto 0;padding:0 20px;
     display:flex;flex-wrap:wrap;gap:8px;
@@ -146,6 +177,28 @@
   .tab-btn:hover{color:var(--gold)}
   .tab-pct{font-size:10px;color:var(--blue);font-weight:600}
   .tab-btn.active .tab-pct{color:var(--gold)}
+
+  .overview-wrap{max-width:900px;margin:0 auto;padding:20px}
+  .overview-table{
+    width:100%;border-collapse:collapse;background:var(--panel);
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px;
+  }
+  .overview-table th, .overview-table td{
+    padding:10px 14px;text-align:center;border-bottom:1px solid #262c33;
+  }
+  .overview-table th{background:var(--panel-2);color:var(--gold);font-family:'Cinzel',serif;font-weight:600}
+  .overview-label{text-align:left!important;color:var(--text-dim)}
+  .overview-full{color:var(--green);font-weight:700}
+  .overview-overall-row td{font-weight:700;color:var(--gold);border-top:2px solid var(--gold-dim)}
+  .overview-feed-title{margin:24px 0 4px;color:var(--gold);font-size:16px}
+  .overview-feed-note{color:var(--text-dim);font-size:12px;margin-bottom:12px;font-style:italic}
+  .activity-feed{display:flex;flex-direction:column;gap:6px}
+  .activity-row{
+    background:var(--panel);border:1px solid var(--line);border-radius:6px;
+    padding:8px 12px;font-size:13px;display:flex;justify-content:space-between;gap:10px;
+  }
+  .activity-row strong{color:var(--gold)}
+  .activity-when{color:var(--text-dim);font-size:11px;white-space:nowrap}
 
   main{max-width:900px;margin:0 auto;padding:20px}
 
@@ -336,6 +389,9 @@
 </div>
 </header>
 
+<div class="search-row">
+  <input id="searchInput" placeholder="🔍 Search all tasks…" />
+</div>
 <div class="tab-bar" id="tabBar"></div>
 <nav class="jumpnav" id="jumpNav"></nav>
 
@@ -381,6 +437,36 @@ async function cloudLoad(){
     return { error: true, reason: e.message };
   }
 }
+// Merges checks/banked at the individual task+member level so two people saving
+// within the same sync window can't clobber each other's progress. A checkmark or
+// banked-material amount is never lost by this merge — only ever gained.
+function mergeCheckData(localTasks, remoteTasks){
+  const remoteByKey = {};
+  remoteTasks.forEach(t => { remoteByKey[t.category + '::' + t.name] = t; });
+  return localTasks.map(lt => {
+    const rt = remoteByKey[lt.category + '::' + lt.name];
+    if(!rt) return lt; // remote doesn't have this task at all — nothing to merge
+    const mergedChecks = Object.assign({}, rt.checks, lt.checks);
+    // If both sides have a timestamp for the same member, keep whichever is newer.
+    Object.keys(lt.checks || {}).forEach(m=>{
+      const lv = lt.checks[m], rv = rt.checks && rt.checks[m];
+      if(lv && rv && typeof lv === 'string' && typeof rv === 'string'){
+        mergedChecks[m] = (new Date(lv) > new Date(rv)) ? lv : rv;
+      }
+    });
+    const mergedBanked = {};
+    const allBankMembers = new Set([...Object.keys(lt.banked||{}), ...Object.keys(rt.banked||{})]);
+    allBankMembers.forEach(m=>{
+      const lb = (lt.banked && lt.banked[m]) || {};
+      const rb = (rt.banked && rt.banked[m]) || {};
+      const mats = new Set([...Object.keys(lb), ...Object.keys(rb)]);
+      mergedBanked[m] = {};
+      mats.forEach(mat=>{ mergedBanked[m][mat] = Math.max(lb[mat]||0, rb[mat]||0); });
+    });
+    return Object.assign({}, lt, { checks: mergedChecks, banked: mergedBanked });
+  });
+}
+
 async function cloudSave(members, tasks, force){
   // Hard safety floor: never let a suspiciously small payload overwrite real shared
   // data. The seed guide alone is 500+ tasks, so anything drastically smaller is far
@@ -389,11 +475,21 @@ async function cloudSave(members, tasks, force){
     console.error('cloudSave refused: payload looks too small to be real (' + (tasks ? tasks.length : 0) + ' tasks). Not sending.');
     return false;
   }
+  // Merge against whatever's live right now before overwriting, so a teammate's
+  // save in the last few seconds doesn't get silently lost.
+  let finalTasks = tasks;
+  if(!force){
+    const remote = await cloudLoad();
+    if(remote && !remote.error && !remote.empty && Array.isArray(remote.tasks)){
+      finalTasks = mergeCheckData(tasks, remote.tasks);
+      state.tasks = finalTasks; // reflect the merge locally too, not just on the server
+    }
+  }
   try{
     await fetch(CLOUD_URL, {
       method: 'POST',
       headers: {'Content-Type': 'text/plain;charset=utf-8'},
-      body: JSON.stringify({ secret: CLOUD_SECRET, payload: { members, tasks } })
+      body: JSON.stringify({ secret: CLOUD_SECRET, payload: { members, tasks: finalTasks } })
     });
     return true;
   }catch(e){
@@ -1282,6 +1378,73 @@ function hideLoadFailedBanner(){
   if(el) el.style.display = 'none';
 }
 
+function computeTotalCompletedForMe(){
+  if(!me) return 0;
+  let count = 0;
+  state.tasks.forEach(t=>{
+    const isSolo = t.category.startsWith('Solo Goals —');
+    if(isSolo && t.owner !== me) return;
+    if(t.recurring){ if(isRecurDone(t, me)) count++; }
+    else { if(t.checks[me]) count++; }
+  });
+  return count;
+}
+
+function checkForCelebration(category){
+  if(!me) return;
+
+  // Milestone: total completed count for me crossing a multiple of 25
+  const total = computeTotalCompletedForMe();
+  const lastTotalKey = 'celebrate-last-total-' + me;
+  const lastTotal = parseInt(localGet(lastTotalKey) || '0', 10);
+  localSet(lastTotalKey, String(total));
+  if(total > 0 && Math.floor(total/25) > Math.floor(lastTotal/25)){
+    fireCelebration(Math.floor(total/25)*25 + ' tasks completed!');
+  }
+
+  // Section complete: is this whole category now fully done for me? Only celebrate
+  // each category once per person, tracked locally.
+  const isSolo = category.startsWith('Solo Goals —');
+  const relevant = state.tasks.filter(t=>t.category===category && (!isSolo || t.owner===me));
+  if(relevant.length > 0 && relevant.every(t => t.recurring ? isRecurDone(t, me) : !!t.checks[me])){
+    const celebratedKey = 'celebrated-cats-' + me;
+    const celebrated = JSON.parse(localGet(celebratedKey) || '[]');
+    if(!celebrated.includes(category)){
+      celebrated.push(category);
+      localSet(celebratedKey, JSON.stringify(celebrated));
+      fireCelebration('Section complete: ' + category.replace(/^Part \d+ — /,'') + '!');
+    }
+  }
+}
+
+function fireCelebration(msg){
+  const toast = document.createElement('div');
+  toast.className = 'celebration-toast';
+  toast.textContent = '🎉 ' + msg;
+  document.body.appendChild(toast);
+  setTimeout(()=>toast.classList.add('show'), 10);
+  setTimeout(()=>{
+    toast.classList.remove('show');
+    setTimeout(()=>toast.remove(), 400);
+  }, 3200);
+  spawnConfetti();
+}
+
+function spawnConfetti(){
+  const colors = ['#c9a227','#5b8a4d','#4d7a9b','#b5522f','#e7e2d3'];
+  for(let i=0;i<36;i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = (Math.random()*100) + 'vw';
+    piece.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
+    piece.style.animationDuration = (2 + Math.random()*1.4) + 's';
+    piece.style.animationDelay = (Math.random()*0.3) + 's';
+    piece.style.opacity = String(0.7 + Math.random()*0.3);
+    document.body.appendChild(piece);
+    setTimeout(()=>piece.remove(), 4200);
+  }
+}
+
 function flashStatus(msg){
   const el = document.getElementById('status');
   el.textContent = msg;
@@ -1383,6 +1546,7 @@ function categoriesInOrder(){
 }
 
 const TAB_DEFS = [
+  {id:'overview', label:'Team Overview', match:null, synthetic:true},
   {id:'part1', label:'Part 1', match:['Part 1 — Getting Started (Quests & Unlocks)']},
   {id:'part2', label:'Part 2', match:['Part 2 — Mid-Game Combat Training']},
   {id:'part3', label:'Part 3', match:['Part 3 — Mid-Game Questing']},
@@ -1405,22 +1569,209 @@ function getTabForCat(catName){
 }
 
 let activeTab = 'part1';
+let searchQuery = '';
 
-function tabPercentForMe(tabId, cats){
-  if(!me) return null;
+function tabPercentForMember(tabId, cats, member){
+  if(!member) return null;
   const catsInTab = cats.filter(c=>getTabForCat(c)===tabId);
   let total = 0, done = 0;
   catsInTab.forEach(catName=>{
     const isSolo = catName.startsWith('Solo Goals —');
     const catTasks = state.tasks.filter(t=>t.category===catName);
     catTasks.forEach(t=>{
-      if(isSolo && t.owner !== me) return; // only count my own solo goals
+      if(isSolo && t.owner !== member) return; // only count that member's own solo goals
       total++;
-      if(t.recurring ? isRecurDone(t, me) : !!t.checks[me]) done++;
+      if(t.recurring ? isRecurDone(t, member) : !!t.checks[member]) done++;
     });
   });
   if(total===0) return null;
   return Math.round((done/total)*100);
+}
+function tabPercentForMe(tabId, cats){ return tabPercentForMember(tabId, cats, me); }
+
+function overallPercentForMember(member, allCats){
+  if(!member) return null;
+  let total=0, done=0;
+  allCats.forEach(catName=>{
+    if(catName.startsWith('Solo Goals —')) return; // solo goals vary per-person, excluded from the shared comparison
+    state.tasks.filter(t=>t.category===catName).forEach(t=>{
+      total++;
+      if(t.recurring ? isRecurDone(t, member) : !!t.checks[member]) done++;
+    });
+  });
+  if(total===0) return null;
+  return Math.round((done/total)*100);
+}
+
+function buildActivityFeed(limit){
+  const events = [];
+  state.tasks.forEach(t=>{
+    Object.entries(t.checks||{}).forEach(([member, val])=>{
+      if(typeof val === 'string'){
+        events.push({ member, taskName: t.name, category: t.category, ts: val });
+      }
+    });
+  });
+  events.sort((a,b)=> new Date(b.ts) - new Date(a.ts));
+  return events.slice(0, limit || 20);
+}
+
+function renderSearchResults(main, query){
+  const q = query.toLowerCase();
+  const matches = state.tasks.filter(t => t.name.toLowerCase().includes(q));
+
+  const wrap = document.createElement('div');
+  wrap.className = 'search-results-wrap';
+
+  const heading = document.createElement('div');
+  heading.className = 'search-results-heading';
+  heading.textContent = matches.length + ' result' + (matches.length===1?'':'s') + ' for "' + query + '"';
+  wrap.appendChild(heading);
+
+  if(matches.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'empty-note';
+    empty.textContent = 'No tasks match that search.';
+    wrap.appendChild(empty);
+  }
+
+  matches.slice(0, 150).forEach(task=>{
+    const row = document.createElement('div');
+    row.className = 'search-result-row';
+
+    const info = document.createElement('div');
+    info.className = 'search-result-info';
+    const catLabel = document.createElement('div');
+    catLabel.className = 'search-result-cat';
+    catLabel.textContent = task.category;
+    info.appendChild(catLabel);
+    const nameRow = document.createElement('div');
+    nameRow.className = 'search-result-name-row';
+    const nameEl = document.createElement('span');
+    nameEl.textContent = task.name;
+    nameRow.appendChild(nameEl);
+    if(task.link){
+      const linkEl = document.createElement('a');
+      linkEl.href = task.link; linkEl.target='_blank'; linkEl.rel='noopener';
+      linkEl.className = 'task-link';
+      linkEl.textContent = '↗ site';
+      nameRow.appendChild(linkEl);
+    }
+    info.appendChild(nameRow);
+    row.appendChild(info);
+
+    if(me){
+      const done = task.recurring ? isRecurDone(task, me) : !!task.checks[me];
+      const box = document.createElement('div');
+      box.className = 'check-box' + (done ? (task.recurring?' recur-checked':' checked') : '');
+      box.textContent = '✓';
+      box.addEventListener('click', ()=>{
+        if(task.recurring){
+          if(isRecurDone(task, me)) delete task.checks[me];
+          else task.checks[me] = new Date().toISOString();
+        } else {
+          if(task.checks[me]) delete task.checks[me];
+          else {
+            task.checks[me] = new Date().toISOString();
+            if(task.matList){
+              if(!task.banked[me]) task.banked[me] = {};
+              task.matList.forEach(({m,n})=>{ task.banked[me][m] = n; });
+            }
+            checkForCelebration(task.category);
+          }
+        }
+        scheduleSave(); renderAll();
+      });
+      row.appendChild(box);
+    }
+    wrap.appendChild(row);
+  });
+
+  if(matches.length > 150){
+    const note = document.createElement('div');
+    note.className = 'empty-note';
+    note.textContent = 'Showing the first 150 of ' + matches.length + ' matches — try a more specific search.';
+    wrap.appendChild(note);
+  }
+
+  main.appendChild(wrap);
+}
+
+function renderTeamOverview(main, allCats){
+  const wrap = document.createElement('div');
+  wrap.className = 'overview-wrap';
+
+  function cell(tag, text, className){
+    const el = document.createElement(tag);
+    el.textContent = text;
+    if(className) el.className = className;
+    return el;
+  }
+
+  const table = document.createElement('table');
+  table.className = 'overview-table';
+  const thead = document.createElement('tr');
+  thead.appendChild(cell('th', 'Section'));
+  state.members.forEach(m => thead.appendChild(cell('th', m)));
+  table.appendChild(thead);
+
+  TAB_DEFS.filter(t=>t.id!=='overview').forEach(def=>{
+    const tr = document.createElement('tr');
+    tr.appendChild(cell('td', def.label, 'overview-label'));
+    state.members.forEach(m=>{
+      const pct = tabPercentForMember(def.id, allCats, m);
+      tr.appendChild(cell('td', pct===null ? '—' : pct+'%', pct===100 ? 'overview-full' : ''));
+    });
+    table.appendChild(tr);
+  });
+
+  const trOverall = document.createElement('tr');
+  trOverall.className = 'overview-overall-row';
+  trOverall.appendChild(cell('td', 'Overall', 'overview-label'));
+  state.members.forEach(m=>{
+    const pct = overallPercentForMember(m, allCats);
+    trOverall.appendChild(cell('td', pct===null ? '—' : pct+'%'));
+  });
+  table.appendChild(trOverall);
+
+  wrap.appendChild(table);
+
+  const feedTitle = document.createElement('h3');
+  feedTitle.className = 'overview-feed-title';
+  feedTitle.textContent = 'Recent Activity';
+  wrap.appendChild(feedTitle);
+
+  const feedNote = document.createElement('div');
+  feedNote.className = 'overview-feed-note';
+  feedNote.textContent = 'Only tracks completions from here forward — anything checked off before this feature existed won\'t show up.';
+  wrap.appendChild(feedNote);
+
+  const feed = buildActivityFeed(20);
+  const feedList = document.createElement('div');
+  feedList.className = 'activity-feed';
+  if(feed.length===0){
+    const empty = document.createElement('div');
+    empty.className = 'empty-note';
+    empty.textContent = 'Nothing yet — this fills in as your crew checks things off.';
+    feedList.appendChild(empty);
+  } else {
+    feed.forEach(ev=>{
+      const row = document.createElement('div');
+      row.className = 'activity-row';
+      const who = document.createElement('strong');
+      who.textContent = ev.member;
+      row.appendChild(who);
+      row.appendChild(document.createTextNode(' completed "' + ev.taskName + '" '));
+      const when = document.createElement('span');
+      when.className = 'activity-when';
+      when.textContent = timeAgoLabel(ev.ts);
+      row.appendChild(when);
+      feedList.appendChild(row);
+    });
+  }
+  wrap.appendChild(feedList);
+
+  main.appendChild(wrap);
 }
 
 function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
@@ -1435,12 +1786,12 @@ function renderAll(){
   tabBar.innerHTML = '';
 
   const allCats = categoriesInOrder();
-  const presentTabIds = TAB_DEFS.map(t=>t.id).filter(id => allCats.some(c=>getTabForCat(c)===id));
+  const presentTabIds = TAB_DEFS.map(t=>t.id).filter(id => id==='overview' || allCats.some(c=>getTabForCat(c)===id));
   if(!presentTabIds.includes(activeTab)) activeTab = presentTabIds[0] || 'part1';
 
   presentTabIds.forEach(tabId=>{
     const def = TAB_DEFS.find(t=>t.id===tabId);
-    const pct = tabPercentForMe(tabId, allCats);
+    const pct = def.synthetic ? null : tabPercentForMe(tabId, allCats);
     const btn = document.createElement('button');
     btn.className = 'tab-btn' + (tabId===activeTab ? ' active' : '');
     btn.innerHTML = def.label + (pct!==null ? ' <span class="tab-pct">'+pct+'%</span>' : '');
@@ -1451,6 +1802,18 @@ function renderAll(){
     });
     tabBar.appendChild(btn);
   });
+
+  if(searchQuery.trim()){
+    tabBar.style.display = 'none';
+    renderSearchResults(main, searchQuery.trim());
+    return;
+  }
+  tabBar.style.display = '';
+
+  if(activeTab === 'overview'){
+    renderTeamOverview(main, allCats);
+    return;
+  }
 
   const cats = allCats.filter(c => getTabForCat(c) === activeTab);
   cats.forEach(catName=>{
@@ -1629,15 +1992,23 @@ function renderAll(){
         box.textContent = '✓';
         if(recurType && task.checks[member]) box.title = 'Last done ' + timeAgoLabel(task.checks[member]);
         box.addEventListener('click', ()=>{
+          const wasDoneForMe = recurType ? isRecurDone(task, member) : !!task.checks[member];
           if(recurType){
             if(isRecurDone(task, member)){ delete task.checks[member]; }
             else { task.checks[member] = new Date().toISOString(); }
           } else {
-            task.checks[member] = !task.checks[member];
-            if(task.checks[member] && task.matList){
-              if(!task.banked[member]) task.banked[member] = {};
-              task.matList.forEach(({m,n})=>{ task.banked[member][m] = n; });
+            if(task.checks[member]){ delete task.checks[member]; }
+            else {
+              task.checks[member] = new Date().toISOString();
+              if(task.matList){
+                if(!task.banked[member]) task.banked[member] = {};
+                task.matList.forEach(({m,n})=>{ task.banked[member][m] = n; });
+              }
             }
+          }
+          const nowDoneForMe = recurType ? isRecurDone(task, member) : !!task.checks[member];
+          if(member === me && !wasDoneForMe && nowDoneForMe && !recurType){
+            checkForCelebration(task.category);
           }
           scheduleSave();
           renderAll();
@@ -1890,6 +2261,10 @@ async function init(){
   document.getElementById('hideDoneToggle').addEventListener('change', (e)=>{
     hideDone = e.target.checked;
     localSet('hide-done-v1', String(hideDone));
+    renderAll();
+  });
+  document.getElementById('searchInput').addEventListener('input', (e)=>{
+    searchQuery = e.target.value;
     renderAll();
   });
   renderAll();
