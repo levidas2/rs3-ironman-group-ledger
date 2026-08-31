@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <title>The Ledger — Group Ironman Tracker</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cinzel+Decorative:wght@700;900&family=Inter:wght@400;500;600&display=swap');
 
   :root{
     --bg:#161a1e;
-    --panel:rgba(30,36,43,.70);
-    --panel-2:rgba(36,43,51,.70);
+    --panel:rgba(30,36,43,.65);
+    --panel-2:rgba(36,43,51,.65);
     --stone:#2c343d;
     --gold:#c9a227;
     --gold-dim:#8a7327;
@@ -55,7 +55,8 @@
   header{
     padding:28px 20px 20px;
     border-bottom:1px solid var(--line);
-    background:linear-gradient(180deg, rgba(28,33,39,.80), rgba(23,27,32,.80));
+    background:linear-gradient(180deg, rgba(28,33,39,.75), rgba(23,27,32,.75));
+    position:relative;
   }
   header .eyebrow{
     letter-spacing:.18em;
@@ -63,29 +64,44 @@
     font-size:11px;
     color:var(--gold-dim);
     margin-bottom:6px;
+    text-align:center;
   }
   header h1{
     margin:0;
-    font-size:28px;
+    font-family:'Cinzel Decorative',serif;
+    font-weight:900;
+    font-size:46px;
     color:var(--gold);
     letter-spacing:.03em;
+    text-align:center;
   }
-  header p{color:var(--text-dim);font-size:13px;margin:8px 0 0;max-width:640px;line-height:1.5}
+  header p{color:var(--text-dim);font-size:13px;margin:8px 0 0;max-width:none;line-height:1.5}
+  @media (max-width:600px){
+    header h1{font-size:32px}
+  }
 
   .header-text{min-width:0}
 
   .members-bar{
-    display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center;
+    display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;align-items:center;
   }
   .member-chip{
     background:var(--panel-2);border:1px solid var(--line);border-radius:20px;
-    padding:6px 12px;font-size:13px;display:flex;align-items:center;gap:6px;
+    padding:4px 6px 4px 4px;display:flex;align-items:center;gap:6px;
   }
-  .member-chip input{
-    background:transparent;border:none;color:var(--text);font-size:13px;width:70px;
-    font-family:'Inter',sans-serif;outline:none;
+  .member-chip.member-chip-active{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold)}
+  .member-name-btn{
+    background:none;border:none;color:var(--text);cursor:pointer;
+    font-size:18px;font-weight:600;padding:6px 12px;border-radius:16px;
+    font-family:'Cinzel',serif;
   }
-  .member-chip button{background:none;border:none;color:var(--ember);cursor:pointer;font-size:14px;padding:0}
+  .member-name-btn:hover{color:var(--gold);background:rgba(201,162,39,.12)}
+  .member-chip-active .member-name-btn{color:var(--gold)}
+  .member-rename-input{
+    background:transparent;border:none;border-bottom:1px dashed var(--line);color:var(--text-dim);
+    font-size:11px;width:70px;font-family:'Inter',sans-serif;outline:none;
+  }
+  .member-del-btn{background:none;border:none;color:var(--ember);cursor:pointer;font-size:13px;padding:0 4px}
   .add-member-form{display:flex;gap:6px;align-items:center}
   .add-member-form input{
     background:var(--panel-2);border:1px dashed var(--gold-dim);border-radius:20px;
@@ -95,15 +111,48 @@
     background:none;border:1px solid var(--gold-dim);color:var(--gold-dim);
     border-radius:20px;padding:6px 12px;font-size:13px;cursor:pointer;
   }
+  .admin-only-note{font-size:11px;color:var(--text-dim);font-style:italic}
+
+  .admin-corner{position:absolute;top:16px;right:16px;z-index:5;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+  .admin-toggle{
+    background:var(--panel-2);border:1px solid var(--line);color:var(--text-dim);
+    border-radius:14px;padding:5px 12px;font-size:11px;cursor:pointer;
+  }
+  .admin-toggle.unlocked{border-color:var(--green);color:var(--green)}
+  .admin-form{display:flex;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px}
+  .admin-form input{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:6px;
+    color:var(--text);padding:5px 8px;font-size:12px;width:100px;
+  }
+  .admin-form button{
+    background:var(--gold-dim);border:none;color:#161a1e;font-weight:600;
+    border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;
+  }
+  @media (max-width:600px){
+    .admin-corner{position:static;align-items:center;margin-bottom:10px}
+  }
 
   .whoami{margin-top:14px;font-size:13px;color:var(--text-dim);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .status-row{margin-top:8px;display:flex;gap:16px;flex-wrap:wrap;font-size:11px;color:var(--text-dim)}
-  .whoami select{
-    background:var(--panel-2);color:var(--text);border:1px solid var(--line);
-    border-radius:6px;padding:4px 8px;font-size:13px;
-    color-scheme:dark;
+
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;
+    display:flex;align-items:center;justify-content:center;padding:20px;
   }
-  .whoami select option{background:#242b33;color:#e7e2d3}
+  .modal-box{
+    background:var(--panel-2);border:1px solid var(--gold-dim);border-radius:12px;
+    padding:24px;max-width:360px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.5);
+  }
+  .modal-box h3{margin:0 0 8px;color:var(--gold);font-size:18px}
+  .modal-box p{margin:0 0 14px;color:var(--text-dim);font-size:13px;line-height:1.5}
+  .modal-input{
+    width:100%;background:var(--panel);border:1px solid var(--line);border-radius:6px;
+    color:var(--text);padding:9px 12px;font-size:14px;margin-bottom:6px;
+  }
+  .modal-error{color:var(--ember);font-size:12px;min-height:16px;margin-bottom:8px}
+  .modal-btn-row{display:flex;justify-content:flex-end;gap:8px}
+  .modal-cancel-btn{background:none;border:1px solid var(--line);color:var(--text-dim);border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer}
+  .modal-confirm-btn{background:var(--gold-dim);border:none;color:#161a1e;font-weight:600;border-radius:6px;padding:8px 14px;font-size:13px;cursor:pointer}
 
   .import-box{margin-top:16px}
   .import-toggle{
@@ -346,17 +395,22 @@
 
 <div id="loadFailedBanner" style="display:none"></div>
 <header>
+  <div class="admin-corner">
+    <button id="adminToggleBtn" class="admin-toggle">🔒 Admin</button>
+    <div id="adminForm" class="admin-form" style="display:none">
+      <input id="adminCodeInput" type="password" placeholder="Admin code" />
+      <button id="adminSubmitBtn">Unlock</button>
+    </div>
+  </div>
   <div class="header-top">
     <div class="header-text">
       <div class="eyebrow">Group Ironman · Progress Ledger</div>
-      <h1>The Ledger</h1>
+      <h1>FlakerZ Group Progress Tracker</h1>
       <p>Shared checklist for the crew, built from the RuneScape Wiki's Efficient Ironman Pathway Guide (Parts 1-6 plus the Dailies/Weeklies/Monthlies, Player-Owned Farm, Mining &amp; Smithing, and Archaeology miniguides). Every quest and skill milestone is summarized in our own words, not copied verbatim from the wiki. Tick off what your own account has already done, reorder with the arrows, and add anything the guide missed.</p>
 
   <div class="members-bar" id="membersBar"></div>
   <div class="whoami">
-    I'm checking things off as:
-    <select id="whoSelect"></select>
-    <span id="whoHint" style="color:var(--text-dim)"></span>
+    <span id="currentUserLabel">Not signed in — click your name above</span>
     <label style="display:flex;align-items:center;gap:5px;margin-left:14px;cursor:pointer">
       <input type="checkbox" id="hideDoneToggle" />
       Hide steps I've already completed
@@ -512,6 +566,8 @@ const PERIOD_MS = { daily: 24*3600*1000, weekly: 7*24*3600*1000, monthly: 30*24*
 let state = { members: [], tasks: [] };
 let me = null;
 let hideDone = false;
+let isAdmin = false;
+const ADMIN_CODE = '437894';
 const expandedMatCards = new Set(); // session-only (not persisted) — which materials cards are expanded
 
 function uid(){ return Math.random().toString(36).slice(2,10); }
@@ -1445,6 +1501,18 @@ function spawnConfetti(){
   }
 }
 
+function updateAdminToggleUI(){
+  const btn = document.getElementById('adminToggleBtn');
+  if(!btn) return;
+  if(isAdmin){
+    btn.textContent = '🔓 Admin (on)';
+    btn.classList.add('unlocked');
+  } else {
+    btn.textContent = '🔒 Admin';
+    btn.classList.remove('unlocked');
+  }
+}
+
 function flashStatus(msg){
   const el = document.getElementById('status');
   el.textContent = msg;
@@ -1470,72 +1538,138 @@ function renderMembers(){
   bar.innerHTML = '';
   state.members.forEach((name, i)=>{
     const chip = document.createElement('div');
-    chip.className = 'member-chip';
-    const input = document.createElement('input');
-    input.value = name;
-    input.addEventListener('change', ()=>{
-      const old = state.members[i];
-      state.members[i] = input.value.trim() || old;
-      state.tasks.forEach(t=>{
-        if(t.owner === old) t.owner = state.members[i];
-        if(t.checks[old] !== undefined){ t.checks[state.members[i]] = t.checks[old]; delete t.checks[old]; }
+    chip.className = 'member-chip' + (name === me ? ' member-chip-active' : '');
+
+    const nameBtn = document.createElement('button');
+    nameBtn.className = 'member-name-btn';
+    nameBtn.textContent = name;
+    nameBtn.addEventListener('click', ()=> openSwitchUserModal(name));
+    chip.appendChild(nameBtn);
+
+    if(isAdmin){
+      const input = document.createElement('input');
+      input.className = 'member-rename-input';
+      input.value = name;
+      input.title = 'Rename (admin only)';
+      input.addEventListener('change', ()=>{
+        const old = state.members[i];
+        const newName = input.value.trim() || old;
+        state.members[i] = newName;
+        state.tasks.forEach(t=>{
+          if(t.owner === old) t.owner = newName;
+          if(t.checks[old] !== undefined){ t.checks[newName] = t.checks[old]; delete t.checks[old]; }
+          if(t.banked && t.banked[old]){ t.banked[newName] = t.banked[old]; delete t.banked[old]; }
+        });
+        if(me === old){ me = newName; saveMe(); }
+        saveMembers();
+        scheduleSave();
+        renderAll();
       });
-      if(me === old) { me = state.members[i]; saveMe(); }
-      saveMembers();
-      scheduleSave();
-      renderAll();
-    });
-    const del = document.createElement('button');
-    del.textContent = '✕';
-    del.title = 'Remove member';
-    del.dataset.armed = 'false';
-    del.addEventListener('click', ()=>{
-      if(del.dataset.armed !== 'true'){
-        del.dataset.armed = 'true';
-        del.textContent = 'sure?';
-        setTimeout(()=>{ del.dataset.armed='false'; del.textContent='✕'; }, 2500);
-        return;
-      }
-      state.members.splice(i,1);
-      saveMembers();
-      renderAll();
-    });
-    chip.appendChild(input);
-    chip.appendChild(del);
+      chip.appendChild(input);
+
+      const del = document.createElement('button');
+      del.textContent = '✕';
+      del.title = 'Remove member (admin only)';
+      del.className = 'member-del-btn';
+      del.dataset.armed = 'false';
+      del.addEventListener('click', ()=>{
+        if(del.dataset.armed !== 'true'){
+          del.dataset.armed = 'true';
+          del.textContent = 'sure?';
+          setTimeout(()=>{ del.dataset.armed='false'; del.textContent='✕'; }, 2500);
+          return;
+        }
+        state.members.splice(i,1);
+        saveMembers();
+        renderAll();
+      });
+      chip.appendChild(del);
+    }
+
     bar.appendChild(chip);
   });
 
-  const addForm = document.createElement('form');
-  addForm.className = 'add-member-form';
-  addForm.innerHTML = '<input class="add-member-input" placeholder="New teammate name" /><button type="submit">+ Add</button>';
-  addForm.addEventListener('submit', e=>{
-    e.preventDefault();
-    const input = addForm.querySelector('.add-member-input');
-    const name = input.value.trim();
-    if(!name) return;
-    state.members.push(name);
-    saveMembers();
-    renderAll();
-  });
-  bar.appendChild(addForm);
-
-  const who = document.getElementById('whoSelect');
-  who.innerHTML = '';
-  if(state.members.length === 0){
-    const opt = document.createElement('option');
-    opt.textContent = 'No members yet — add one above';
-    opt.disabled = true;
-    who.appendChild(opt);
-  } else {
-    state.members.forEach(name=>{
-      const opt = document.createElement('option');
-      opt.value = name; opt.textContent = name;
-      if(name === me) opt.selected = true;
-      who.appendChild(opt);
+  if(isAdmin){
+    const addForm = document.createElement('form');
+    addForm.className = 'add-member-form';
+    addForm.innerHTML = '<input class="add-member-input" placeholder="New teammate name" /><button type="submit">+ Add</button>';
+    addForm.addEventListener('submit', e=>{
+      e.preventDefault();
+      const input = addForm.querySelector('.add-member-input');
+      const name = input.value.trim();
+      if(!name) return;
+      state.members.push(name);
+      saveMembers();
+      renderAll();
     });
+    bar.appendChild(addForm);
+  } else {
+    const note = document.createElement('span');
+    note.className = 'admin-only-note';
+    note.textContent = 'Adding/removing/renaming players requires admin';
+    bar.appendChild(note);
   }
-  who.onchange = ()=>{ me = who.value; saveMe(); renderAll(); };
-  document.getElementById('whoHint').textContent = '(controls which "solo goals" section you add to)';
+
+  const label = document.getElementById('currentUserLabel');
+  if(label) label.textContent = me ? ('Signed in as: ' + me) : 'Not signed in — click your name above';
+}
+
+function openSwitchUserModal(name){
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+  const box = document.createElement('div');
+  box.className = 'modal-box';
+
+  const title = document.createElement('h3');
+  title.textContent = 'Switch to ' + name + '?';
+  box.appendChild(title);
+
+  const desc = document.createElement('p');
+  desc.textContent = 'Type "' + name + '" to confirm — this changes whose checkmarks your clicks affect.';
+  box.appendChild(desc);
+
+  const input = document.createElement('input');
+  input.className = 'modal-input';
+  input.placeholder = 'Type the name…';
+  box.appendChild(input);
+
+  const err = document.createElement('div');
+  err.className = 'modal-error';
+  box.appendChild(err);
+
+  const btnRow = document.createElement('div');
+  btnRow.className = 'modal-btn-row';
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'modal-cancel-btn';
+  cancelBtn.textContent = 'Cancel';
+  const confirmBtn = document.createElement('button');
+  confirmBtn.className = 'modal-confirm-btn';
+  confirmBtn.textContent = 'Confirm';
+  btnRow.appendChild(cancelBtn);
+  btnRow.appendChild(confirmBtn);
+  box.appendChild(btnRow);
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  input.focus();
+
+  function close(){ overlay.remove(); }
+  cancelBtn.addEventListener('click', close);
+  overlay.addEventListener('click', (e)=>{ if(e.target===overlay) close(); });
+  function doConfirm(){
+    if(input.value.trim().toLowerCase() === name.toLowerCase()){
+      me = name;
+      saveMe();
+      close();
+      renderAll();
+      flashStatus('Signed in as ' + name);
+    } else {
+      err.textContent = "That doesn't match — try again.";
+      input.focus();
+    }
+  }
+  confirmBtn.addEventListener('click', doConfirm);
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') doConfirm(); });
 }
 
 function categoriesInOrder(){
@@ -2257,6 +2391,8 @@ async function init(){
   }
   hideDone = localGet('hide-done-v1') === 'true';
   activeTab = localGet('active-tab-v1') || 'part1';
+  isAdmin = localGet('is-admin-v1') === 'true';
+  updateAdminToggleUI();
   document.getElementById('hideDoneToggle').checked = hideDone;
   document.getElementById('hideDoneToggle').addEventListener('change', (e)=>{
     hideDone = e.target.checked;
@@ -2266,6 +2402,35 @@ async function init(){
   document.getElementById('searchInput').addEventListener('input', (e)=>{
     searchQuery = e.target.value;
     renderAll();
+  });
+  document.getElementById('adminToggleBtn').addEventListener('click', ()=>{
+    if(isAdmin){
+      isAdmin = false;
+      localSet('is-admin-v1', 'false');
+      updateAdminToggleUI();
+      renderAll();
+      flashStatus('Admin mode off');
+      return;
+    }
+    const form = document.getElementById('adminForm');
+    form.style.display = (form.style.display === 'none' || !form.style.display) ? 'flex' : 'none';
+  });
+  document.getElementById('adminSubmitBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('adminCodeInput');
+    if(input.value === ADMIN_CODE){
+      isAdmin = true;
+      localSet('is-admin-v1', 'true');
+      input.value = '';
+      document.getElementById('adminForm').style.display = 'none';
+      updateAdminToggleUI();
+      renderAll();
+      flashStatus('Admin unlocked');
+    } else {
+      flashStatus('Wrong admin code');
+    }
+  });
+  document.getElementById('adminCodeInput').addEventListener('keydown', e=>{
+    if(e.key==='Enter') document.getElementById('adminSubmitBtn').click();
   });
   renderAll();
   if(!state.loadFailed){
