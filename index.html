@@ -172,7 +172,7 @@
   #importFallback a{color:var(--gold);font-size:12px;display:block;margin-bottom:8px;word-break:break-all}
   #pasteJson{width:100%;min-height:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);font-size:12px;padding:8px;margin-bottom:8px;font-family:monospace}
 
-  nav.jumpnav{max-width:900px;margin:10px auto 0;padding:0 20px;display:flex;flex-wrap:wrap;gap:6px}
+  nav.jumpnav{max-width:1000px;margin:10px auto 0;padding:0 20px;display:flex;flex-wrap:wrap;gap:6px}
   nav.jumpnav a{
     font-size:11px;color:var(--text-dim);text-decoration:none;border:1px solid var(--line);
     border-radius:14px;padding:4px 10px;background:var(--panel-2);
@@ -192,14 +192,14 @@
   }
   @keyframes confetti-fall{ to { transform: translateY(105vh) rotate(360deg); } }
 
-  .search-row{max-width:900px;margin:16px auto 0;padding:0 20px}
+  .search-row{max-width:1000px;margin:16px auto 0;padding:0 20px}
   .search-row input{
     width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;
     color:var(--text);padding:10px 14px;font-size:14px;
   }
   .search-row input:focus{outline:none;border-color:var(--gold-dim)}
 
-  .search-results-wrap{max-width:900px;margin:0 auto;padding:20px}
+  .search-results-wrap{max-width:1000px;margin:0 auto;padding:20px}
   .search-results-heading{color:var(--gold);font-size:14px;margin-bottom:10px}
   .search-result-row{
     display:flex;justify-content:space-between;align-items:center;gap:12px;
@@ -210,16 +210,17 @@
   .search-result-cat{font-size:10px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
   .search-result-name-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:14px}
 
-  .app-layout{
-    display:flex;align-items:flex-start;gap:0;max-width:1180px;margin:16px auto 0;padding:0 20px;
-  }
-  .app-content{flex:1;min-width:0}
+  .page-content{margin-left:220px}
+  .app-content{max-width:1180px;margin:0 auto;padding:0 20px}
   .app-content .search-row, .app-content .jumpnav{max-width:none;padding:0}
-  .app-content main{max-width:900px;margin:0 auto}
+  .app-content main{max-width:1000px;margin:0 auto}
 
   .tab-bar{
-    flex:0 0 200px;display:flex;flex-direction:column;gap:4px;
-    position:sticky;top:16px;margin-right:20px;
+    position:fixed;left:0;top:0;bottom:0;width:220px;
+    display:flex;flex-direction:column;gap:4px;
+    padding:16px 12px;overflow-y:auto;box-sizing:border-box;
+    background:var(--panel);border-right:1px solid var(--line);
+    z-index:10;
   }
   .tab-btn{
     background:var(--panel);border:1px solid var(--line);color:var(--text-dim);
@@ -236,17 +237,17 @@
   .tab-btn.active .tab-pct{color:var(--gold)}
 
   @media (max-width:800px){
-    .app-layout{flex-direction:column;padding:0}
+    .page-content{margin-left:0}
     .tab-bar{
-      flex-direction:row;flex-wrap:wrap;position:static;width:100%;
-      margin-right:0;margin-bottom:12px;padding:0 20px;
+      position:static;flex-direction:row;flex-wrap:wrap;width:100%;height:auto;
+      padding:12px 20px;border-right:none;border-bottom:1px solid var(--line);
     }
     .tab-btn{border-left:none;border-bottom:2px solid transparent;border-radius:8px 8px 0 0}
     .tab-btn.active{border-left:none;border-bottom:2px solid var(--gold)}
-    .app-content{width:100%}
+    .app-content{padding:0 20px}
   }
 
-  .overview-wrap{max-width:900px;margin:0 auto;padding:20px}
+  .overview-wrap{max-width:1000px;margin:0 auto;padding:20px}
   .overview-table{
     width:100%;border-collapse:collapse;background:var(--panel);
     border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13px;
@@ -257,7 +258,7 @@
   .overview-table th{background:var(--panel-2);color:var(--gold);font-family:'Cinzel',serif;font-weight:600}
   .overview-label{text-align:left!important;color:var(--text-dim)}
   .overview-full{color:var(--green);font-weight:700}
-  .diary-dashboard{max-width:900px;margin:16px auto 0;padding:0 20px}
+  .diary-dashboard{max-width:1000px;margin:16px auto 0;padding:0 20px}
   .diary-dashboard-title{color:var(--gold);font-size:13px;margin-bottom:8px;font-family:'Cinzel',serif}
   .diary-dashboard-table{font-size:12px}
   .diary-dashboard-table th, .diary-dashboard-table td{padding:6px 10px}
@@ -274,7 +275,7 @@
   .activity-row strong{color:var(--gold)}
   .activity-when{color:var(--text-dim);font-size:11px;white-space:nowrap}
 
-  main{max-width:900px;margin:0 auto;padding:20px}
+  main{max-width:1000px;margin:0 auto;padding:20px}
 
   .category{
     background:var(--panel);
@@ -354,7 +355,7 @@
   .task-link:hover{color:var(--gold)}
 
   .tab-total-card{
-    max-width:900px;margin:16px auto 0;padding:16px 20px;background:var(--panel);
+    max-width:1000px;margin:16px auto 0;padding:16px 20px;background:var(--panel);
     border:2px solid var(--gold-dim);border-radius:10px;
   }
   .tab-total-title{color:var(--gold);font-family:'Cinzel',serif;font-size:14px;margin-bottom:10px}
@@ -397,7 +398,7 @@
   }
 
   .new-category-row{
-    max-width:900px;margin:0 auto 30px;padding:0 20px;
+    max-width:1000px;margin:0 auto 30px;padding:0 20px;
   }
   .new-category-row form{display:flex;gap:8px;}
   .new-category-row input{
@@ -409,7 +410,7 @@
     border-radius:8px;padding:10px 16px;font-size:13px;cursor:pointer;
   }
 
-  .backup-row{max-width:900px;margin:0 auto 30px;padding:0 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+  .backup-row{max-width:1000px;margin:0 auto 30px;padding:0 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
   .backup-btn{
     background:var(--panel);border:1px solid var(--line);color:var(--text-dim);
     border-radius:8px;padding:9px 14px;font-size:12px;cursor:pointer;
@@ -435,6 +436,10 @@
 </style>
 </head>
 <body>
+
+<nav class="tab-bar" id="tabBar"></nav>
+
+<div class="page-content">
 
 <div id="loadFailedBanner" style="display:none"></div>
 <header>
@@ -486,15 +491,12 @@
 </div>
 </header>
 
-<div class="app-layout">
-  <nav class="tab-bar" id="tabBar"></nav>
-  <div class="app-content">
-    <div class="search-row">
-      <input id="searchInput" placeholder="🔍 Search all tasks…" />
-    </div>
-    <nav class="jumpnav" id="jumpNav"></nav>
-    <main id="main"></main>
+<div class="app-content">
+  <div class="search-row">
+    <input id="searchInput" placeholder="🔍 Search all tasks…" />
   </div>
+  <nav class="jumpnav" id="jumpNav"></nav>
+  <main id="main"></main>
 </div>
 
 <div class="backup-row" id="backupRow">
@@ -507,9 +509,11 @@
     <span id="restoreStatus" class="import-status"></span>
   </div>
 </div>
-<div class="admin-only-note" id="backupRowNote" style="display:none;max-width:900px;margin:0 auto 20px;padding:0 20px">⬇ Backup export/restore requires admin</div>
+<div class="admin-only-note" id="backupRowNote" style="display:none;max-width:1000px;margin:0 auto 20px;padding:0 20px">⬇ Backup export/restore requires admin</div>
 
 <div class="status" id="status">Saved</div>
+
+</div>
 
 <script>
 const STORAGE_KEY = 'tasks-v2';
