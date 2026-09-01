@@ -312,6 +312,10 @@
   .mat-needed{color:var(--text-dim);min-width:38px}
   .mat-remaining{color:var(--ember);font-size:11px;min-width:50px;text-align:right}
   .mat-remaining-done{color:var(--green)}
+  .kill-count-input{
+    width:44px;background:var(--panel);border:1px solid var(--gold-dim);border-radius:5px;
+    color:var(--gold);padding:4px 4px;font-size:13px;text-align:center;font-weight:700;
+  }
 
   .cat-total-card{
     margin:6px 16px 12px;padding:12px 14px;background:var(--panel-2);
@@ -320,6 +324,17 @@
   }
   .cat-total-card strong{color:var(--gold)}
   .task-link:hover{color:var(--gold)}
+
+  .tab-total-card{
+    max-width:900px;margin:16px auto 0;padding:16px 20px;background:var(--panel);
+    border:2px solid var(--gold-dim);border-radius:10px;
+  }
+  .tab-total-title{color:var(--gold);font-family:'Cinzel',serif;font-size:14px;margin-bottom:10px}
+  .tab-total-body strong{color:var(--green)}
+  .tab-total-item{
+    display:inline-block;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:6px;padding:4px 10px;margin:0 6px 6px 0;font-size:12px;color:var(--text);
+  }
 
   .checks{display:flex;gap:6px;flex-wrap:wrap}
   .check-box{
@@ -451,7 +466,7 @@
 
 <main id="main"></main>
 
-<div class="backup-row">
+<div class="backup-row" id="backupRow">
   <button id="exportBtn" class="backup-btn">⬇ Export backup (.json)</button>
   <button id="importBackupToggle" class="backup-btn">⬆ Restore from backup</button>
   <input type="file" id="importFile" accept=".json,application/json" style="display:none" />
@@ -461,6 +476,7 @@
     <span id="restoreStatus" class="import-status"></span>
   </div>
 </div>
+<div class="admin-only-note" id="backupRowNote" style="display:none;max-width:900px;margin:0 auto 20px;padding:0 20px">⬇ Backup export/restore requires admin</div>
 
 <div class="status" id="status">Saved</div>
 
@@ -1220,6 +1236,948 @@ function seedData(){
         'Test task — check this off, confirm it shows up for everyone, then we can delete this whole section',
       ]
     },
+    {
+      name: 'PvM — Introductory Bosses',
+      note: 'Summarized from PvME\'s "Bossing Path" guide (pvme.io) — a curated learning progression, not an exhaustive boss list. Each boss has a kill counter plus checkable milestones split into "introductory" and "advanced" goals for that boss specifically.',
+      tasks: [
+        {n:'Arch-Glacor — Kill Count', killTrack:true, l:'https://pvme.io/pvme-guides/basic-guides/arch-glacor-basic/', note:'Widely considered the best all-around learning boss — mechanics can be toggled on/off individually in normal mode.'},
+        'Arch-Glacor: Complete a normal mode kill with no mechanics enabled',
+        'Arch-Glacor: Complete 5 normal mode kills, each with a different single mechanic enabled',
+        'Arch-Glacor: Complete a normal mode kill with all mechanics enabled',
+        'Arch-Glacor: Complete a hard mode kill',
+        'Arch-Glacor (Advanced): Complete a hard mode kill using no food, at any enrage, via Soul Split flicking',
+        'Arch-Glacor (Advanced): Complete a 25 kill streak, or a 250%+ enrage kill, in hard mode',
+
+        {n:'GWD2: Heart of Gielinor — Kill Count', killTrack:true, l:'https://pvme.io/pvme-guides/basic-guides/vindicta-basic/', note:'Vindicta, Helwyr, Twin Furies, and Gregorovic — roughly equal difficulty, Gregorovic slightly harder.'},
+        'GWD2: Kill each of the four bosses (Vindicta, Helwyr, Twin Furies, Gregorovic) at least once',
+        'GWD2: Get 3 kills in a row at any GWD2 boss without banking for food',
+        'GWD2 (Advanced): Complete a no-food kill at Vindicta or Helwyr using defensives well',
+
+        {n:'Osseous — Kill Count', killTrack:true, l:'https://pvme.io/pvme-guides/rex-matriarchs/osseous-basic/', note:'A gentle intro to fighting while using Necromancy.'},
+        'Osseous: Kill without signing or activating the Ring of Death effects',
+        'Osseous: Get 3 kills in a row without banking for food',
+        'Osseous (Advanced): Complete a no-food kill using defensives well',
+        'Osseous (Advanced): Complete 3 no-food kills in a row',
+
+        {n:'Honorable mentions — single-mechanic teachers (optional)', note:'Ivar, King of Bones teaches prayer flicking. Silverquill, the Dreadhog teaches reflect mechanics + minions. Flesh-hatcher Mhekarnahz teaches area denial + minions. Good for a quick, focused lesson rather than a full progression.'},
+      ]
+    },
+    {
+      name: 'PvM — Intermediate Bosses',
+      note: 'Bosses that force you to build on the introductory foundations — more complex mechanics, higher damage requirements, less room for error.',
+      tasks: [
+        {n:'Araxxor — Kill Count', killTrack:true, l:'https://pvme.io/pvme-guides/basic-guides/araxxor-basic/', note:'A very common "graduation" milestone into higher-tier PvM. Highly discouraged to learn in duo — significantly harder that way and not worth it.'},
+        'Araxxor: Complete a 0%+ enrage kill on each of the three paths',
+        'Araxxor: Complete a kill at 100% enrage, on any path',
+        'Araxxor (Advanced): Complete a kill on the top (minions) path at 160%+ enrage',
+        "Araxxor (Advanced): At any enrage, complete phase 4 having correctly prayer-flicked each of Araxxi's auto-attacks",
+
+        {n:'Elite Dungeon 2: Dragonkin Laboratory — Run Count', killTrack:true, l:'https://pvme.io/pvme-guides/basic-guides/ed2-basic/', note:'Generally the easiest of the three elite dungeons. Solo is more challenging than group due to scaling, but very learnable.'},
+        'ED2: Complete a duo or trio run, surviving each boss encounter',
+        'ED2: Complete a solo run with no deaths',
+        'ED2: Complete a solo run, having banked at most twice',
+        'ED2 (Advanced): Complete a solo run having banked once or not at all',
+        'ED2 (Advanced): Complete a solo run in under 40 minutes',
+        'ED2 (Advanced): Earn the "Dragonkin Laboratory Initiate" mastery role',
+
+        {n:'TzKal-Zuk (Normal Mode) — Run Count', killTrack:true, l:'https://pvme.io/pvme-guides/basic-guides/tzkal-zuk-basic/', note:'Multiple waves of enemies before facing Zuk himself. Flawless normal mode unlocks hard mode.'},
+        'Zuk: Complete a normal mode run',
+        'Zuk: Complete a normal mode run with no deaths or teleporting out',
+        'Zuk (Advanced): Complete a normal mode run in under 30 minutes',
+        'Zuk (Advanced): Complete a flawless normal mode run (unlocks hard mode)',
+      ]
+    },
+    {
+      name: 'PvM — Advanced Bosses',
+      note: 'A meaningful step into high-level PvM. From here, where you go next is mostly personal preference — chase content that\'s actually fun, not just whatever\'s "next" on a list.',
+      tasks: [
+        {n:'Raksha — Kill Count', killTrack:true, l:'https://pvme.io/pvme-guides/basic-guides/raksha-basic/', note:'Fightable alone or duo. Easiest first kills are usually duo as DPS, then move to tanking or soloing once comfortable.'},
+        'Raksha: Complete a duo kill as DPS',
+        "Raksha: Successfully Soul Split flick against Raksha's auto-attacks for a whole phase",
+        'Raksha: Complete a duo kill as tank, or a solo kill',
+        'Raksha (Advanced): Complete a solo kill (or duo as tank) while Soul Split flicking the entire fight',
+        'Raksha (Advanced): Earn the "Raksha Initiate" mastery role',
+
+        {n:'Kerapac: Hard Mode — Kill Count', killTrack:true, l:'https://pvme.io/pvme-guides/basic-guides/kerapac-hm-basic/', note:'Featuring the unique Warp Time mechanic. Recommended to duo or solo when learning — trio isn\'t enough of a challenge at this stage.'},
+        'Kerapac HM: Complete a duo kill in hard mode',
+        'Kerapac HM (Advanced): Complete a solo hard mode kill in under 6 minutes, with no beast of burden familiar',
+        'Kerapac HM (Advanced): Earn the "Kerapac Initiate" mastery role',
+      ]
+    },
+    {
+      name: 'PvM — Bosses with Limited Learning Value',
+      note: 'PvME explicitly doesn\'t recommend these for self-improvement — they don\'t teach much beyond what you\'d already know. Totally fine to do for fun or for drops; just don\'t expect them to build your skillset the way the bosses above will.',
+      tasks: [
+        'Barrows Brothers', 'Chaos Elemental', 'Corporeal Beast', 'Commander Zilyana',
+        'Dagannoth Kings', 'General Graardor', 'Giant Mole', 'Kalphite Queen',
+        'King Black Dragon', "Kree'arra", "K'ril Tsutsaroth", 'Legiones',
+        'Magister', 'Rex Matriarchs',
+      ]
+    },
+    {
+      name: 'PvM — Unlock Guide: General Unlocks',
+      note: 'Condensed from the wiki\'s PvM Unlock Guide — quests, items, and abilities specifically worth prioritizing for bossing, not the full quest list. This covers quests/items/abilities/prayers/misc; Magic and Necromancy weapon/armour progression are still needed as a follow-up (my fetch of that page cut off before reaching them — paste those sections and I\'ll add them the same way we\'ve done before).',
+      tasks: [
+        {n:'Broken Home → Asylum surgeon\'s ring', q:'Broken Home', note:'Must be completed under 37 minutes after your first completion, plus all the other designated challenges beforehand.'},
+        {n:'The Elder Kiln → TokHaar-Kal cape', q:'The Elder Kiln', note:'Needed to start Fight Kiln — a fire cape must be sacrificed to play it, so complete TzHaar Fight Cave first.'},
+        {n:'One of a Kind → Dragon Rider amulet', q:'One of a Kind'},
+        {n:'Haunted Mine → Salve amulet', q:'Haunted Mine', note:'Upgrades to Salve amulet (e) via the Lair of Tarn Razorlor miniquest.'},
+        {n:'Horror from the Deep → a god book', q:'Horror from the Deep', note:'Book of Wisdom for a stationary target, Book of Law otherwise; Book of Chaos is a cheap alternative.'},
+        {n:'One Piercing Note → Illuminated god book upgrade', q:'One Piercing Note', note:'+2 style bonus and prayer bonus over the base god book.'},
+        {n:'Contact! → Keris', q:'Contact!', note:'Excellent vs Kalphite King/Queen, especially with hard Desert achievements.'},
+        {n:"Beneath Scabaras' Sands → Primed keris", q:"Beneath Scabaras' Sands", note:'Upgrades to the consecrated keris after killing 200 elite profane scabarites.'},
+        {n:"Merlin's Crystal → Excalibur", q:"Merlin's Crystal", note:'Upgrades to Enhanced Excalibur via hard Seers\' Village achievements.'},
+        {n:'River of Blood → Blood essences', q:'River of Blood', note:'A pre-supreme-overload alternative sustain option alongside Guthix rest.'},
+        {n:'The Brink of Extinction → Obsidian equipment', q:'The Brink of Extinction', note:'45% damage reduction in TzHaar Fight Cave and Fight Kiln when worn (excluding the kiteshield).'},
+        {n:'Smoking Kills → Slayer helmet', q:'Smoking Kills', note:'Full slayer helmet effects apply when fighting bosses on your current Slayer assignment.'},
+        {n:'City of Senntisten → Pontifex shadow ring + 4 more Ancient Magicks spells', q:'City of Senntisten'},
+        {n:"Requiem for a Dragon → Zorgoth's soul ring", q:'Requiem for a Dragon'},
+        {n:'The World Wakes → Death\'s Swiftness / Sunshine', q:'The World Wakes'},
+        {n:'The Dig Site → Smoke Tendrils / Shadow Tendrils', q:'The Dig Site'},
+        {n:'Lunar Diplomacy → Lunar spells', q:'Lunar Diplomacy', note:'Also opens Livid Farm for Disruption Shield and Borrowed Power.'},
+        {n:'Desert Treasure → Ancient Magicks', q:'Desert Treasure'},
+        {n:'The Light Within → Seren spells', q:'The Light Within', note:'Especially Crystal Mask.'},
+        {n:'The Mighty Fall → God Wars Dungeon Teleport', q:'The Mighty Fall'},
+        {n:'Extinction → passive Ring of vigour effect', q:'Extinction', note:'Combine the reward warped gem with a Ring of vigour to make it passive.'},
+        {n:'The Temple at Senntisten → Ancient Curses', q:'The Temple at Senntisten'},
+        {n:"King's Ransom → Piety / Rigour / Augury", q:"King's Ransom", note:'Also needs Knight Waves training ground plus 70 Defence and 70 Prayer.'},
+        {n:'Ritual of the Mahjarrat → Akrisae the Doomed', q:'Ritual of the Mahjarrat', note:'Damage boost in various places — notably the Glacor Cave.'},
+        {n:'Kindred Spirits → Linza the Disgraced', q:'Kindred Spirits'},
+        {n:"Summer's End → Corporeal Beast access", q:"Summer's End"},
+        {n:"Icthlarin's Little Helper → Sophanem Slayer Dungeon + the Magister", q:"Icthlarin's Little Helper"},
+        {n:'Impressing the Locals → Temple of Aminishi access', q:'Impressing the Locals'},
+        {n:'Curse of the Black Stone → 10% damage reduction in ED1/ED2/ED3', q:'Curse of the Black Stone'},
+        {n:'Song from the Depths → reduced damage taken from Queen Black Dragon', q:'Song from the Depths'},
+        {n:"Plague's End → Recipe Shop (combination potions like elder overload)", q:"Plague's End"},
+        {n:'Guthix staff — cast Divine Storm 100x in the Mage Arena to use it outside', note:'Obtained from the Mage Arena minigame.'},
+        {n:"War's Retreat kill-count rewards — track your unlock milestones", note:'10 kills: teleport spell. 100: boss portal. 200: Altar of War (prayer/summoning restore). 500: cooldown reset at the altar. 1,000: adrenaline crystals around the garden. 2,000: adrenaline potion cooldown refresh. All from War\'s Wares.'},
+        {n:'Reaper Crew achievement — defeat every boss Death can assign as a task', note:'Grants additional stats on completion.'},
+        {n:'Hard Desert achievements → improved Keris hit chance and crit vs Kalphite King'},
+        {n:'Elite Fremennik achievements → +10% autoattack / +5% ability damage vs Dagannoth Kings'},
+        {n:'Hard Morytania achievements → Barrows perks', note:'Halved prayer drain, double runes, and direct banking of Barrows chest loot.'},
+        {n:"Elite Seers\' Village achievements → double duration on Enhanced Excalibur's heal, +2% enchanted bolt proc chance"},
+        {n:'Elite Tirannwn achievements → Tirannwn quiver 4', note:'+4 Prayer bonus, holds 20,000 ammo of one type, 5% charge-save on attuned crystal bow/ward, +5% damage to dark beasts.'},
+      ]
+    },
+    {
+      name: 'PvM — Useful Links',
+      note: 'Full source pages instead of us re-transcribing every gear table by hand — the wiki\'s own tables are more complete and always current.',
+      tasks: [
+        {n:'PvM Unlock Guide — full page (Magic & Necromancy leveling gear, endgame upgrade order)', l:'https://runescape.wiki/w/PvM_unlock_guide#Magic'},
+        {n:"Guide:Ikbenbeter/Ironman — community ironman guide", l:'https://runescape.wiki/w/Guide:Ikbenbeter/Ironman'},
+        {n:"PvME Bossing Path (the source for our PvM Progression tab)", l:'https://pvme.io/pvme-guides/new-to-bossing/bossing-path/'},
+      ]
+    },
+    {
+      name: 'Necromancy Gear — Armour Progression',
+      note: 'From the wiki\'s Necromancy armour page. Two lines: Deathwarden (tank — pure Defence requirement) and Deathdealer (power — needs both Defence and Necromancy, plus a Hermodic plate from Hermod, the Spirit of War, on top of the standard materials from tier 70 on). Each tier must be crafted once yourself (via the Kili\'s Knowledge achievements) before it can be worn, even though the pieces are tradeable after that.',
+      tasks: [
+        {n:'Deathwarden (tank) tier 10 — 1 Defence, buy from Sostratus after Necromancy!', q:'Necromancy!'},
+        {n:'Deathwarden (tank) tier 20 — 20 Defence + Kili Row (5 chickens or 1 lesser communion ritual)', matList:[{m:'Lesser ensouled cloth',n:7}]},
+        {n:"Deathwarden (tank) tier 30 — 30 Defence + Kili's Knowledge I (25 trolls or 3 lesser communion rituals)", matList:[{m:'Lesser ensouled cloth',n:7}]},
+        {n:"Deathwarden (tank) tier 40 — 40 Defence + Kili's Knowledge II (50 undead or 5 lesser communion rituals)", matList:[{m:'Lesser ensouled cloth',n:7},{m:'Lesser ensouled thread',n:5}]},
+        {n:"Deathwarden (tank) tier 50 — 50 Defence + Kili's Knowledge III (75 demons, some mogres, or 10 lesser communion rituals)", matList:[{m:'Lesser ensouled cloth',n:7},{m:'Lesser ensouled thread',n:5},{m:'Spirit rune',n:100}]},
+        {n:"Deathwarden (tank) tier 60 — 60 Defence + Kili's Knowledge IV (50 level-70 monsters, some ankou, or 10 greater communion rituals)", matList:[{m:'Ensouled cloth',n:7},{m:'Ensouled thread',n:5},{m:'Spirit rune',n:125}]},
+        {n:'Deathwarden (tank) tier 70 — 70 Defence', matList:[{m:'Ensouled cloth',n:12},{m:'Ensouled thread',n:10},{m:'Flesh rune',n:100}]},
+        {n:'Deathdealer (power) tier 70 — 70 Defence + 70 Necromancy, plus a Hermodic plate from Hermod, the Spirit of War', note:'This is the tier where you pick tank vs power — power gives the passive Death Mark effect (instant-kill below 20% health) and is generally recommended once you know boss mechanics, but tank is more forgiving while learning.', matList:[{m:'Hermodic plate',n:5},{m:'Ensouled cloth',n:12},{m:'Ensouled thread',n:10},{m:'Bone rune',n:100}]},
+        {n:'Deathwarden (tank) tier 80 — 80 Defence', matList:[{m:'Greater ensouled cloth',n:7},{m:'Greater ensouled thread',n:5},{m:'Flesh rune',n:125}]},
+        {n:'Deathdealer (power) tier 80 — 80 Defence + 80 Necromancy', matList:[{m:'Hermodic plate',n:10},{m:'Greater ensouled cloth',n:7},{m:'Greater ensouled thread',n:5},{m:'Miasma rune',n:125}]},
+        {n:'Deathwarden (tank) tier 90 — 90 Defence', matList:[{m:'Greater ensouled cloth',n:12},{m:'Greater ensouled thread',n:10},{m:'Spirit rune',n:100},{m:'Bone rune',n:100},{m:'Flesh rune',n:100},{m:'Miasma rune',n:100}]},
+        {n:'Deathdealer (power) tier 90 — 90 Defence + 90 Necromancy', matList:[{m:'Hermodic plate',n:15},{m:'Greater ensouled cloth',n:12},{m:'Greater ensouled thread',n:10},{m:'Spirit rune',n:125},{m:'Bone rune',n:125},{m:'Flesh rune',n:125},{m:'Miasma rune',n:125}]},
+        {n:"Robes of the First Necromancer (power) tier 95 — 95 Defence + 95 Necromancy", note:'Also has Misalionar\'s death mask and Visage of the First Necromancer as cosmetic variants.'},
+      ]
+    },
+    {
+      name: 'Necromancy Gear — Weapon Progression (Death Skull equipment)',
+      note: 'The death guard (main-hand siphon) and skull lantern (off-hand conduit) — together called Death Skull equipment. Unlike armour there\'s no tank/power split, just one line, tiers 10-90 unlocked exactly the same way as the armour (Kili Row, then Kili\'s Knowledge I-IV). Tier 95 (the omni guard + soulbound lantern) is not crafted — it\'s a rare drop from Rasial, the First Necromancer, with no other requirements besides 95 Necromancy to use.',
+      tasks: [
+        {n:'Death guard & skull lantern tier 10 — no requirements beyond the Necromancy tutorial'},
+        {n:'Death guard & skull lantern tier 20 — Kili Row (5 chickens or 1 lesser communion ritual)', matList:[{m:'Lesser ensouled bar',n:2}]},
+        {n:"Death guard & skull lantern tier 30 — Kili's Knowledge I (25 trolls or 3 lesser communion rituals)", matList:[{m:'Lesser ensouled bar',n:2}]},
+        {n:"Death guard & skull lantern tier 40 — Kili's Knowledge II (50 undead or 5 lesser communion rituals)", matList:[{m:'Lesser ensouled bar',n:4}]},
+        {n:"Death guard & skull lantern tier 50 — Kili's Knowledge III (75 demons, some mogres, or 10 lesser communion rituals)", matList:[{m:'Lesser ensouled bar',n:6}]},
+        {n:"Death guard & skull lantern tier 60 — Kili's Knowledge IV (50 level-70 monsters, some ankou, or 10 greater communion rituals)", note:'From here, crafting also needs a Smithing level equal to the tier minus 5 (e.g. tier 70 needs 65 Smithing) — it grants Smithing XP, not weapon XP.', matList:[{m:'Ensouled bar',n:6},{m:'Bone rune',n:50}]},
+        {n:'Death guard & skull lantern tier 70 — unlocks Death Grasp special attack (stun + heavy hit, scales with Necrosis stacks)', matList:[{m:'Ensouled bar',n:8},{m:'Bone rune',n:100}]},
+        {n:'Death guard & skull lantern tier 80', matList:[{m:'Greater ensouled bar',n:6},{m:'Miasma rune',n:50}]},
+        {n:'Death guard & skull lantern tier 90', matList:[{m:'Greater ensouled bar',n:10},{m:'Spirit rune',n:100},{m:'Bone rune',n:100},{m:'Flesh rune',n:100},{m:'Miasma rune',n:100}]},
+        {n:'Omni guard & soulbound lantern (tier 95) — rare drop from Rasial, the First Necromancer', note:'No crafting requirement, just 95 Necromancy to use. Omni guard\'s special (Death Essence) empowers your next several basic attacks; the lantern boosts max Residual Soul stacks.'},
+      ]
+    },
+    {
+      name: 'Necromancy Gear — Moonlit Rites (moonstone jewellery)',
+      note: 'The moonstone jewellery line — all four pieces (ring, necklace, bracelet, amulet) — plus the Ring of Kayazu and the Zorgoth\'s ring line, grouped together since they all draw on Necromancy resources the same way. These are mostly single-item crafts (1 ensouled bar + 1 gem each), so they\'re tracked as plain checkable steps rather than materials cards — the armour and weapon sections above are where the real bulk-material tracking lives.',
+      tasks: [
+        {n:'Complete the Mystical Moonstone achievement (Former Master Crafter, City of Um)', note:'The Former Master Crafter only appears once you\'re 50 Necromancy. This is the prerequisite for crafting any moonstone jewellery.'},
+        {n:'Reach 60 Necromancy', note:'Needed to make the ensouled bars every piece of moonstone jewellery requires (or buy one from Thalmund\'s Wares instead).'},
+        {n:'Craft a moonstone ring — 67 Crafting, 1 ensouled bar + 1 moonstone at a furnace'},
+        {n:'Craft a moonstone necklace — 77 Crafting, 1 ensouled bar + 1 moonstone'},
+        {n:'Craft a moonstone bracelet — 79 Crafting, 1 ensouled bar + 1 moonstone', note:'Equips in the gloves slot, not the usual bracelet slot.'},
+        {n:'Craft a moonstone amulet — 85 Crafting, 1 ensouled bar + 1 cut moonstone at a furnace (amulet mould)', note:'Made unstrung first, then strung with a ball of wool (or the String Jewellery spell) before it can be worn.'},
+        {n:'Enchant the ring → ring of imbuing (68 Magic, Lvl-5 Enchant spell or tablet)'},
+        {n:'Enchant the necklace → alteration necklace (68 Magic, Lvl-5 Enchant spell or tablet)'},
+        {n:'Enchant the bracelet → passing bracelet (68 Magic, Lvl-5 Enchant spell or tablet)'},
+        {n:"Enchant the amulet → conjurer's raising amulet (68 Magic, Lvl-5 Enchant spell or tablet)"},
+        {n:'Solve The Final Revolution mystery (Archaeology)', note:'Needed before the Ring of Kayazu can be made.'},
+        {n:'Craft the Ring of Kayazu — 88 Archaeology, 67 Crafting, 1 moonstone ring + 1 restored Fang of Kayazu at an archaeologist\'s workbench', l:'https://runescape.wiki/w/Ring_of_Kayazu', note:'+80% soul attraction during rituals, 20% chance to double ritual disturbance item rewards. The Fang of Kayazu comes from the Blood altar hotspot (levels 88-89) in our own Archaeology farming route above.'},
+        {n:'Requiem for a Dragon → Zorgoth\'s ring', q:'Requiem for a Dragon', note:'Already listed under General Unlocks too — repeated here since it belongs to the same Necromancy-resource family.'},
+        {n:"Upgrade Zorgoth's ring → Zorgoth's soul ring", note:'Wear the ring while performing rituals at the Ungael ritual site.'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Ardougne',
+      note: 'From the wiki\'s Ardougne step-by-step guide, organized by area the same way the guide is (East/West/North Ardougne → Witchaven → Port Khazard → Khazard Battlefield → Castle Wars → Yanille). Before starting: plant watermelons in the Ardougne allotment, plant/check a jade vine, plant a papaya or coconut tree by Tree Gnome Stronghold — these all take real time (jade vine averages ~12 hours to grow, then up to 2.5 more to go wild). Easy needs Biohazard, Gertrude\'s Cat, Monk\'s Friend, Plague City, Tower of Life. Hard adds Back to my Roots, Catapult Construction, Legends\' Quest, Lunar Diplomacy, Monkey Madness, Watchtower. Elite needs Rune Mysteries. Rewards are Ardougne cloaks 1-4, in order.',
+      tasks: [
+        {n:'Steal silk from the silk stall in Ardougne Market (keep it for later)'},
+        {n:'Picklock the door east of the gem stall, upstairs'},
+        {n:'Steal a nature rune from a chest in Ardougne'},
+        {n:'Ask the Chief Servant at the Servants\' Guild about house servants'},
+        {n:'Have Wizard Cromperty teleport you to the essence mine'},
+        {n:'Buy a skewered kebab from the Poison Arrow pub'},
+        {n:'Sail from East Ardougne to Karamja and back'},
+        {n:'Kill your own jade vine', q:'Back to my Roots', note:'Wear dragonhide + prayer-boosting gear, bring food, prayer pots, antipoison, secateurs, a hatchet.'},
+        {n:'Sell your stolen silk to the silk trader for 60gp'},
+        {n:'Buy a water-filled vial from Aemad and Kortan\'s general store'},
+        {n:'Get a zookeeper to put you in the Ardougne Zoo monkey cage', note:'Wear a monkey greegree and talk to a monkey minder.'},
+        {n:'Spend Penguin Points with Larry or Chuck at Ardougne Zoo'},
+        {n:'Cross the River Dougne on the log balance shortcut'},
+        {n:'Teleport to the Wilderness with the Ardougne lever, then bank and head to West Ardougne'},
+
+        {n:'Get a civilian to throw a tomato at the army recruiter, West Ardougne'},
+        {n:'Use the altar in West Ardougne\'s church'},
+        {n:'Ask a West Ardougne civilian about selling your cat (no kittens, you keep the cat)'},
+
+        {n:'Enter the Combat Training Camp, north of Ardougne'},
+        {n:'Steal blood runes from the chest in the Chaos Druid tower dungeon'},
+        {n:'Teleport to the past at the sheep furnace NW corner and talk to Sarah about Herblore', q:'Meeting History', note:'Wear/carry nothing but the Enchanted Key to travel back.'},
+        {n:'Pickpocket the master farmer north of Ardougne, west of the Farm Shop'},
+        {n:'Pick watermelons from the farming patch north of Ardougne'},
+
+        {n:'Sell rubium to Ezekial Lovecraft in Witchaven', note:'Mine it in Witchaven Dungeon between the statues and the railway.'},
+        {n:'Spin sinew into a crossbow string in south-east Witchaven (bane crossbow, part 2 of 3)'},
+        {n:'Catch a fish at the Fishing Platform via Holgart or Jeb'},
+        {n:'Mine coal from the rocks east of Ardougne, near the Legends\' Guild'},
+        {n:'Recharge a combat bracelet or skills necklace at the Legends\' Guild Totem Pole'},
+        {n:'Kill a shadow warrior in the Legends\' Guild basement'},
+        {n:'Fairy ring BIS into the Ardougne Zoo unicorn pen, then DJP to the Tower of Life'},
+
+        {n:'Kill a unicow in the Tower of Life, NW corner'},
+        {n:'Kill a swordchick in the Tower of Life, SW corner'},
+        {n:'Kill a frogeel in the Tower of Life, west side', note:'Careful not to accidentally eat the giant frog legs on the way.'},
+        {n:'Pop a balloon in the Ardougne Monastery, south of Ardougne'},
+        {n:'Use the Air Guitar emote near the musician outside the monastery'},
+        {n:'Use the Summoning obelisk east of the Fight Arena'},
+        {n:'Talk to Tindel Marchant about identifying swords, north of the Charter Ships'},
+        {n:'Start a game of Fishing Trawler', note:'Easy just needs a lobby+start. Elite needs a full win with manta rays — deposit items first, gear up from a pack yak. Ironmen: board the trawler for Easy, cook a raw rocktail on the docks for Elite.'},
+
+        {n:'Cast Ourania Teleport (talk to Baba Yaga first if you haven\'t used it before)'},
+        {n:'Catch a red salamander in the Hunter area outside Ourania Altar'},
+        {n:'Craft runes at Ourania Altar using an Abyssal Titan filled from a Giant pouch'},
+        {n:'Kill anything on the Khazard Battlefield'},
+        {n:'Pick a papaya or coconut from the fruit tree patch near Tree Gnome Village'},
+
+        {n:'Use a ring of duelling to teleport to Castle Wars'},
+        {n:'Take the hot-air balloon from Entrana to Castle Wars'},
+        {n:'Enter the Castle Wars waiting room'},
+        {n:'Use a catapult in a Castle Wars match', q:'Catapult Construction'},
+        {n:'Win a game of Castle Wars', note:'You must stay the whole match yourself, but teammates can leave early once you\'ve scored.'},
+        {n:'Check the shooting-star noticeboard in the Observatory office'},
+
+        {n:'Cook raw meat into sinew on a range in Yanille (bane crossbow, part 1 of 3)'},
+        {n:'Cast Watchtower Teleport'},
+        {n:'Pickpocket a watchman in Yanille while wearing gloves of silence'},
+        {n:'Cross the monkey bars in the Yanille Agility Dungeon'},
+        {n:'Picklock the basement door in the Yanille Agility Dungeon'},
+        {n:'Smith bane limbs, make magic stock, and string a bane crossbow (part 3 of 3)'},
+        {n:'View the Hunter equipment in Aleck\'s shop, Yanille'},
+        {n:'Grapple over the south wall of Yanille'},
+        {n:'Claim buckets of sand from Bert, north-west Yanille'},
+        {n:'Enter the Magic Guild in Yanille'},
+        {n:'Use the Magic Guild\'s west portal to teleport to Thormac\'s tower'},
+        {n:'Cast Ardougne Teleport to finish up', note:'Do this last, once every plant is picked and the jade vine is dead.'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Daemonheim',
+      note: 'From the wiki\'s Daemonheim (Dungeoneering) step-by-step guide — condensed, with the ironman-specific branch followed wherever the guide splits by account type. Easy needs any Fremennik saga (Three\'s Company recommended). Medium/Hard need the unabridged Three\'s Company, plus Vengeance/Nadir/Thok It To \'Em/Thok Your Block Off sagas for Hard. Ironmen additionally need Waterfall Quest (Medium) and Salt in the Wound + A Clockwork Syringe partial (Hard). Rewards are Daemonheim passive buffs, claimed in order.',
+      tasks: [
+        {n:'Get to Daemonheim: cross the Wilderness wall east of Fort Forinthry, follow the path north to the entrance'},
+        {n:'Get a ring of kinship from the Dungeoneering tutor (or your bank, if you already have one)'},
+        {n:'Complete floor 1 solo on low complexity without dying', note:'Reset and repeat as many times as it takes.'},
+        {n:'Complete frozen floors on high complexity, gathering every resource and drop you can'},
+        {n:'Light a fire and use your ring of kinship on it'},
+        {n:'Find the frozen figure, turn him into the hooded man with logs or a fire spell, tell him to return to the surface, then find and click the bear pelt'},
+        {n:'Craft or smith a full set of Tier 1 armour on a high-complexity floor and equip it'},
+        {n:'Make a bloodrager, deathslinger, or stormbringer pouch and summon it right before a boss door'},
+        {n:'Complete your first high-complexity dungeon on the medium size'},
+        {n:'Harvest from every wisp on a high-complexity floor; after any non-pale wisp, teleport to the start room and configure the rift to convert memories into energy, then convert one'},
+        {n:'At Dungeoneering 20+, bind two different equipment pieces via the Smuggler\'s Bind-setup and use each loadout in turn'},
+        {n:'Complete floor 12 on low complexity'},
+        {n:'Exit Daemonheim, bank your ring of kinship, and talk to Skaldrun about the bear pelt to start the abridged Three\'s Company saga'},
+        {n:'Have Talsar teleport you to a sinkhole entrance (or click it directly if ironman) and complete one'},
+
+        {n:'With an empty inventory and nothing equipped, complete the unabridged Three\'s Company saga via Skaldrun'},
+        {n:'Buy the gem bag from the Rewards Trader'},
+        {n:'Mine an uncommon gem rock north of Al Kharid until you get a gem, then store it in the gem bag'},
+        {n:'Complete floor 1 as a small floor on high complexity, guide mode on, in under 6 minutes', note:'Critical path only — skip anything not blocking a guardian door.'},
+        {n:'On a large frozen floor, open every door hunting for a frost dragon + prayer altar; kill the dragon and use its bones on the altar'},
+        {n:'Progress through Daemonheim on high-complexity small floors up through floor 18, looting everything as you go'},
+        {n:'Craft portents of passage from divine energies (sparkling and above) to open skill doors'},
+        {n:'Fletch and place a spinebeam trap'},
+        {n:'Grow a wormwood seed, clean the herb, make wormwood potion (unf), add void dust, and drink it'},
+        {n:'Cast Create Gatestone outside a boss room, then Gatestone Teleport from inside it'},
+        {n:'Complete floor 18 solo on low complexity, fighting Rammernaut with ranged/magic from the far wall'},
+        {n:'Ironmen: chain through the resource dungeons (Waterfall Dungeon → Edgeville chaos druids → hill giant → Daemonheim Peninsula → Falador → Karamja Volcano) quickly enough for Totem Pole Position', note:'Non-ironmen instead repeat sinkholes via Talsar, gathering and depositing resources, until the same achievement pops.'},
+
+        {n:'Complete abandoned floors on low complexity until you find and click the collection of swords'},
+        {n:'Complete furnished floors on low complexity until you find and click the damaged device'},
+        {n:'Complete abandoned 2 floors on low complexity until you find and click the scribbled notes'},
+        {n:'Complete occult floors on low complexity, opening every door, until you find and click the rock and twine bundle'},
+        {n:'Unlock the Rapid Renewal prayer from the Rewards Trader'},
+        {n:'Complete the unabridged Vengeance, Nadir, Thok It To \'Em, and Thok Your Block Off sagas', note:'Redo Three\'s Company unabridged on a members world too, if you originally did it F2P.'},
+        {n:'Kill a rum-pumped crab in the Braindeath Island \'Rum\'-geon', note:'Bring a diving apparatus and fishbowl helmet.'},
+        {n:'In a high-complexity dungeon, activate Rapid Renewal, sell everything except rune essence/one wand/one log, then craft law runes at the runecrafting altar with a spinebeam wand'},
+        {n:'On floor 33 (low complexity), fight Bal\'lak the Pummeller and lead him into one of his own rifts'},
+        {n:'Bind 225 of one arrow or rune type as your primary loadout'},
+        {n:'In a large high-complexity dungeon, harvest from a Lustrous wisp or higher'},
+        {n:'Kill everything but the boss, then sell every drop except raw bouldabass, a low-tier log, a cave potato seed, an edicap mushroom spore, 5 zephyrium ore, and 5 bovistrangler logs'},
+        {n:'Grow the cave potato and edicap mushroom in farming patches, then harvest both'},
+        {n:'Cook the bouldabass and cave potato on a fire, combine into a bouldabass potato, then add the mushroom'},
+        {n:'Build a prayer altar on the group gatestone portal hotspot, drain some prayer, then recharge on it'},
+        {n:'Eat the bouldabass & edicap potato mid-fight against the boss'},
+        {n:'Upgrade any ring of kinship role to level 10, switch to it, then unequip and re-equip the ring'},
+
+        {n:'Complete any floors on high complexity'},
+        {n:'Smelt 2 promethium bars and smith a promethium full helm'},
+        {n:'Craft and equip a spiritbloom orb'},
+        {n:'Cook one of every Dungeoneering fish type, all on members-only worlds'},
+        {n:'Trigger a Portent of Restoration IX by dropping below 50% health while unarmoured'},
+        {n:'Build and use a 4-piece bind loadout (no ammo or potions)'},
+        {n:'Solo a warped floor against Warped Gulega, dodging its special attack'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Desert',
+      note: 'From the wiki\'s Desert achievements step-by-step guide. Easy needs Diamond in the Rough, Stolen Hearts, One Piercing Note, and (ironman-only) Icthlarin\'s Little Helper started. Medium needs Eagles\' Peak, The Feud, Spirits of the Elid, A Fairy Tale II (started), Missing My Mummy. Hard needs Dream Mentor, Dealing with Scabaras, Smoking Kills, Do No Evil, Enakhra\'s Lament, Desert Treasure, Contact!, Deadliest Catch, 450 Dominion Tower kills, and broad ammo unlocked (300 Slayer points). Elite needs Smoking Kills, Desert Treasure, One Piercing Note, Restless Ghost, Diamond in the Rough, Do No Evil, As a First Resort, and every Dominion Tower achievement done. Rewards are Desert amulets 1-4, claimed in order.',
+      tasks: [
+        {n:'Use a ring of duelling to reach Het\'s Oasis and view the memorial board'},
+        {n:'Head west to the fire altar and craft some fire runes'},
+        {n:'Earn and spend pizazz points at the Mage Training Arena (buy cosmic runes with Enchantment points)'},
+        {n:'Cross the Al Kharid crafting shop/bank rooftops via the obstacle path to the hay cart'},
+        {n:'Speak to Khoochak inside Emir Shah\'s palace'},
+        {n:'Do the troubadour dance near the Abbey of St. Elspeth Citharede musicians (past the strykewyrms)'},
+        {n:'Buy and equip a desert outfit + empty waterskin at the Shantay Pass'},
+        {n:'Take the magic carpet to Uzer'},
+        {n:'Catch a golden warbler west of Uzer with a bird snare'},
+        {n:'Fill your waterskin from a Kharidian cactus'},
+        {n:'Spectate a match inside the Dominion Tower'},
+        {n:'Get 5 artefacts from Pyramid Plunder in Sophanem'},
+        {n:'Speak to Grand Vizier Hassan for your reward (Desert amulet 1)', lvl:'5 Hunter, 14 Runecrafting, 21 Thieving, 7 Magic'},
+
+        {n:'Repair/grab a rope near the eagles at Eagles\' Peak, then use it to take the desert eagle'},
+        {n:'Do an easy runedoku with Ali Morrisane in Al Kharid (examine a small casket)'},
+        {n:'Cross the river south of Lumbridge graveyard using the crossbow shortcut'},
+        {n:'Mine granite at the quarry south-west of Bandit Camp'},
+        {n:'Fairy ring to BIQ, grab a potato cactus in the Kalphite hive if you don\'t have one (bring antipoison)'},
+        {n:'Fairy ring to DLQ, go through Uzer Mastaba and pray at Amascut\'s altar'},
+        {n:'Try to cut a teak tree on the Ruins of Uzer shoreline'},
+        {n:'Pray at the Elidinis Statuette in Nardah'},
+        {n:'Kill a desert goat, then in Nardah: crush the horn, make a vial from molten glass, fill it at the fountain (not Humidify), add harralander, add the crushed horn'},
+        {n:'Make a Spirit kalphite pouch at the summoning obelisk west of Nardah'},
+        {n:'Grab the pyramid top at the Agility Pyramid and sell it to Simon'},
+        {n:'Speak to Zahur in Nardah for your reward (Desert amulet 2)', lvl:'45 Prayer, 3 Defence, 35 Woodcutting, 25 Summoning, 45 Mining, 33 Crafting, 49 Farming, 57 Herblore, 30 Agility, 37 Ranged, 19 Strength'},
+
+        {n:'Plant a cactus seed in the Al Kharid cactus patch (~9 hours to grow, or use a leafy growth potion)'},
+        {n:'Switch to the lunar spellbook and gather water/death/fire/astral runes plus 2 waterskins and feathers'},
+        {n:'Gather an onion, tomato, empty bowl, pot of flour, bucket of water, and raw ugthanki meat'},
+        {n:'Talk to Al the Camel in Al Kharid while wearing a full cramulet'},
+        {n:'Harvest cactus spines, then enter the Al Kharid resource dungeon'},
+        {n:'Equip a charged enchanted water tiara at Bandit Camp'},
+        {n:'Fill a waterskin at Enakhra\'s Temple fountain, exit, then cast Humidify on the second waterskin'},
+        {n:'Kill a dust devil in the Smoke Dungeon (wear a face mask or slayer helmet)'},
+        {n:'Fletch broad bolts or arrows at Sumona\'s house in Pollnivneach'},
+        {n:'Make an ugthanki kebab in Nardah (dough → bread, meat, onion & tomato, combine, finish)'},
+        {n:'Switch to the ancient spellbook and cast Ice Burst on a desert enemy'},
+        {n:'Loot a sarcophagus in the 61-Thieving room of Pyramid Plunder'},
+        {n:'Deposit something in the Bedabin Camp deposit box while carrying dreadnips and a Keris'},
+        {n:'Deploy a dreadnip on the Kalphite Queen and land a Keris hit on a kalphite along the way'},
+        {n:'Speak to Hakeem the Mayor in Pollnivneach for your reward (Desert amulet 3)', lvl:'70 Magic, 50 Runecrafting, 52 Fletching, 58 Cooking, 65 Slayer, 55 Farming, 70 Thieving, 75 Dungeoneering, 110 combat level', note:'Also needs 450 Dominion Tower kills and broad ammo unlocked (300 Slayer points).'},
+
+        {n:'Kill a desert strykewyrm while wielding an ancient staff and wearing a full slayer helmet'},
+        {n:'Play the Holy Cithara inside the Abbey of St. Elspeth Citharede'},
+        {n:'Plant a dominion marker in the desert past the Shantay Pass'},
+        {n:'Carpet to the Monkey colony and enter the fissure to Apmeken tomb'},
+        {n:'Take the Ankh and Scabaras mask, then equip both while standing in the desert'},
+        {n:'In Nardah: make 2 super antifire potions (phoenix feather + robust glass + potion flask)'},
+        {n:'Reach room 8 of Pyramid Plunder in Sophanem and open the sarcophagus'},
+        {n:'Talk to the clay golem in Uzer for your reward (Desert amulet 4)', lvl:'79 Slayer, 89 Crafting, 91 Thieving (no boosts), 80 Agility, 81 Mining, 85 Herblore'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Falador',
+      note: 'From the wiki\'s Falador achievements step-by-step guide. Quests: Medium needs Recruitment Drive, Wanted!, The Knight\'s Sword, Garden of Tranquillity (started), Gertrude\'s Cat. Hard needs A Fairy Tale II (started), The Slug Menace, The Hand in the Sand, the Mogre lore activity, Elemental Workshop I. Elite needs Lunar Diplomacy + The Temple at Senntisten. Rewards come as Falador shields 1-4, claimed in order.',
+      tasks: [
+        {n:'(Easy) Go to Falador west bank and take your items out'},
+        {n:'(Easy) Make a Mind tiara at the mind altar'},
+        {n:'(Easy) Feed the Hairdresser\'s pet (in the treadmill) a piece of cheese'},
+        {n:'(Easy) Fill your bucket at the pump outside the bank'},
+        {n:'(Easy) Buy a stat-boosting beer from the inn'},
+        {n:'(Easy) Climb to the top of the White Knights\' Castle (west side)'},
+        {n:'(Easy) Talk to Sir Renitee about your family crest'},
+        {n:'(Easy) Kill a duck in Falador Park'},
+        {n:'(Easy) Enter and exit the Falador Mole Lair'},
+        {n:'(Easy) Go to the Party Room and talk to Party Pete'},
+        {n:'(Easy) Try on a black chainbody at Wayne\'s shop, then sell it back'},
+        {n:'(Easy) Heal an elemental wizard south of Falador with the matching elemental spell'},
+        {n:'(Easy) Buy an amulet of farming from Sarah'},
+        {n:'(Easy) Kill a highwayman south of the cabbage patch'},
+        {n:'(Easy) Recharge Prayer at the altar south-west of Port Sarim'},
+        {n:'(Easy) Take the boat to Entrana (no weapons or explorer\'s ring — bank first)'},
+        {n:'(Easy) Talk to Redbeard Frank on Port Sarim\'s north pier for your reward', lvl:'25 Defence, 16 Construction'},
+
+        {n:'(Medium) Pickpocket a Falador Guard right outside the west bank', lvl:'10 Prayer, 10 Mining, 19 Ranged, 20 Defence, 23 Farming, 26 Agility, 36 Crafting, 37 Strength, 40 Thieving, 49 Firemaking'},
+        {n:'(Medium) Crawl under the wall on the south-west side of Falador (both directions)'},
+        {n:'(Medium) Kill a Black Knight outside the Black Knights\' Fortress'},
+        {n:'(Medium) Grapple onto the Falador wall near the Park and jump down'},
+        {n:'(Medium) Salute Sir Tiffy Cashien while wearing full Initiate armour'},
+        {n:'(Medium) Craft a fruit basket on the loom south of the farm'},
+        {n:'(Medium) Plant a scarecrow, then plant 3 sweetcorn seeds in the cabbage patch'},
+        {n:'(Medium) Travel to Karamja for free, then return to Port Sarim'},
+        {n:'(Medium) Summon a pet cat on the sandy patch next to The Face'},
+        {n:'(Medium) Kill an ice giant and mine a blurite ore in the Asgarnian Ice Dungeon'},
+        {n:'(Medium) Smelt the blurite bar (superheat if you have the runes)'},
+        {n:'(Medium) Smith the blurite bar into blurite limbs on Thurgo\'s anvil'},
+        {n:'(Medium) Light your bullseye lantern at the Chemist\'s house in Rimmington'},
+        {n:'(Medium) Talk to the Chemist for your reward'},
+
+        {n:'(Hard) Plant a magic tree in Falador Park (grows over several hours — start this early)', note:'A magic tree is better than yew since it also covers an Elite requirement later.'},
+        {n:'(Hard) Use the fairy ring at Mudskipper Point (code AIQ) to reach the fishing spot'},
+        {n:'(Hard) Kill a mogre with fishing explosive on the ominous fishing spot'},
+        {n:'(Hard) Kill a skeletal wyvern in the Asgarnian Ice Dungeon (elemental/mind/body/dragonfire shield needed)'},
+        {n:'(Hard) Dye a cape pink with pink dye from Betty in Port Sarim'},
+        {n:'(Hard) Summon an Ibis in the Port Sarim fish store'},
+        {n:'(Hard) Go upstairs in the Dark Wizards\' Tower wearing full proselyte armour'},
+        {n:'(Hard) Change your family crest to the Saradomin symbol in White Knights\' Castle'},
+        {n:'(Hard) Craft 140 mind runes in one trip at the mind altar'},
+        {n:'(Hard) Talk to Squire Asrol for Falador shield 3', lvl:'16 Construction, 30 Defence, 56 Runecrafting, 56 Summoning, 60 Mining, 70 Prayer, 72 Slayer, 60 Farming, 60 Woodcutting'},
+
+        {n:'(Elite) Catch and cook a Rocktail (90 Fishing, 93 Cooking, cook on any range in Falador)'},
+        {n:'(Elite) Mine a concentrated gold rock in the Living Rock Caverns (80 Mining)'},
+        {n:'(Elite) Cut down your magic tree in Falador Park (75 Farming, 75 Woodcutting)'},
+        {n:'(Elite) Use a summoned hydra familiar to regrow the tree (80 Summoning)'},
+        {n:'(Elite) Cast String Jewellery at the Falador furnace', q:'Lunar Diplomacy'},
+        {n:'(Elite) Switch from curses to regular prayers at a White Knights\' Castle altar while Turmoil is active', q:'The Temple at Senntisten'},
+        {n:'(Elite) Talk to Squire Asrol for Falador shield 4'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Fremennik',
+      note: 'From the wiki\'s Fremennik achievements step-by-step guide, organized geographically the same way the guide is (Fremennik Isles → Barbarian Outpost → Rellekka → Fremennik Province → Lunar Isle/Miscellania/Waterbirth). Medium needs The Fremennik Trials, The Fremennik Isles (partial), Garden of Tranquillity, A Fairy Tale II. Hard/Elite need Lunar Diplomacy, Royal Trouble, The Fremennik Trials, all four Barbarian Training sections, Bar Crawl, Tai Bwo Wannai Trio, Blood Runs Deep. Rewards are Fremennik sea boots 1-4, claimed in order.',
+      tasks: [
+        {n:'Teleport to Barbarian Outpost with a games necklace'},
+        {n:'Talk to Captain Cain and exhaust all options in the Barbarian Assault tutorial'},
+        {n:'Head to Otto\'s Grotto and speak to Otto Godblessed about Barbarian Training'},
+        {n:'Kill a Cave crawler in the Fremennik Slayer Dungeon (south-east of Fremennik lodestone)'},
+        {n:'Attempt to chop the windswept tree north-east of the dungeon'},
+        {n:'Go north up the steps to find the hunting expert'},
+        {n:'Collect 3 seaweed from the shore by the rock crabs'},
+        {n:'Kill 5 rock crabs on the shore'},
+        {n:'Kill an adult black unicorn near the Fremennik lodestone'},
+        {n:'Recharge Summoning points at the small obelisk south of Rellekka\'s gates'},
+        {n:'Catch a tuna (or any fish) barehanded on the Rellekka docks'},
+        {n:'Claim your reward from the council workman on the Seers\' Village/Rellekka bridge (Fremennik sea boots 1)', lvl:'10 Slayer'},
+
+        {n:'Travel to Neitiznot, climb the north-east tower ladder, and talk to a guard to start a shouting match'},
+        {n:'Equip yak-hide armour and kill an ice troll male (not a runt or female)'},
+        {n:'Exit the Fremennik Slayer Dungeon and use fairy ring code DKS'},
+        {n:'At the hunting grounds north-west of the dungeon, hunt a sabre-toothed kyatt'},
+        {n:'Run south-west to the Fossegrimen, wear Ring of charos (a), and talk to it'},
+        {n:'Talk to Yrsa to open the boot recolouring options at her shoe store', note:'Remove all armour/weapons/familiars/customizations first — you don\'t have to actually recolour them.'},
+        {n:'Make 3 vials at the furnace south-west of Rellekka'},
+        {n:'Steal a fish from the fish stall in Rellekka marketplace'},
+        {n:'Talk to Brundt the Chieftain and learn Fremennik/Outerlander history'},
+        {n:'Interact with your pet rock'},
+        {n:'Churn a cheese wheel at the dairy churn north of the obelisk (or milk a nearby dairy cow)'},
+        {n:'Return to Rellekka for your reward from Yrsa (Fremennik sea boots 2)', lvl:'55 Hunter, 48 Cooking, 42 Thieving, 33 Crafting, 20 Defence'},
+
+        {n:'Cut an Arctic Pine log on the Fremennik Isles (save it for later)'},
+        {n:'Complete a lap of the Barbarian Outpost Agility Course'},
+        {n:'Complete Barbarian Firemaking if needed, then dive into the whirlpool at Baxtorian Falls'},
+        {n:'Kill mithril dragons for 2+ chewed bones (or get mangled bones from a confused barbarian/barbarian corpse)'},
+        {n:'Make 2 pyre ships at Otto\'s Grotto — one with the arctic pine log, one with magic logs'},
+        {n:'Complete Barbarian Fishing if needed, then barehand-catch a shark on Jatizso'},
+        {n:'Equip full Fremennik armour (rockshell/spined/skeletal) and speak to a Rellekka local'},
+        {n:'Use the Lunar Isle lodestone and head to the dungeon symbol north-east on the isle'},
+        {n:'Mine pure essence at the Lunar Isle mine'},
+        {n:'Pray at the Astral Altar and cast Bake Pie on an uncooked pie'},
+        {n:'Sail to Waterbirth Island by talking to Jarvald on the westernmost Rellekka dock'},
+        {n:'Enter Waterbirth Island Dungeon and kill 3 Dagannoths, one of them with Balmung'},
+        {n:'Take the boat to Miscellania via the Sailor near Jarvald'},
+        {n:'Manage Advisor Ghrim, put all resources on Mahogany, then collect your reward (Fremennik sea boots 3)', lvl:'65 Magic, 60 Mining, 55 Fishing, 54 Woodcutting, 52 Crafting, 52 Firemaking, 50 Defence, 50 Ranged or Magic, 35 Strength, 35 Agility'},
+
+        {n:'Complete a lap of the Barbarian Outpost Advanced Course wearing your agile top'},
+        {n:'Complete Barbarian Herblore if needed, then make a super ranging mix with caviar at Otto\'s Grotto'},
+        {n:'Complete Barbarian Smithing if needed: make a spear, then a rune hasta from magic logs + rune bar'},
+        {n:'Head deeper into the Fremennik Slayer Dungeon and jump the chasm'},
+        {n:'Enter the Ice strykewyrm cave and kill one'},
+        {n:'Craft 56 astral runes in a single trip at the Astral Altar'},
+        {n:'Talk to Advisor Ghrim again for your final reward (Fremennik sea boots 4)', lvl:'96 Fishing, 93 Slayer, 90 Agility, 90 Smithing, 85 Crafting, 85 Firemaking, 82 Runecrafting, 80 Herblore, 76 Strength, 75 Attack, 35 Constitution, 35 Defence'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Karamja',
+      note: 'Easy/Medium/Elite are from the wiki\'s step-by-step walkthrough; Hard tier is now the full official achievement list (10/10), since the walkthrough only covered 1 of those. Medium needs Dragon Slayer, Shilo Village, Jungle Potion, Tai Bwo Wannai Trio, The Grand Tree. Hard needs Legends\' Quest, Rune Mysteries, Tai Bwo Wannai Trio, Shilo Village. Elite needs While Guthix Sleeps, Shilo Village, Smoking Kills. Rewards are Karamja gloves 1-4, in order.',
+      tasks: [
+        {n:'Before your run: plant a fruit tree seed in the North Brimhaven patch, and place a Chameleon egg (from Cairn Isle) in an incubator', note:'Both take real time to finish — start these first.'},
+        {n:'Take the charter ship from Port Sarim to Musa Point, then sail back and return'},
+        {n:'Pick 5 bananas from the Musa Point banana plantation'},
+        {n:'Catch any fish at the fishing spot north of Musa Point'},
+        {n:'Enter the volcano-top dungeon and search the hidden wall (where Elvarg was defeated)'},
+        {n:'Continue down the corridor into Crandor'},
+        {n:'Search the glass and enter the pothole dungeon, kill a jogre'},
+        {n:'Swing the rope to the moss giant island and back'},
+        {n:'Mine a gold ore near the moss giant island'},
+        {n:'Pay the fare to sail to Ardougne, then sail back to Brimhaven', lvl:'5 Fishing, 15 Agility, 40 Mining'},
+
+        {n:'Pay 875 coins and enter Brimhaven dungeon'},
+        {n:'Chop the vines to the west and proceed into the dungeon'},
+        {n:'Cross the spiked pit via the stepping stones near the moss giants'},
+        {n:'Climb to the greater demons floor, then return to the ground floor'},
+        {n:'Inspect a fully grown fruit tree in the Brimhaven fruit tree patch, south of the docks'},
+        {n:'Earn 10 Agility Arena tickets at Brimhaven Agility Arena', lvl:'12-40 Agility, 50 Woodcutting, 16 Cooking, 65 Fishing, 27 Farming, 41 Hunter, 40 Mining', note:'You need 10+ tickets banked to also cover the Elite step below — worth farming a few extra while you\'re here.'},
+
+        {n:'Flawless Victory — become the champion of the TzHaar Fight Pit (last one standing)'},
+        {n:'Play Dead, Doggy — kill a Ket-Zek in the TzHaar Fight Cave (they start appearing wave 31+)'},
+        {n:'I\'d Be Kharazi to Eat This — eat an oomlie wrap (raw oomlie + palm leaf, cooked, 50 Cooking)'},
+        {n:'At One With Nature — craft nature runes at a nature altar (Karamja, Abyss, or Great Orb Project all count)', lvl:'44 Runecrafting'},
+        {n:'Drop It Like It\'s Hot — cook a raw karambwan thoroughly', lvl:'30 Cooking', q:'Tai Bwo Wannai Trio', note:'Talk to Tiadeche in Tai Bwo Wannai first or you\'ll only make poison karambwan, which doesn\'t count.'},
+        {n:'Deadwing — kill a deathwing in the Viyeldi caves beneath Kharazi Jungle', q:'Legends\' Quest', note:'Bring a lockpick and pickaxe for the ancient gate. Ranged gear recommended (level 77 combat, weak to arrows).'},
+        {n:'Quick As a Shot — use the grapple shortcut from Musa Point to southern Karamja', lvl:'53 Agility, 42 Ranged, 21 Strength', note:'Needs an iron crossbow or better plus a mithril grapple.'},
+        {n:'A Palm For Each Finger — collect 5 palm leaves by shaking Leafy Palm Trees in Kharazi Jungle', q:'Legends\' Quest', note:'Dropping and re-picking up a leaf counts as a new pickup.'},
+        {n:'Yes, My Master — get a Slayer assignment from Duradel in Shilo Village', lvl:'100 combat level, 50 Slayer', q:'Shilo Village', note:'Use Lapalok instead if Duradel is unavailable during/after While Guthix Sleeps.'},
+        {n:'Can Opener — kill a metal dragon in Brimhaven Dungeon', note:'Bronze dragons are the weakest that still count. Bring antifire.'},
+
+        {n:'With 10+ Agility Arena tickets banked, buy a clean snapdragon and combine it with a vial of water + red spider\'s eggs to make a super restore', lvl:'91 Runecrafting, 95 Summoning, 27 Hunter, 63 Herblore, 80 Cooking, 74 Agility, 50 Slayer, 100 combat level'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Lumbridge',
+      note: 'From the wiki\'s Lumbridge achievements step-by-step guide — every individual requirement, tagged by tier. Quests needed: The Restless Ghost (Beginner/Easy), Cook\'s Assistant (Medium/Hard), started Dragon Slayer (Medium). Rewards come one ring at a time in order — you can\'t skip ahead and claim a higher ring before the earlier ones.',
+      tasks: [
+        {n:'(Beginner) Climb the ladder outside Lumbridge Castle bank\'s north wall to the highest point in Lumbridge'},
+        {n:'(Beginner) Raise the flag on the roof of the Lumbridge Bank'},
+        {n:'(Beginner) Talk to Duke Horacio on the upper floor of Lumbridge Castle'},
+        {n:'(Beginner) Look through Father Aereck\'s selection of gravestones in Lumbridge Church', q:'The Restless Ghost'},
+        {n:'(Beginner) Play the organ in the Lumbridge Church'},
+        {n:'(Beginner) Ring the bell in the Lumbridge Church'},
+        {n:'(Beginner) Talk to the Lumbridge Sage'},
+        {n:'(Beginner) Speak with the Doomsayer about the Warning System'},
+        {n:'(Beginner) Browse the Lumbridge General Store and buy a bucket and cake tin'},
+        {n:'(Beginner) Talk to the herald of Lumbridge to claim a herald cape'},
+        {n:'(Beginner) Go to Al Kharid'},
+        {n:'(Beginner) Mine 3 clay in the Lumbridge south-east mine (soften with water)'},
+        {n:'(Beginner) Enter the courtyard of Draynor Manor'},
+        {n:'(Beginner) Mine 1 clay north-west of the Lumbridge flour mill'},
+        {n:'(Beginner) Visit the Draynor Village Market'},
+        {n:'(Beginner) Find out about the Rules of Conduct from the Draynor town crier'},
+        {n:'(Beginner) Spin soft clay into a pot on the potter\'s wheel'},
+        {n:'(Beginner) Bake the unfired pot in the kiln'},
+        {n:'(Beginner) Climb to the top of the Wizards\' Tower'},
+        {n:'(Beginner) Mine copper south-east of Lumbridge Swamp'},
+        {n:'(Beginner) Catch raw shrimp east of Lumbridge Swamp (don\'t cook it)'},
+        {n:'(Beginner) Sell the raw shrimp to the Lumbridge Fishing Shop'},
+        {n:'(Beginner) Visit Fred the Farmer\'s chicken and sheep farm'},
+        {n:'(Beginner) Grind wheat inside the windmill and keep it'},
+
+        {n:'(Easy) Access the bank in Draynor Village'},
+        {n:'(Easy) Make 2 clay rings, bake them, and sell one to Morgan near Ned\'s house'},
+        {n:'(Easy) Have the Wise Old Man check your bank and/or inventory'},
+        {n:'(Easy) Discover what the Wise Old Man is watching through his telescope'},
+        {n:'(Easy) Kill a zombie in the Draynor sewers'},
+        {n:'(Easy) Catch a raw pike in the river east of Lumbridge Castle', lvl:'15 Mining, 25 Fishing, 30 Smithing, 5 Runecrafting, 4 Crafting'},
+        {n:'(Easy) Mine 2 iron ores from the Lumbridge Swamp mining spot'},
+        {n:'(Easy) Taunt the demon on the upper floor of the Wizards\' Tower'},
+        {n:'(Easy) Have Sedridor teleport you to the Essence mine'},
+        {n:'(Easy) Craft at least 100 water runes at the Water Altar in one inventory (no explorer\'s ring/pouches/familiars)', note:'Also required again at Hard tier.'},
+        {n:'(Easy) Search the shed in Lumbridge Swamp'},
+        {n:'(Easy) Get a replacement Amulet of Ghostspeak from Father Urhney'},
+        {n:'(Easy) Kill a giant rat in Lumbridge Swamp and keep the meat'},
+        {n:'(Easy) Cut down a tree in Lumbridge Swamp'},
+        {n:'(Easy) Light a campfire from the logs you just cut'},
+        {n:'(Easy) Cook the raw rat meat on the campfire'},
+        {n:'(Easy) Have your remaining clay ring blessed by Father Aereck'},
+        {n:'(Easy) Smelt 2 steel bars in the Lumbridge furnace'},
+
+        {n:'(Medium) Obtain an anti-dragon shield from Duke Horacio', q:'Dragon Slayer', note:'Only needs Dragon Slayer to be started (33 QP), not completed.'},
+        {n:'(Medium) Cook a lobster on the range in Lumbridge Castle kitchen', q:"Cook's Assistant"},
+        {n:'(Medium) Cut the lone willow tree east of Lumbridge Castle', lvl:'36 Smithing, 31 Magic, 30 Firemaking, 40 Cooking, 30 Woodcutting, 16 Crafting, 30 Fishing, 30 Mining'},
+        {n:'(Medium) Catch a raw salmon in the river east of Lumbridge Castle'},
+        {n:'(Medium) Light the willow log on top of the Lumbridge Castle gatehouse'},
+        {n:'(Medium) Mine one silver ore at the Al Kharid mine'},
+        {n:'(Medium) Mine 4 coal ores in Lumbridge Swamp and keep them'},
+        {n:'(Medium) Smith a steel longsword on the anvil in the jailhouse sewers'},
+        {n:'(Medium) Cast the Lumbridge Teleport spell (the rune-based one, not a tab/tablet)'},
+        {n:'(Medium) Smelt a silver bar in the Lumbridge furnace'},
+        {n:'(Medium) Craft an unstrung holy symbol in the Lumbridge furnace'},
+        {n:'(Medium) Get Beefy Bill to bank raw beef for you (or flour/cowhide)'},
+
+        {n:'(Hard) Hit a goblin or giant spider in the Lumbridge forest with Fire Blast', lvl:'30 Smithing, 50 Crafting, 59 Magic, 50 Cooking, 45 Prayer, 57 Runecrafting, 60 Firemaking', q:"Cook's Assistant"},
+        {n:'(Hard) Light a yew log fire on top of the Lumbridge Castle gatehouse'},
+        {n:'(Hard) Smith a mithril platebody on the anvil in the jailhouse sewers'},
+        {n:'(Hard) Pray at an altar with Mystic Might active'},
+        {n:'(Hard) Enchant a ruby amulet with Lvl-3 Enchant'},
+        {n:'(Hard) Add a chocolate bar to a cake you\'ve baked yourself'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Morytania',
+      note: 'From the wiki\'s Morytania achievements step-by-step guide, real achievement names in parentheses. Easy needs Priest in Peril, Creature of Fenkenstrain, Nature Spirit, In Aid of the Myreque. Medium adds Ghosts Ahoy, Shades of Mort\'ton, A Fairy Tale II (started), In Search of the Myreque, The Darkness of Hallowvale, Haunted Mine, Dwarf Cannon. Hard adds Legacy of Seergaze, The Branches of Darkmeyer, Desert Treasure, All Fired Up. Elite adds Ritual of the Mahjarrat. Rewards are Morytania legs 1-4, claimed in order.',
+      tasks: [
+        {n:'Cast Bloom near a log in Mort Myre Swamp with a silver sickle (b) (Blooming Marvellous)'},
+        {n:'Kill a Myre Blamish Snail west of Mort\'ton and craft a snelm (Chisellin\' Conchiolin)'},
+        {n:'Cook a thin snail west of Mort\'ton (It\'s Only Wafer Thin)'},
+        {n:'Kill a ghast in Mort Myre Swamp (Struck A-Ghast)'},
+        {n:'Pray at the altar in the Nature Grotto, south inside Mort Myre Swamp (Fortified Spirit)'},
+        {n:'Kill a werewolf in human form south of Canifis while wielding a wolfbane dagger (Dislike-Anthrope)'},
+        {n:'Kill any creature on the Slayer Tower\'s ground floor, west of Canifis (If It Bleeds...)'},
+        {n:'Kill an experiment in the dungeon by the eastern grave near Fenkenstrain\'s Castle (Lab Clean-up Assistant)'},
+        {n:'Complete a game of Werewolf Skullball south-east of Canifis lodestone (Cranius Lupus)'},
+        {n:'Take an easy companion through an easy Temple Trekking route from Burgh de Rott (Only Going Forward. We Can\'t Find Reverse)'},
+        {n:'Plant a limpwurt seed near Port Phasmatys, wait 20 minutes, then harvest it (Wurt A Bundle)', lvl:'15 Crafting, 12 Cooking, 25 Agility, 26 Farming'},
+
+        {n:'Plant a bittercap mushroom spore west of Canifis and bind an amulet of nature to it (Fun Guy But Bitter, part 1)'},
+        {n:'Slay an Infernal Mage on the Slayer Tower\'s 1st floor, north-west (The Higher, The Badder)'},
+        {n:'Telegrab the pickled brain on a table in the Hair of the Dog tavern, Canifis (Brain Bending)'},
+        {n:'Head down the tavern cellar, through the Myreque shortcut and swamp boat to Mort\'ton (I Wonder How Far It Ghost?)'},
+        {n:'Use a Flamtaer hammer to help repair the Mort\'ton temple (Flamtaer Will Get You Everywhere)'},
+        {n:'View either of Razmire Keelgan\'s shops (bring Serum 207/208 if he\'s still afflicted) (Ad-Myre The Goods)'},
+        {n:'Unlock any chest in the Shade Catacombs, west of the Shades of Mort\'ton minigame (Plenty Mort Where That Came From)'},
+        {n:'Mine mithril ore in the Abandoned Mine, south-west (Polterheist)'},
+        {n:'Take a medium companion through a medium Temple Trekking route from Burgh de Rott (Ready? Trek!)'},
+        {n:'Complete a Burgh de Rott Ramble with any companion (Don\'t Stop Me If I Start To Ramble)'},
+        {n:'Cut bark from a Hollow tree east of Canifis — keep it for Hard tier (Barking Up the Wrong Tree)'},
+        {n:'Charter a ship from Port Sarim to Port Phasmatys (Charter A Course)'},
+        {n:'Use the Ectophial to teleport to the Ectofuntus (Travelling On The Slime Trail)'},
+        {n:'Grind a silver bar at the Ectofuntus while carrying garlic + restore potion, then combine them with the dust (Finding Your Balance)'},
+        {n:'Trade ecto-tokens for ale yeast in the Green Ghost Inn cellar, Port Phasmatys (The Yeast They Can Do)'},
+        {n:'Add 4 apple mush (or water/barley malt/ale ingredient) plus the ale yeast to a Fermenting Vat (The Beer Inn-spectre)'},
+        {n:'Walk through Port Phasmatys\'s Western Gate (Gate Spectre-ations)'},
+        {n:'Make a batch of cannonballs at the Port Phasmatys furnace (Obvious Forgery)'},
+        {n:'Fairy ring from Yanille lodestone to code ALQ in the Haunted Woods (Who You Gonna Ring?)'},
+        {n:'Trap a green salamander south-west in the Haunted Woods (Izzy Wizzy Let\'s Get Lizzy)'},
+        {n:'Harvest your bittercap mushrooms west of Canifis (Fun Guy But Bitter, part 2)', lvl:'45 Woodcutting, 57 Herblore, 14 Cooking, 29 Hunter, 33 Magic, 35 Smithing, 45 Slayer, 53 Farming, 55 Mining'},
+
+        {n:'With a Drakan\'s medallion, teleport to Burgh de Rott, then find Tarn\'s Lair through the Haunted Mine and ensure he\'s slain (Detarnation)'},
+        {n:'Craft a Blisterwood polearm from a blisterwood log and 2 silver sickles (Raising The Stakes)'},
+        {n:'Escort Smiddi Ryak through a hard Temple Trekking route from Burgh de Rott (Trekkin\' Ain\'t Easy)'},
+        {n:'Cast Bloom with your Ivandis flail, south in Mort Myre Swamp (Shade-Shattering Ka-Bloom)'},
+        {n:'Use the agility shortcut through the Paterdomus temple fence (Time Salver)'},
+        {n:'Use a Columbarium key on a casket downstairs in the Columbarium (burn a vyre corpse pyre if you need a key) (Just One More Key...)'},
+        {n:'Wearing a ring of fire, light a Haunted Woods torch at Canifis using your saved bark (Better Than Cursing The Darkness)'},
+        {n:'Complete a lap of the Werewolf Agility Course south, then hand in your stick (They\'ll Just Throw It Away Again)'},
+        {n:'Break a Blood altar teleport tablet (Runecraft Carrier)'},
+        {n:'Create or travel through a Kharyrll Portal in your player-owned house\'s Portal Chamber (Huge Success)'},
+        {n:'Teleport to Barrows with your Drakan\'s medallion, then equip one Barrows item with a 2-handed weapon and nothing else on (I Brought Your Stuff Back)', lvl:'50 Runecrafting, 65 Agility, 50 Construction, 70 Magic, 63 Farming, 67 Slayer, 64 Crafting, 70 Defence, 70 Fletching, 76 Woodcutting, 62 Firemaking'},
+
+        {n:'Kill an abyssal demon in the Slayer Tower, west of Canifis lodestone (Whip: It Good)'},
+        {n:'Craft blood runes at the Blood altar with rune essence and a blood talisman (As You Might Expect)'},
+        {n:'Summon a ghast familiar anywhere in Morytania (Thoroughly A-Ghast)'},
+        {n:'Use a games necklace to teleport to Burgh de Rott (Not Such a Rotten Idea)'},
+        {n:'Catch a shark barehanded off the Burgh de Rott docks (Fremennik Export)'},
+        {n:'Kill a fiyr shade in Mort\'ton and use a pyre log + remains on a funeral pyre (Set It On Fiyr)'},
+        {n:'Teleport to Barrows with your Drakan\'s medallion and kill all 7 brothers, including Akrisae (Bros Before Barrows)'},
+        {n:'Teleport to Darkmeyer with your Drakan\'s medallion (On Wings Of Bling)'},
+        {n:'Grow a fellstalk + a morchella mushroom near Port Phasmatys/Canifis, then make a prayer renewal potion while still in Morytania (As Good As Renew)', lvl:'85 Slayer, 77 Runecrafting, 87 Summoning, 91 Farming, 94 Herblore, 96 Fishing, 76 Strength, 80 Firemaking'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Seers\' Village',
+      note: 'From the wiki\'s Seers\' Village step-by-step guide — a genuinely efficient combined route, real achievement names in parentheses. Easy needs Murder Mystery. Medium needs Scorpion Catcher, One Small Favour (started), Elemental Workshop I. Hard needs King\'s Ransom, A Fairy Tale II (fairy ring access), Family Crest, optionally Legends\' Quest. Elite needs Lunar Diplomacy. Rewards are Seer\'s headbands 1-4 — bring the previous headband to claim the next one.',
+      tasks: [
+        {n:'Jump the shortcut log near Sinclair Mansion and back (Fleeing the Scene)'},
+        {n:'Fill 5 pots with flour from the Sinclair Mansion kitchen barrel (Bunch of Flours)'},
+        {n:'Use the churn in the Sinclair Mansion garden, north-west corner (Sinclair Swirling)'},
+        {n:'Fish a salmon south-west of Sinclair Mansion (It\'s a Trap! No, Wait, It\'s a Pie — part 1)'},
+        {n:'In Taverley dungeon, charge 5 water orbs in one trip at the water obelisk (Water Palaver)'},
+        {n:'Use the grapple shortcut from the water obelisk island to Catherby Beach (Island Hopper)'},
+        {n:'Catch 5 sharks in Catherby (Gonna Need a Bigger Boat)'},
+        {n:'Catch a raw mackerel on Catherby beach (Mack Rolled)'},
+        {n:'Catch a bass in Catherby (All Your Bass... — part 1)'},
+        {n:'Catch a tuna in Catherby (It\'s a Trap! No, Wait, It\'s a Pie — part 2)'},
+        {n:'Get a pet fish from Harry at the Catherby fishing shop (fill a fishbowl + seaweed) (At Least It Doesn\'t Need Walking)'},
+        {n:'Buy a white candle from the Catherby candle maker (Grand Candle)'},
+        {n:'Cast Fertile Soil on the Catherby allotment patch, then harvest potatoes (Moon Raker / It\'s a Trap! No, Wait, It\'s a Pie — part 3)', note:'Needs the lunar spellbook.'},
+        {n:'Cook a bass on the range north of Catherby bank (All Your Bass...)'},
+        {n:'Cook 5 sharks on the same range (Gonna Need a Bigger Range)'},
+        {n:'Make an admiral pie from scratch: cook salmon+tuna, make pastry dough into a pie shell, add salmon/tuna/potato, bake (It\'s a Trap! No, Wait, It\'s a Pie)'},
+        {n:'Teleport to the Ranging Guild with a combat bracelet (At Home on the Range)'},
+        {n:'Make an extreme ranging potion from scratch and drink it inside the Ranging Guild (Plenty - potion - entiary)'},
+        {n:'Kill one guard on each Ranging Guild tower with a regular shieldbow (Sniper Training)'},
+        {n:'Get congratulated by the Ranging Guild judge for 1,000+ archery tickets (Arch Archer)'},
+        {n:'Buy something from the Ranging Guild ticket exchange (Studded coif is 12 tickets) (What, No Cuddly Toy?)'},
+        {n:'Ask Thormac about mystic staves, south-east near the magic trees (It\'s a Slightly Magical Stick.)'},
+        {n:'Cut 5 yew logs south of the Flax fields, bottom floor (See Yew at Five)'},
+        {n:'Pick 5 flax north of the yew trees (Reflax Actions)'},
+        {n:'Pray at the church altar north-west of the flax field (A Seer-ing Light)'},
+        {n:'Spin flax into bowstrings at the 1st-floor spinning wheel (Another String to Your Bow)'},
+        {n:'Climb to the weather vane roof (I Can Seer My House From Here)'},
+        {n:'Give cider to locals at the Forester\'s Arms, north of the lodestone (5 doses, same person is fine) (Happy Hour)'},
+        {n:'Kill one of each elemental inside the Elemental Workshop (Mastering the Elements)'},
+        {n:'Make an enchanted diamond-tipped bolt from scratch: smith unf bolts, craft diamond tips, fletch, enchant (Make a Bolt For It)'},
+        {n:'Fletch and string a magic longbow from scratch (The Long of It)'},
+        {n:'String a magic shortbow in Seers\' Village bank (The Short of It)'},
+        {n:'Cast High Level Alchemy on that shortbow while still in the bank (Alch-aholic)'},
+        {n:'Use a familiar to light a maple log fire outside the bank (Familiar Fire Familiarity)'},
+        {n:'Burn a magic log in Seers\' Village, manually or with a familiar (Twisted Fire Starter)'},
+        {n:'Walk a clockwise circle around the mysterious statue east of the bank (Why?)'},
+        {n:'Enter the Seers\' Village Courthouse with Piety active (Prayer of Attorney)'},
+        {n:'Cast Camelot Teleport (It\'s Only a Model)'},
+        {n:'Use a poison chalice on King Arthur — don\'t drink it (La Morte D\'Arthur)'},
+        {n:'Fairy ring to McGrubor\'s Wood (ALS), then to Zanaris and back (Beware of the Dog)'},
+        {n:'Plant jute seeds on the hops patch north of McGrubor\'s Wood — no need to harvest (Jute Alors!)'},
+        {n:'Have Sir Galahad make you a cup of tea, west of McGrubor\'s Wood (Stir, Galahad)'},
+        {n:'Cross the agility shortcut west of Sir Galahad and mine the remaining coal (up to 224 pieces) (King Coal)'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Tirannwn',
+      note: 'From the wiki\'s Tirannwn step-by-step guide — genuinely the most complex diary in the game. Hard tier specifically requires being in the right Prifddinas district while that district\'s Voice of Seren buff is active (it rotates over real time across the 7 districts, unrelated to Ithell) — check in-game which district currently has it before attempting those steps. Easy needs Desert Treasure, A Fairy Tale II, Mourning\'s End I & II, The Path of Glouphrie, Regicide, Underground Pass. Medium adds Deadliest Catch, The Prisoner of Glouphrie, Within the Light. Hard needs Bringing Home the Bacon, Legacy of Seergaze, Plague\'s End. Elite needs Blood Runs Deep, The Branches of Darkmeyer, The Elder Kiln, Fate of the Gods, As a First Resort, One of a Kind, Ritual of the Mahjarrat, The World Wakes, The Void Stares Back, The Chosen Commander, The Firemaker\'s Curse, plus the Grand ranging potion recipe unlocked. Rewards are Tirannwn quivers 1-4, in order.',
+      tasks: [
+        {n:'Switch to the Ancient spellbook, then spirit-tree teleport from Varrock to Poison Waste'},
+        {n:'Enter the sewer west of the spirit tree and kill a Warped terrorbird or Warped tortoise'},
+        {n:'Teleport to Ardougne, wear mourner gear into West Ardougne, and enter the NE building\'s basement'},
+        {n:'Reach the Temple of Light through the cave and kill a Shadow with any Shadow Spell'},
+        {n:'From Eagles\' Peak lodestone, enter Arandar wearing only mourner gear'},
+        {n:'Follow the path south and mine limestone at the end'},
+        {n:'Cross the log, pass through the dense forest, and enter the cave to the Well of Voyage'},
+        {n:'Kill a Disciple of Iban using Iban\'s staff'},
+        {n:'Take the stairs NW of the cave, talk to Klank about his gloves'},
+        {n:'Go back up and through the NE door, follow the path to the door south of the spike pits, and unlock it'},
+        {n:'Teleport to Lletya on your crystal teleport seed until it\'s out of charges'},
+        {n:'Use the crystal teleport seed on Eluned or Ilfeen'},
+        {n:'Talk to Gwir about a previous adventure, east of Lletya'},
+        {n:'Charter from Port Sarim to Port Tyras and buy/equip a Tyras helm at Tyras Camp'},
+        {n:'Fairy ring from Yanille to the Poison Waste (DLR), then teleport to the Tirannwn lodestone'},
+        {n:'Jump the leaf trap NE, jump back, and talk to the Elf Tracker for your reward', lvl:'5 Defence, 52 Magic, 10 Mining, 43 Prayer, 56 Slayer, 50 Thieving'},
+
+        {n:'Charter to Tyras Camp and buy a halberd from the quartermaster'},
+        {n:'Teleport to Prifddinas, plant and pick a papaya in the Meilyr district fruit patch'},
+        {n:'Fletch a yew longbow in the Cadarn district: cut a yew log, fletch it, spin flax, string it'},
+        {n:'South of the Elf Camp, cross the bridge and dense forest to the hunter area'},
+        {n:'Set box traps baited with papaya to catch a pawya, then bait a box trap with the raw pawya meat'},
+        {n:'At the Elf Camp, fish and deposit a shark'},
+        {n:'Kill an elf with your halberd'},
+        {n:'Teleport to Lletya, then navigate the mountains: rope up, dead tree, stepping stones, gap jumps, rope crossing, past the hill giants'},
+        {n:'Get rune essence, then teleport to (or walk to) the death altar and craft there'},
+        {n:'At Lletya, buy 15 swamp tar and gather stranger plant pouch materials (pouch, 128 spirit shards, crimson charm, bagged plant 1, harralander)'},
+        {n:'Navigate from Lletya to the Well of Voyage cave entrance and make the stranger plant pouch inside'},
+        {n:'South of Lletya at the Poison Waste, jump to the first island and make harralander tar'},
+        {n:'Return to Lletya and speak to Gwir for your reward', lvl:'56 Agility, 57 Farming, 76 Fishing, 70 Fletching, 77 Hunter, 65 Runecrafting, 40 Strength, 64 Summoning, 60 Woodcutting, 48 Herblore'},
+
+        {n:'Climb to Prifddinas lodestone\'s 1st floor with a bacon mound, bread, and chocolate bar, and give them to Seren'},
+        {n:'Ithell district: speak to Lady Ithell, mine soft clay with a bracelet of clay equipped'},
+        {n:'Ithell district: play and retune all 4 harps in the Ithell Harmonium'},
+        {n:'Hefin district: speak to Lady Hefin'},
+        {n:'During the Hefin Voice of Seren: summon a light creature, lap the Hefin agility course repeatedly until a shortcut appears, then take it'},
+        {n:'Cleanse the Corrupted Seren Stone with a cleansing crystal'},
+        {n:'Meilyr district: speak to Lady Meilyr'},
+        {n:'During the Meilyr Voice of Seren: harvest moss from the harmony pillars and mix it with a Juju farming potion'},
+        {n:'Crwys district: speak to Lord Crwys'},
+        {n:'During the Crwys Voice of Seren: cut a magic log'},
+        {n:'Trahaearn district: speak to Lady Trahaearn'},
+        {n:'During the Trahaearn Voice of Seren: mine an adamantite rock'},
+        {n:'Cadarn district: speak to Arianwyn, swap to Ancient spellbook at the Cadarn grimoire'},
+        {n:'During the Cadarn Voice of Seren, on Ancient spellbook: kill a Cadarn elf, landing at least some damage with a crystal bow'},
+        {n:'Iorwerth district: speak to Lord Iorwerth'},
+        {n:'During the Iorwerth Voice of Seren: pray at an Iorwerth altar and kill an Iorwerth elf, landing at least some damage with a crystal dagger', note:'Switch to Legacy Combat if it doesn\'t trigger.'},
+        {n:'Play a non-reward game of Rush of Blood'},
+        {n:'Spend 100 Slayer points to prefer a Morvran task, then complete it'},
+        {n:'Amlodd district: speak to Lord Amlodd'},
+        {n:'Kill blissful shadows until you get a blissful shadow core, then throw it into the Amlodd crater'},
+        {n:'Catch 10+ different impling types for Dafydd, then dance in his house with 10+ present'},
+        {n:'During the Amlodd Voice of Seren: create a Titan\'s constitution summoning scroll'},
+        {n:'Exchange a familiar pouch for shards with Lord Amlodd'},
+        {n:'Speak to Arianwyn in the Cadarn district for your reward', lvl:'75 Farming, 77 Agility, 70 Attack, 81 Divination, 77 Herblore, 74 Hunter, 70 Ranged, 85 Slayer, 88 Summoning, 75 Woodcutting, 75 Crafting'},
+
+        {n:'Home teleport to Prifddinas, activate the crest of Seren head override'},
+        {n:'Climb to the Tower of Voices and bow or curtsy in front of Seren'},
+        {n:'In the Ithell district, use the singing bowl with an attuned crystal weapon/armour seed + 1,000 harmonic dust to make attuned crystal gear', note:'Lady Ithell gives a free seed if you have no crystal weapon and haven\'t dropped anything in 10 minutes.'},
+        {n:'Mine crystal-flecked sandstone in the Ithell district (must be that district\'s rock, not the Edimmu dungeon one)'},
+        {n:'Blow it into crystal glass at the Prifddinas robust glass machine, then into a crystal flask'},
+        {n:'Combine super ranging (4) + ranging (4) potions in the flask for a grand ranging potion', note:'Recipe costs 100,000 coins from Lady Meilyr.'},
+        {n:'In the Iorwerth district, start a gold or platinum Rush of Blood run with Morvan and clear wave 15'},
+        {n:'In the Trahaearn district, wearing the full exoskeleton set, pickpocket a Trahaearn worker'},
+        {n:'In the Cadarn district, use 9 balls of wool on the loom to make a level 90 milestone cape'},
+        {n:'At the Max Guild garden, unfurl a flag for a skill you have at 99 (or Jump For Joy if all are already unfurled)'},
+        {n:'In the Crwys district, grow an elder tree if needed (2 days 16 hours), then chop and fletch an elder shortbow (unstrung)'},
+        {n:'In the Meilyr district, enter the Gorajo Hoardstalker Dungeon, drink a perfect juju dungeoneering potion, and talk to Gojaro hoardstalker'},
+        {n:'Return to the Max Guild and talk to Elen Anterth for your reward', lvl:'95 Slayer, 95 Thieving, 90+ in every other non-elite skill, plus one skill at 99 or a Quest Cape'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Underworld',
+      note: 'From the wiki\'s Underworld (City of Um) step-by-step guide — this one leans hard into Necromancy specifically, and connects directly to the Necromancy Gear tab above. Easy needs Kili Row, Rune Mythos. Medium adds nothing new beyond Rune Mythos. Hard needs Curse of the Empty Lord, Kili Row, the Mystical Moonstone achievement, That Old Black Magic (ironmen also need Extinction). Elite needs Housing of Parliament, Icthlarin\'s Little Helper, Kili\'s Knowledge VII, Nomad\'s Elegy, \'Phite Club, Requiem for a Dragon, Soul Searching, The Temple at Senntisten. Rewards are Underworld Grimoires 1-4, in order.',
+      tasks: [
+        {n:'Craft a spirit rune at the spirit altar in the Necromantic Rune Temple'},
+        {n:'Buy 7+ basic ghostly ink, 200 weak necroplasm, and 4 basic ritual candles from Soul Supplies'},
+        {n:'Deposit the weak necroplasm in the Um ritual site\'s Focus storage'},
+        {n:'Perform the Lesser Necroplasm ritual: 1 Elemental I glyph, 2 Reagent I glyphs, 4 light sources'},
+        {n:'Dispel at least one ritual disturbance during that ritual (a wandering soul or sparkling glyph)'},
+        {n:'Take the ectoplasm and lesser necroplasm from the ritual chest'},
+        {n:'Combine lesser necroplasm + vial of water + ashes into regular ghostly ink'},
+        {n:'Wielding a conduit (skull lantern), fight a skeleton and use Conjure Skeleton Warrior'},
+        {n:'Kill a ghostly troll thrower or bruiser at the Trollgrav cave entrance, using Necromancy'},
+        {n:'Build 6+ Necrosis stacks with Touch of Death (twice), then use Finger of Death'},
+        {n:'Reach the top of the City of Um clock tower'},
+        {n:'Talk to Selene to learn a Necromancy prayer'},
+        {n:'Get one lesser ensouled bar (15 Smithing) or lesser ensouled cloth (15 Crafting)', note:'Buyable from Thalmund\'s Wares, or via the Lesser ensoul material ritual.'},
+        {n:'Use it to upgrade a death guard/skull lantern or deathwarden piece to tier 20'},
+
+        {n:'Cast the City of Um Teleport incantation'},
+        {n:'Combine cadava berries + marrentill potion (unfinished) into a necromancy potion, in the City of Um'},
+        {n:'Craft a flesh rune at the flesh altar in the Necromantic Rune Temple'},
+        {n:'Complete a Lesser Communion ritual: 1 Elemental I, 2 Commune I, 1 Multiply III glyphs, 4 light sources, with a broken/fragile memento'},
+        {n:'Gain 400+ souls total via more Lesser Communion rituals'},
+        {n:'Train Necromancy combat until you\'ve unlocked Command Skeleton Warrior and either Conjure Vengeful Ghost or Conjure Putrid Zombie', note:'Needs 4 talent points — roughly 28,080 combat XP.'},
+        {n:'Wielding a conduit, use Conjure Skeleton Warrior then Command Skeleton Warrior'},
+        {n:'Fight a zombie + Conjure Putrid Zombie, or a ghost + Conjure Vengeful Ghost'},
+        {n:'Cast Lesser Bone Shield, build 50% adrenaline in combat, then use Reflect'},
+        {n:'Use Bloat on an enemy and kill it while it\'s within 1 square of 2+ other enemies (Lumbridge Catacombs works well)'},
+        {n:'Complete Kili\'s Knowledge I, II, and III'},
+        {n:'Upgrade a death guard/skull lantern/deathwarden piece to tier 50'},
+
+        {n:'Keep the ghostly robe outfit on you and catch any ghost impling you spot along the way', note:'Catch it in an impling jar too if you want the separate um pop achievement from Austin.'},
+        {n:'Home teleport to the City of Um, then listen to any member of the band east of the plaza'},
+        {n:'At the Um smithy, smelt a necronium bar and cut an uncut moonstone'},
+        {n:'Craft a moonstone bracelet with an ensouled bar at the furnace'},
+        {n:'Cast Lvl-5 Enchant on it (manually, not a tablet) to make a passing bracelet — keep it on you'},
+        {n:'Spin 5 tempered fungal shafts into a fungal bowstring at the nearby spinning wheel'},
+        {n:'Rub the passing bracelet to the hanging gardens and plant a morchella mushroom spore'},
+        {n:'Rub the passing bracelet to the haunt on the hill, then through the dark portal to craft miasma runes'},
+        {n:'Rub the passing bracelet to the reflection pool, catch a raw ghostly sole, and cook it at the nearby oven'},
+        {n:'With Necromancy gear, head to the troll cave; keep Soul Sap on your revo bar and Soul Strike/Volley of Souls off it'},
+        {n:'Build 3 stacks of residual souls fighting the trolls, then manually cast Volley of Souls'},
+
+        {n:'Spot 8 owls around the City of Um as you go'},
+        {n:'On a Wednesday, give Thalmund a blueberry pie, south of the Um smithy', note:'Golden fleece from Lalli near the Fremennik Slayer Dungeon → spin into golden wool → fairy ring CIS to ScapeRune → trade Evil Bob twice for blueberries → bake into a pie.'},
+        {n:'Make an overload potion inside the Last Call tavern', note:'Only the final clean torstol step needs to happen inside the bar.'},
+        {n:'Dispel 6 ritual disturbances in one Powerful ritual (or the Manifest Ectoplasm ritual) at the Um ritual site'},
+        {n:'Wearing a soul cape, craft soul runes at the Soul Rune Temple'},
+        {n:'With 5 spirit runes, use Ungael Teleport to reach the Ungael ritual site'},
+        {n:'With Ancient Curses active, go through Death\'s door behind his desk in Death\'s Office'},
+        {n:'At the dock\'s water edge, activate the Sorrow prayer'},
+        {n:'Defeat Nakatra, Devourer Eternal in the Sanctum of Rebirth, then speak to Mekhat by the treasure chest', note:'Wear a catspeak amulet (or equivalent) while clearing it, and don\'t leave before talking to Mekhat or you\'ll have to redo the fight.'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Varrock',
+      note: 'From the wiki\'s Varrock achievements step-by-step guide, with the real in-game achievement name for each step in parentheses. Medium needs all four Stronghold of Security levels done and the balloon transport unlocked first. Hard needs 153 kudos and Ancient Magicks activated before starting. Elite needs a fully-grown tree in the Varrock palace patch, a rune bar banked, and Ancient Curses active.',
+      tasks: [
+        {n:'Enter and exit Edgeville Dungeon (On the Ragged Edge)'},
+        {n:'Reach the 2nd level of the Stronghold of Security (Making Learning Fun!)', note:'Worth continuing through all 4 levels now — Medium tier needs it done.'},
+        {n:'Make a bowl in the Barbarian Village crafting hut (Pot Stop)'},
+        {n:'Catch a trout in the river east of Barbarian Village (Sherpa\'s Delight)'},
+        {n:'Mine iron ore south-west of Varrock (Doing the Ironing)'},
+        {n:'Jump the fence south-east past the wheat field (Jumping-off Point)'},
+        {n:'Chop a dead tree at the south-east mine (No Good to Me Alive)'},
+        {n:'Feed a bone to a stray dog in Varrock (Dog and Bone)'},
+        {n:'Teleport to the rune essence mine via Aubury\'s, then exit (Essential Facilitator)'},
+        {n:'Speak to Thessalia to change your outfit (Strike a Pose)'},
+        {n:'Buy a Newspaper from Benny in Varrock Square (Read All About It)'},
+        {n:'Climb to the top of Varrock Palace, north-west tower (King of the Castle)'},
+        {n:'Travel through the Varrock sewers past the spider webs (Stick the Knife In)'},
+        {n:'Change your house location at the Varrock Estate agent (Relocation, Relocation, Relocation)'},
+        {n:'Have Elsie tell you a story upstairs in the church (Jackanory)'},
+        {n:'Speak to Haig Halen at the Varrock Museum (It Belongs in a Museum)'},
+        {n:'Enter and exit the Earth Altar (Journey to the Centre of the Earth Altar)'},
+        {n:'Make a plank at the Fort Forinthry sawmill (Plank You Very Much)'},
+        {n:'Mine limestone at Silvarea mining site (Limey)'},
+
+        {n:'Perform the four Stronghold of Security emotes: Idea, Stomp, Flap, Slap Head (Unlocking Your Emotions)'},
+        {n:'Wear Ring of charos (a), ask Gertrude for a new cat, choose its colour (A Lick of Paint)'},
+        {n:'Get a Slayer assignment from Vannaka (Challenge Vannaka)'},
+        {n:'Browse Oziach\'s shop (The Body Shop)'},
+        {n:'Use the fairy ring, travel anywhere, then return with code DKR (Dial V For Varrock)'},
+        {n:'Use the agility shortcut into the Grand Exchange (For Fast Transactions)'},
+        {n:'Use the spirit tree at the GE to travel and return (Point of En-tree)'},
+        {n:'Pick fruit from the white tree in Varrock Palace Garden (Master Scrumper)'},
+        {n:'Teleport to the Digsite with a Digsite/Ali\'s pendant (Return to Senntisten)'},
+        {n:'Enter and exit the A Soul\'s Bane rift (You Wouldn\'t Like Me When I\'m Angry)'},
+        {n:'Excavate the Tunnel of Chaos entrance and reach the far portal (What Lies Below? — Medium)'},
+        {n:'Use the balloon to travel anywhere and return (Engage)'},
+        {n:'Make a maple plank at the Fort Forinthry sawmill (My Fort Smells of Syrup)'},
+        {n:'Cast Varrock Teleport from the Standard spellbook (Like a Varrocket)'},
+        {n:'Pickpocket a guard in the palace courtyard (Royale With Thieve)'},
+        {n:'Wield a rat pole and catch 6 rats (With a Ten-foot Pole)'},
+        {n:'Get your cat to 100 total rat catches, then tell Gertrude (Faster, Pussycat! Kill! Kill!)'},
+        {n:'Grab red spider eggs past the sewer webs, if not already done (Can\'t Make an Omelette)'},
+        {n:'Have the Apothecary make a strength potion (Double-strength Weaksauce)'},
+
+        {n:'Craft an air battlestaff at a lectern (Battle of the Elements)'},
+        {n:'Make a Varrock teleport tablet on the lectern (Keeping Tabs on Varrock)'},
+        {n:'Use the skull sceptre to teleport to Barbarian Village (Intersceptre)'},
+        {n:'Give Romily Weaklax a wild pie in the Cooking Guild (Who Ate All the Pie?)'},
+        {n:'Make a waka canoe at the canoe station (Waka-Waka-Waka)'},
+        {n:'Plant a poison ivy bush, then pick poison ivy berries (Burning Bush)', note:'The bush takes up to 2h40m to grow — plant it before starting the rest of Hard.'},
+        {n:'Speak to Orlando Smith/Mark Brodie with 153+ kudos (Kudos on the Kudos!)'},
+        {n:'Talk to the estate agent about player-owned housing (Make a House a Home)'},
+        {n:'Smith an adamant med helm (Put Your Smithing Hat On)'},
+        {n:'Trade 2 dashing kebbit furs + 800 coins for a spottier cape (Lighten Up)'},
+        {n:'Have Dimintheis replace your family gauntlets (Hand-Me-Downs)'},
+        {n:'Cast Home Teleport from the Ancient Magicks spellbook (Living on the Edge)'},
+        {n:'Use the crevice shortcut from Edgeville Dungeon into the Varrock Sewers (Security Isn\'t a Dirty Word)'},
+
+        {n:'Make and bake a raw summer pie at the Cooking Guild (Red, Red Pies of Summer)'},
+        {n:'Chop your grown tree in the Varrock palace patch until the inferno adze incinerates a log (It All Adze Up)'},
+        {n:'Smith unfinished rune bolts, then feather them (A Bolt From the Blue)'},
+        {n:'Chop a magic tree in the Varrock Sewers resource dungeon (Arborehole)'},
+        {n:'Defeat Bork in the Chaos Tunnels (Stick a Bork In Him, He\'s Done)'},
+        {n:'Craft earth runes at the Earth altar (A Ton of Earth)'},
+        {n:'Tell Sil\'as Dahcsnu you\'re the leader of the Dagon\'hai (Mind Your Back)'},
+        {n:'Activate Soul Split, then kill a skeleton or pray at the Altar of Zaros (Splitting Headache)'},
+        {n:'Swap your Soul Wars cape colour with Zimberfizz/Zanik (Nomadness)'},
+      ]
+    },
+    {
+      name: 'Achievement Diaries — Wilderness',
+      note: 'From the wiki\'s Wilderness step-by-step guide, organized by location the same way the guide is. This is genuine PvP territory — everything here happens in the actual Wilderness, where other players can attack you. Hard needs Summer\'s End. Before starting: plant a limpwurt seed at the western ruins flower patch, plant a bloodweed seed at the herb patch north of the Crater, grab a hellhound Slayer contract from Erskine (finish it later), and talk to Mami Rimba about bakriminel bolts. Rewards are Wilderness swords 1-4, in order — the sword itself scales in power with how many tiers you\'ve done, no separate reclaim needed unless you die and lose it.',
+      tasks: [
+        {n:'Teleport to the Wilderness Crater lodestone with Home Teleport'},
+        {n:'Enter the Chaos Tunnels from a Wilderness entrance'},
+        {n:'Offer some bones on the chaos altar in level 12 Wilderness (the prayer altar, not the runecrafting one)'},
+        {n:'Check your bank with Simon, behind the chaos altar'},
+        {n:'North of Fort Forinthry, reach a score of 10 on the strange switches'},
+        {n:'View the death list noticeboard in Edgeville'},
+        {n:'Ask Vala in Edgeville about the history of PvP in the Wilderness'},
+
+        {n:'Use a waka canoe from Edgeville to reach the Wilderness'},
+        {n:'North of your landing, harvest the bloodweed patch and make a luck potion with crushed dragonstone'},
+        {n:'At the centre of the lava maze, open the chest with a muddy key', note:'Ripper demons guard the centre — come prepared to fight, not just loot.'},
+        {n:'Catch a black salamander near the Boneyard, north of Fort Forinthry'},
+        {n:'Buy a God Staff from the chamber guardian at the Mage Arena bank', note:'Needs the Mage Arena minigame done first to unlock purchasing god staves.'},
+        {n:'Complete a full lap of the Wilderness Agility Course'},
+        {n:'Loot the chest in the magic axe hut, north-east of the Deep Wilderness lever'},
+        {n:'Pickpocket a rogue inside Rogues\' Castle'},
+        {n:'Persuade Noterazzo in the Bandit Camp to show you his goods'},
+        {n:'Make an anchovy pizza from scratch in the Bandit Camp and give it to Fat Tony', note:'Base + tomato + cheese, cook it, then add cooked anchovies (fished on the camp\'s east side).'},
+
+        {n:'Charge an orb at the Obelisk of Air, through Edgeville Dungeon past the black demons'},
+        {n:'Activate and teleport from every Wilderness obelisk, starting at level 13'},
+        {n:'Kill 30 hellhounds in the crater for Erskine\'s Slayer contract'},
+        {n:'Defeat a tormented wraith at Dark Warriors\' Fortress', note:'Only harmed by black metal equipment. Wear Jennica\'s ring and operate it to enter the central area.'},
+        {n:'Harvest the limpwurt at the western ruins flower patch, north-west of Dark Warriors\' Fortress'},
+        {n:'Defeat the King Black Dragon with the Wilderness entrance buff active, dealing the most damage', note:'Must be done in an instance.'},
+        {n:'Make a camouflage potion with black salamander, from the same bloodweed patch north of Fort Forinthry'},
+        {n:'Defeat the Chaos Elemental while dealing the most damage, east of the Deep Wilderness lever'},
+        {n:'Turn in your completed hellhound Slayer contract to Erskine in Edgeville'},
+
+        {n:'Craft bakriminel bolts from scratch by the bloodwood tree next to the chaos altar'},
+        {n:'Capture a charming moth on the east coast of level 27 Wilderness, north-east of the salamander spot'},
+        {n:'In the Forinthry dungeon, defeat one of each revenant creature type', note:'14 types: imp, goblin, icefiend, pyrefiend, hobgoblin, vampyre, werewolf, cyclops, hellhound, demon, ork, dark beast, knight, dragon.'},
+        {n:'Defeat a lava strykewyrm, west near the King Black Dragon area'},
+        {n:'Make an aggression potion with searing ashes, same bloodweed patch north of Fort Forinthry'},
+        {n:'Loot supplies from a Wilderness Warbands camp (Dark Warriors\' Fortress camp, the lowest-level one at level 10)', note:'Solo ironmen can only attempt this one — worth checking current mechanics before relying on it.'},
+      ]
+    },
   ];
 
   const tasks = [];
@@ -1243,6 +2201,8 @@ function seedData(){
         solo: false,
         owner: null,
         recurring: cat.recurring || null,
+        killTrack: isObj ? !!item.killTrack : false,
+        kills: {},
         checks: {}
       });
     }
@@ -1331,7 +2291,7 @@ async function load(){
     if(!existingKeys.has(key)){
       const nextOrder = (maxOrderByCat[seedTask.category] ?? -1) + 1;
       maxOrderByCat[seedTask.category] = nextOrder;
-      state.tasks.push(Object.assign({}, seedTask, { id: uid(), order: nextOrder, checks: {}, banked: {} }));
+      state.tasks.push(Object.assign({}, seedTask, { id: uid(), order: nextOrder, checks: {}, banked: {}, kills: {} }));
       existingKeys.add(key);
       addedCount++;
     } else {
@@ -1438,6 +2398,7 @@ function computeTotalCompletedForMe(){
   if(!me) return 0;
   let count = 0;
   state.tasks.forEach(t=>{
+    if(t.killTrack) return;
     const isSolo = t.category.startsWith('Solo Goals —');
     if(isSolo && t.owner !== me) return;
     if(t.recurring){ if(isRecurDone(t, me)) count++; }
@@ -1503,14 +2464,19 @@ function spawnConfetti(){
 
 function updateAdminToggleUI(){
   const btn = document.getElementById('adminToggleBtn');
-  if(!btn) return;
-  if(isAdmin){
-    btn.textContent = '🔓 Admin (on)';
-    btn.classList.add('unlocked');
-  } else {
-    btn.textContent = '🔒 Admin';
-    btn.classList.remove('unlocked');
+  if(btn){
+    if(isAdmin){
+      btn.textContent = '🔓 Admin (on)';
+      btn.classList.add('unlocked');
+    } else {
+      btn.textContent = '🔒 Admin';
+      btn.classList.remove('unlocked');
+    }
   }
+  const backupRow = document.getElementById('backupRow');
+  const backupNote = document.getElementById('backupRowNote');
+  if(backupRow) backupRow.style.display = isAdmin ? 'flex' : 'none';
+  if(backupNote) backupNote.style.display = isAdmin ? 'none' : 'block';
 }
 
 function flashStatus(msg){
@@ -1691,6 +2657,9 @@ const TAB_DEFS = [
   {id:'farm', label:'Player-Owned Farm', match:['Player-Owned Farm — Before Level 64 Farming','Player-Owned Farm — After Level 64 Farming']},
   {id:'mining', label:'Mining & Smithing', match:['Mining & Smithing Training']},
   {id:'arch', label:'Archaeology', match:['Archaeology Training — Mysteries (in order)','Archaeology Training — Collections (in order)','Archaeology Training — Methods By Level','Archaeology — Artefact Farming Route (Levels 1-42)','Archaeology — Artefact Farming Route (Levels 42-70)','Archaeology — Artefact Farming Route (Levels 70-90)','Archaeology — Artefact Farming Route (Levels 90-99)','Archaeology — Artefact Farming Route (Levels 99-120+)']},
+  {id:'pvm', label:'PvM Progression', match:['PvM — Introductory Bosses','PvM — Intermediate Bosses','PvM — Advanced Bosses','PvM — Bosses with Limited Learning Value','PvM — Unlock Guide: General Unlocks','PvM — Useful Links']},
+  {id:'necro-gear', label:'Necromancy Gear', match:['Necromancy Gear — Armour Progression','Necromancy Gear — Weapon Progression (Death Skull equipment)','Necromancy Gear — Moonlit Rites (moonstone jewellery)']},
+  {id:'diaries', label:'Achievement Diaries', match:['Achievement Diaries — Ardougne','Achievement Diaries — Daemonheim','Achievement Diaries — Desert','Achievement Diaries — Falador','Achievement Diaries — Fremennik','Achievement Diaries — Karamja','Achievement Diaries — Lumbridge','Achievement Diaries — Morytania',"Achievement Diaries — Seers\' Village",'Achievement Diaries — Tirannwn','Achievement Diaries — Underworld','Achievement Diaries — Varrock','Achievement Diaries — Wilderness']},
   {id:'solo', label:'Solo Goals', match:null},
 ];
 
@@ -1713,6 +2682,7 @@ function tabPercentForMember(tabId, cats, member){
     const isSolo = catName.startsWith('Solo Goals —');
     const catTasks = state.tasks.filter(t=>t.category===catName);
     catTasks.forEach(t=>{
+      if(t.killTrack) return; // a counter, not a completable item
       if(isSolo && t.owner !== member) return; // only count that member's own solo goals
       total++;
       if(t.recurring ? isRecurDone(t, member) : !!t.checks[member]) done++;
@@ -1729,6 +2699,7 @@ function overallPercentForMember(member, allCats){
   allCats.forEach(catName=>{
     if(catName.startsWith('Solo Goals —')) return; // solo goals vary per-person, excluded from the shared comparison
     state.tasks.filter(t=>t.category===catName).forEach(t=>{
+      if(t.killTrack) return;
       total++;
       if(t.recurring ? isRecurDone(t, member) : !!t.checks[member]) done++;
     });
@@ -1748,6 +2719,34 @@ function buildActivityFeed(limit){
   });
   events.sort((a,b)=> new Date(b.ts) - new Date(a.ts));
   return events.slice(0, limit || 20);
+}
+
+// Catches teammates' completions you missed while you weren't looking — a toast fires
+// the next time you open (or return to) the page, not just live in the moment. Uses the
+// same timestamped check data as the Activity Feed, compared against a personal
+// "last seen" marker in this browser's localStorage.
+function checkForCatchUpCelebrations(){
+  if(!me) return;
+  const lastSeenKey = 'last-seen-activity-' + me;
+  const lastSeenRaw = localGet(lastSeenKey);
+  const lastSeenTime = lastSeenRaw ? new Date(lastSeenRaw) : null;
+
+  const feed = buildActivityFeed(200);
+  const newEvents = lastSeenTime
+    ? feed.filter(ev => ev.member !== me && new Date(ev.ts) > lastSeenTime)
+    : []; // first time this feature has run on this browser — nothing to "catch up" on yet
+
+  // Always advance the marker so we never re-show the same event twice.
+  localSet(lastSeenKey, new Date().toISOString());
+
+  if(newEvents.length === 0) return;
+
+  const byMember = {};
+  newEvents.forEach(ev => { (byMember[ev.member] = byMember[ev.member] || []).push(ev); });
+  const parts = Object.entries(byMember).map(([m, evs]) =>
+    m + ' completed ' + evs.length + (evs.length === 1 ? ' thing' : ' things')
+  );
+  fireCelebration('While you were away: ' + parts.join(', ') + '!');
 }
 
 function renderSearchResults(main, query){
@@ -1829,6 +2828,48 @@ function renderSearchResults(main, query){
   }
 
   main.appendChild(wrap);
+}
+
+function renderTabMaterialsTotal(main, cats){
+  const tasksInTab = state.tasks.filter(t => cats.includes(t.category) && t.matList && t.matList.length);
+  if(!tasksInTab.length) return; // nothing to summarize for this tab
+
+  const totals = {};
+  let anyRemaining = false;
+  tasksInTab.forEach(t=>{
+    const done = me ? !!t.checks[me] : false;
+    const myBanked = (me && t.banked[me]) ? t.banked[me] : {};
+    t.matList.forEach(({m,n})=>{
+      const remaining = done ? 0 : Math.max(0, n - (myBanked[m]||0));
+      if(remaining > 0) anyRemaining = true;
+      totals[m] = (totals[m]||0) + remaining;
+    });
+  });
+
+  const card = document.createElement('div');
+  card.className = 'tab-total-card';
+  const title = document.createElement('div');
+  title.className = 'tab-total-title';
+  title.textContent = 'Grand total — everything still needed across this whole tab';
+  card.appendChild(title);
+
+  const body = document.createElement('div');
+  body.className = 'tab-total-body';
+  if(!me){
+    body.textContent = 'Pick your name above to see your personal total.';
+  } else if(!anyRemaining){
+    body.innerHTML = '<strong>Everything on this tab is fully banked. 🎉</strong>';
+  } else {
+    const parts = Object.entries(totals).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+    parts.forEach(([m,v])=>{
+      const row = document.createElement('span');
+      row.className = 'tab-total-item';
+      row.textContent = v + 'x ' + m;
+      body.appendChild(row);
+    });
+  }
+  card.appendChild(body);
+  main.appendChild(card);
 }
 
 function renderTeamOverview(main, allCats){
@@ -1950,6 +2991,7 @@ function renderAll(){
   }
 
   const cats = allCats.filter(c => getTabForCat(c) === activeTab);
+  renderTabMaterialsTotal(main, cats);
   cats.forEach(catName=>{
     const isSolo = catName.startsWith('Solo Goals —');
     const allItems = state.tasks.filter(t=>t.category===catName).sort((a,b)=>a.order-b.order);
@@ -1972,17 +3014,19 @@ function renderAll(){
     catEl.id = slugify(catName);
 
     const doneCount = allItems.filter(t=>{
+      if(t.killTrack) return false;
       if(isSolo){ return t.checks[t.owner]; }
       if(recurType){ return state.members.length>0 && state.members.every(m=>isRecurDone(t,m)); }
       return state.members.length>0 && state.members.every(m=>t.checks[m]);
     }).length;
+    const completableCount = allItems.filter(t=>!t.killTrack).length;
 
     const head = document.createElement('div');
     head.className = 'category-head';
     head.innerHTML =
       '<div><h2>' + catName + (recurType ? '<span class="recur-badge">'+recurType+'</span>' : '') + '</h2></div>' +
       '<div style="display:flex;align-items:center;gap:10px">' +
-        '<span class="count">' + doneCount + '/' + allItems.length + '</span>' +
+        '<span class="count">' + doneCount + '/' + completableCount + '</span>' +
         '<span class="chevron">▾</span>' +
       '</div>';
     head.addEventListener('click', ()=>{ catEl.classList.toggle('collapsed'); });
@@ -2117,6 +3161,26 @@ function renderAll(){
       const checksWrap = document.createElement('div');
       checksWrap.className = 'checks';
 
+      function buildKillCountBox(member){
+        const col = document.createElement('div');
+        col.className = 'check-col';
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.min = '0';
+        input.className = 'kill-count-input';
+        input.value = task.kills[member] || 0;
+        input.addEventListener('change', ()=>{
+          const val = Math.max(0, parseInt(input.value,10) || 0);
+          task.kills[member] = val;
+          scheduleSave();
+        });
+        const label = document.createElement('div');
+        label.className = 'check-label';
+        label.textContent = member;
+        col.appendChild(input); col.appendChild(label);
+        return col;
+      }
+
       function buildBox(member){
         const col = document.createElement('div');
         col.className = 'check-col';
@@ -2154,7 +3218,9 @@ function renderAll(){
         return col;
       }
 
-      if(isSolo){
+      if(task.killTrack){
+        state.members.forEach(m=> checksWrap.appendChild(buildKillCountBox(m)));
+      } else if(isSolo){
         checksWrap.appendChild(buildBox(task.owner));
       } else {
         state.members.forEach(m=> checksWrap.appendChild(buildBox(m)));
@@ -2436,6 +3502,7 @@ async function init(){
   if(!state.loadFailed){
     markSynced();
     loadBackupReminder();
+    checkForCatchUpCelebrations();
   }
 }
 init();
@@ -2457,7 +3524,10 @@ async function backgroundSync(){
   if(isUserActivelyEditing()) return;
   await load();
   renderAll();
-  if(!state.loadFailed) markSynced();
+  if(!state.loadFailed){
+    markSynced();
+    checkForCatchUpCelebrations();
+  }
 }
 document.addEventListener('visibilitychange', ()=>{
   if(document.visibilityState === 'visible') backgroundSync();
