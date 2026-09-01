@@ -58,6 +58,22 @@
     background:linear-gradient(180deg, rgba(28,33,39,.75), rgba(23,27,32,.75));
     position:relative;
   }
+
+  .loading-overlay{
+    position:fixed;inset:0;z-index:9999;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+    background:#12151a;
+    transition:opacity .3s ease;
+  }
+  .loading-overlay.hidden{opacity:0;pointer-events:none}
+  .loading-spinner{
+    width:44px;height:44px;border-radius:50%;
+    border:4px solid var(--panel-2);border-top-color:var(--gold);
+    animation:loading-spin 0.9s linear infinite;
+  }
+  @keyframes loading-spin{to{transform:rotate(360deg)}}
+  .loading-text{font-family:'Cinzel',serif;font-size:16px;color:var(--gold);letter-spacing:.02em}
+  .loading-sub{font-size:12px;color:var(--text-dim);max-width:320px;text-align:center;line-height:1.5}
   header .eyebrow{
     letter-spacing:.18em;
     text-transform:uppercase;
@@ -452,6 +468,12 @@
 </style>
 </head>
 <body>
+
+<div id="loadingOverlay" class="loading-overlay">
+  <div class="loading-spinner"></div>
+  <div id="loadingText" class="loading-text">Loading the tracker…</div>
+  <div class="loading-sub">First load can take a few seconds — pulling the shared board from Google Sheets.</div>
+</div>
 
 <nav class="tab-bar" id="tabBar"></nav>
 
@@ -1336,19 +1358,26 @@ function seedData(){
     },
     {
       name: 'Necromancy Gear — Armour Progression',
-      note: 'From the wiki\'s Necromancy armour page. Two lines: Deathwarden (tank — pure Defence requirement) and Deathdealer (power — needs both Defence and Necromancy, plus a Hermodic plate from Hermod, the Spirit of War, on top of the standard materials from tier 70 on). Each tier must be crafted once yourself (via the Kili\'s Knowledge achievements) before it can be worn, even though the pieces are tradeable after that.',
+      note: 'IMPORTANT MECHANIC: Deathwarden and Deathdealer are the same physical item through tier 60 — there is no separate Deathdealer craft below tier 70. But upgrading a tier 60 piece into Deathdealer at tier 70 consumes that piece; it does not duplicate it. So if you want a permanent tank set AND a permanent power set (very common — tank while learning a boss, power once you know it), you need to craft the tier 10-60 progression TWICE, once per eventual destination. If you only ever want one or the other, you only need to do it once — pick your path and ignore the other track below. Each tier must be crafted once yourself (via the Kili\'s Knowledge achievements) before it can be worn, even though the pieces are tradeable after that.',
       tasks: [
-        {n:'Deathwarden (tank) tier 10 — 1 Defence, buy from Sostratus after Necromancy!', q:'Necromancy!'},
-        {n:'Deathwarden (tank) tier 20 — 20 Defence + Kili Row (5 chickens or 1 lesser communion ritual)', matList:[{m:'Lesser ensouled cloth',n:7}]},
-        {n:"Deathwarden (tank) tier 30 — 30 Defence + Kili's Knowledge I (25 trolls or 3 lesser communion rituals)", matList:[{m:'Lesser ensouled cloth',n:7}]},
-        {n:"Deathwarden (tank) tier 40 — 40 Defence + Kili's Knowledge II (50 undead or 5 lesser communion rituals)", matList:[{m:'Lesser ensouled cloth',n:7},{m:'Lesser ensouled thread',n:5}]},
-        {n:"Deathwarden (tank) tier 50 — 50 Defence + Kili's Knowledge III (75 demons, some mogres, or 10 lesser communion rituals)", matList:[{m:'Lesser ensouled cloth',n:7},{m:'Lesser ensouled thread',n:5},{m:'Spirit rune',n:100}]},
-        {n:"Deathwarden (tank) tier 60 — 60 Defence + Kili's Knowledge IV (50 level-70 monsters, some ankou, or 10 greater communion rituals)", matList:[{m:'Ensouled cloth',n:7},{m:'Ensouled thread',n:5},{m:'Spirit rune',n:125}]},
+        {n:'Deathwarden (tank) tier 10 — 1 Defence, buy from Sostratus after Necromancy!', q:'Necromancy!', note:'Track A: this copy is staying Deathwarden (tank) permanently.'},
+        {n:'Deathwarden (tank) tier 20 — 20 Defence + Kili Row (5 chickens or 1 lesser communion ritual)', matList:[{m:'Lesser ensouled cloth',n:7}], note:'Track A.'},
+        {n:"Deathwarden (tank) tier 30 — 30 Defence + Kili's Knowledge I (25 trolls or 3 lesser communion rituals)", matList:[{m:'Lesser ensouled cloth',n:7}], note:'Track A.'},
+        {n:"Deathwarden (tank) tier 40 — 40 Defence + Kili's Knowledge II (50 undead or 5 lesser communion rituals)", matList:[{m:'Lesser ensouled cloth',n:7},{m:'Lesser ensouled thread',n:5}], note:'Track A.'},
+        {n:"Deathwarden (tank) tier 50 — 50 Defence + Kili's Knowledge III (75 demons, some mogres, or 10 lesser communion rituals)", matList:[{m:'Lesser ensouled cloth',n:7},{m:'Lesser ensouled thread',n:5},{m:'Spirit rune',n:100}], note:'Track A.'},
+        {n:"Deathwarden (tank) tier 60 — 60 Defence + Kili's Knowledge IV (50 level-70 monsters, some ankou, or 10 greater communion rituals)", matList:[{m:'Ensouled cloth',n:7},{m:'Ensouled thread',n:5},{m:'Spirit rune',n:125}], note:'Track A. This is the piece that stays Deathwarden — do NOT upgrade this one into Deathdealer at tier 70, that\'s what the second copy below is for.'},
         {n:'Deathwarden (tank) tier 70 — 70 Defence', matList:[{m:'Ensouled cloth',n:12},{m:'Ensouled thread',n:10},{m:'Flesh rune',n:100}]},
-        {n:'Deathdealer (power) tier 70 — 70 Defence + 70 Necromancy, plus a Hermodic plate from Hermod, the Spirit of War', note:'This is the tier where you pick tank vs power — power gives the passive Death Mark effect (instant-kill below 20% health) and is generally recommended once you know boss mechanics, but tank is more forgiving while learning.', matList:[{m:'Hermodic plate',n:5},{m:'Ensouled cloth',n:12},{m:'Ensouled thread',n:10},{m:'Bone rune',n:100}]},
         {n:'Deathwarden (tank) tier 80 — 80 Defence', matList:[{m:'Greater ensouled cloth',n:7},{m:'Greater ensouled thread',n:5},{m:'Flesh rune',n:125}]},
-        {n:'Deathdealer (power) tier 80 — 80 Defence + 80 Necromancy', matList:[{m:'Hermodic plate',n:10},{m:'Greater ensouled cloth',n:7},{m:'Greater ensouled thread',n:5},{m:'Miasma rune',n:125}]},
         {n:'Deathwarden (tank) tier 90 — 90 Defence', matList:[{m:'Greater ensouled cloth',n:12},{m:'Greater ensouled thread',n:10},{m:'Spirit rune',n:100},{m:'Bone rune',n:100},{m:'Flesh rune',n:100},{m:'Miasma rune',n:100}]},
+
+        {n:'2nd copy — Deathwarden tier 10 (this one becomes Deathdealer later)', q:'Necromancy!', note:'Track B: skip this whole second track entirely if you only want one final armour type. Only needed if you want both a tank set and a power set.'},
+        {n:'2nd copy — Deathwarden tier 20', matList:[{m:'Lesser ensouled cloth',n:7}], note:'Track B.'},
+        {n:'2nd copy — Deathwarden tier 30', matList:[{m:'Lesser ensouled cloth',n:7}], note:'Track B.'},
+        {n:'2nd copy — Deathwarden tier 40', matList:[{m:'Lesser ensouled cloth',n:7},{m:'Lesser ensouled thread',n:5}], note:'Track B.'},
+        {n:'2nd copy — Deathwarden tier 50', matList:[{m:'Lesser ensouled cloth',n:7},{m:'Lesser ensouled thread',n:5},{m:'Spirit rune',n:100}], note:'Track B.'},
+        {n:'2nd copy — Deathwarden tier 60', matList:[{m:'Ensouled cloth',n:7},{m:'Ensouled thread',n:5},{m:'Spirit rune',n:125}], note:'Track B. This is the copy you actually upgrade into Deathdealer next, at tier 70.'},
+        {n:'Deathdealer (power) tier 70 — 70 Defence + 70 Necromancy, plus a Hermodic plate from Hermod, the Spirit of War', note:'Upgrades your Track B tier 60 piece — that piece is gone/consumed once this happens. Power gives the passive Death Mark effect (instant-kill below 20% health) and is generally recommended once you know boss mechanics; tank is more forgiving while learning.', matList:[{m:'Hermodic plate',n:5},{m:'Ensouled cloth',n:12},{m:'Ensouled thread',n:10},{m:'Bone rune',n:100}]},
+        {n:'Deathdealer (power) tier 80 — 80 Defence + 80 Necromancy', matList:[{m:'Hermodic plate',n:10},{m:'Greater ensouled cloth',n:7},{m:'Greater ensouled thread',n:5},{m:'Miasma rune',n:125}]},
         {n:'Deathdealer (power) tier 90 — 90 Defence + 90 Necromancy', matList:[{m:'Hermodic plate',n:15},{m:'Greater ensouled cloth',n:12},{m:'Greater ensouled thread',n:10},{m:'Spirit rune',n:125},{m:'Bone rune',n:125},{m:'Flesh rune',n:125},{m:'Miasma rune',n:125}]},
         {n:"Robes of the First Necromancer (power) tier 95 — 95 Defence + 95 Necromancy", note:'Also has Misalionar\'s death mask and Visage of the First Necromancer as cosmetic variants.'},
       ]
@@ -2732,12 +2761,19 @@ let CAT_NOTES = {};
 let CAT_REQUIREMENT_ITEMS = {};
 let CAT_ORDER = [];
 
+function setLoadingText(msg){
+  const el = document.getElementById('loadingText');
+  if(el) el.textContent = msg;
+}
+
 async function load(){
+  setLoadingText('Building the task list…');
   const seedRef = seedData();
   CAT_NOTES = seedRef.catNotes;
   CAT_REQUIREMENT_ITEMS = seedRef.catRequirementItems;
   CAT_ORDER = seedRef.catOrder;
 
+  setLoadingText('Syncing with the shared board…');
   const cloud = await cloudLoad();
 
   if(cloud.error){
@@ -2768,6 +2804,14 @@ async function load(){
   state.tasks = state.tasks.filter(t => !DEPRECATED_CATEGORIES.includes(t.category));
   let removedCount = beforeRemoveCount - state.tasks.length;
 
+  // Every Achievement Diaries category now has a tier suffix, e.g. "... — Falador (Easy)".
+  // Older saved data can still have the pre-split single-category version (just "... — Falador"),
+  // which no longer matches anything in the tab list and was silently falling into the
+  // Solo Goals tab as an unrecognized leftover. Clear those out specifically.
+  const beforeOrphanCount = state.tasks.length;
+  state.tasks = state.tasks.filter(t => !(t.category.startsWith('Achievement Diaries — ') && !/\([^)]+\)$/.test(t.category)));
+  removedCount += beforeOrphanCount - state.tasks.length;
+
   // Same idea, but for individual tasks within a category we're otherwise keeping —
   // e.g. a real game-mechanics change (Guthixian Cache is no longer a plain daily).
   const DEPRECATED_TASKS = [
@@ -2789,6 +2833,7 @@ async function load(){
     }
   });
 
+  setLoadingText('Merging in the latest updates…');
   // Merge in anything new from seedData (new categories, new tasks added by an update)
   // without touching or duplicating anything that already exists. Matched by
   // category + exact task name, so renaming a task "adopts" it as fully custom.
@@ -3064,6 +3109,7 @@ function renderMembers(){
           return;
         }
         state.members.splice(i,1);
+        state.tasks = state.tasks.filter(t => t.category !== 'Solo Goals — ' + name);
         saveMembers();
         renderAll();
       });
@@ -4199,10 +4245,8 @@ document.getElementById('importFile').addEventListener('change', (e)=>{
 
 async function init(){
   await load();
-  if(!state.loadFailed){
-    ensureSoloSections();
-    await saveNow();
-  }
+  setLoadingText('Rendering your board…');
+  if(!state.loadFailed) ensureSoloSections();
   hideDone = localGet('hide-done-v1') === 'true';
   activeTab = localGet('active-tab-v1') || 'part1';
   isAdmin = localGet('is-admin-v1') === 'true';
@@ -4246,11 +4290,23 @@ async function init(){
   document.getElementById('adminCodeInput').addEventListener('keydown', e=>{
     if(e.key==='Enter') document.getElementById('adminSubmitBtn').click();
   });
+
+  // Render immediately once we have data — don't make the person wait through a second
+  // network round-trip (the save-back below) before they can see or use the board.
   renderAll();
+  const overlay = document.getElementById('loadingOverlay');
+  if(overlay){
+    overlay.classList.add('hidden');
+    setTimeout(()=>{ overlay.style.display = 'none'; }, 350);
+  }
+
   if(!state.loadFailed){
     markSynced();
     loadBackupReminder();
     checkForCatchUpCelebrations();
+    // Push any newly-merged seed tasks back to the shared store, in the background —
+    // this was previously awaited before the first render, doubling the wait.
+    saveNow();
   }
 }
 init();
