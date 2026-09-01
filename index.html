@@ -210,22 +210,41 @@
   .search-result-cat{font-size:10px;color:var(--gold-dim);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
   .search-result-name-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-size:14px}
 
+  .app-layout{
+    display:flex;align-items:flex-start;gap:0;max-width:1180px;margin:16px auto 0;padding:0 20px;
+  }
+  .app-content{flex:1;min-width:0}
+  .app-content .search-row, .app-content .jumpnav{max-width:none;padding:0}
+  .app-content main{max-width:900px;margin:0 auto}
+
   .tab-bar{
-    max-width:900px;margin:16px auto 0;padding:0 20px;
-    display:flex;flex-wrap:wrap;gap:8px;
+    flex:0 0 200px;display:flex;flex-direction:column;gap:4px;
+    position:sticky;top:16px;margin-right:20px;
   }
   .tab-btn{
     background:var(--panel);border:1px solid var(--line);color:var(--text-dim);
-    border-radius:8px 8px 0 0;padding:10px 16px;font-size:13px;cursor:pointer;
-    border-bottom:2px solid transparent;
+    border-radius:8px;padding:10px 14px;font-size:13px;cursor:pointer;
+    text-align:left;display:flex;justify-content:space-between;align-items:center;gap:8px;
+    border-left:3px solid transparent;
   }
   .tab-btn.active{
     background:var(--panel-2);color:var(--gold);border-color:var(--gold-dim);
-    border-bottom:2px solid var(--gold);
+    border-left:3px solid var(--gold);
   }
   .tab-btn:hover{color:var(--gold)}
-  .tab-pct{font-size:10px;color:var(--blue);font-weight:600}
+  .tab-pct{font-size:10px;color:var(--blue);font-weight:600;white-space:nowrap}
   .tab-btn.active .tab-pct{color:var(--gold)}
+
+  @media (max-width:800px){
+    .app-layout{flex-direction:column;padding:0}
+    .tab-bar{
+      flex-direction:row;flex-wrap:wrap;position:static;width:100%;
+      margin-right:0;margin-bottom:12px;padding:0 20px;
+    }
+    .tab-btn{border-left:none;border-bottom:2px solid transparent;border-radius:8px 8px 0 0}
+    .tab-btn.active{border-left:none;border-bottom:2px solid var(--gold)}
+    .app-content{width:100%}
+  }
 
   .overview-wrap{max-width:900px;margin:0 auto;padding:20px}
   .overview-table{
@@ -467,13 +486,16 @@
 </div>
 </header>
 
-<div class="search-row">
-  <input id="searchInput" placeholder="🔍 Search all tasks…" />
+<div class="app-layout">
+  <nav class="tab-bar" id="tabBar"></nav>
+  <div class="app-content">
+    <div class="search-row">
+      <input id="searchInput" placeholder="🔍 Search all tasks…" />
+    </div>
+    <nav class="jumpnav" id="jumpNav"></nav>
+    <main id="main"></main>
+  </div>
 </div>
-<div class="tab-bar" id="tabBar"></div>
-<nav class="jumpnav" id="jumpNav"></nav>
-
-<main id="main"></main>
 
 <div class="backup-row" id="backupRow">
   <button id="exportBtn" class="backup-btn">⬇ Export backup (.json)</button>
@@ -1236,16 +1258,6 @@ function seedData(){
         {n:'Levels 119-120: Xolo remains — need 2x Xolo shield, 2x Xolo spear', l:'https://runescape.wiki/w/Xolo_remains', note:'Orthen, Xolo City.', matList:[{m:'Goldrune',n:104},{m:'Orgone',n:216},{m:'Felt',n:84},{m:'Dragon metal',n:148}]},
         {n:'Levels 119-120: Makeshift pie oven — need 2x Horogothgar cooking pot, 4x \'Da Boss Man\' sculpture', l:'https://runescape.wiki/w/Makeshift_pie_oven', note:'Warforge, Thalmund\'s forge. Completes Museum - Bandosian III, Green Gobbo Goodies III, Red Rum Relics III, and Knowledge is Power.', matList:[{m:'Yu\'biusk clay',n:320},{m:'Malachite green',n:252},{m:'Soapstone',n:256}]},
         {n:'Level 120+: Saurthen debris — need 3x Gold dish, 3x \'Raksha\' idol', l:'https://runescape.wiki/w/Saurthen_debris', note:'Orthen, Xolo City — the highest-level site. One of each completes Mysterious City. Completes the final Dragonkin IV and Museum - Dragonkin IV. Last spot for I Am Become Death pages if not already done.', matList:[{m:'Goldrune',n:378},{m:'Dragon metal',n:294},{m:'Orgone',n:168}]},
-      ]
-    },
-    {
-      name: 'PvM — Bosses with Limited Learning Value',
-      note: 'PvME explicitly doesn\'t recommend these for self-improvement — they don\'t teach much beyond what you\'d already know. Totally fine to do for fun or for drops; just don\'t expect them to build your skillset the way the bosses above will.',
-      tasks: [
-        'Barrows Brothers', 'Chaos Elemental', 'Corporeal Beast', 'Commander Zilyana',
-        'Dagannoth Kings', 'General Graardor', 'Giant Mole', 'Kalphite Queen',
-        'King Black Dragon', "Kree'arra", "K'ril Tsutsaroth", 'Legiones',
-        'Magister', 'Rex Matriarchs',
       ]
     },
     {
@@ -2375,7 +2387,7 @@ async function load(){
 
   // Deliberately deprecated categories — removed from a past update at the person's request.
   // This is the only kind of automatic deletion this tool ever does: explicit, named, and one-directional.
-  const DEPRECATED_CATEGORIES = ['Archaeology — Excavation Sites Reference', 'Archaeology — Materials Needed (Levels 1-42)', 'Archaeology — Materials Needed (Levels 42-70)', 'PvM — Introductory Bosses', 'PvM — Intermediate Bosses', 'PvM — Advanced Bosses', 'Testing'];
+  const DEPRECATED_CATEGORIES = ['Archaeology — Excavation Sites Reference', 'Archaeology — Materials Needed (Levels 1-42)', 'Archaeology — Materials Needed (Levels 42-70)', 'PvM — Introductory Bosses', 'PvM — Intermediate Bosses', 'PvM — Advanced Bosses', 'Testing', 'PvM — Bosses with Limited Learning Value'];
   const beforeRemoveCount = state.tasks.length;
   state.tasks = state.tasks.filter(t => !DEPRECATED_CATEGORIES.includes(t.category));
   let removedCount = beforeRemoveCount - state.tasks.length;
@@ -2787,7 +2799,7 @@ const TAB_DEFS = [
   {id:'farm', label:'Player-Owned Farm', match:['Player-Owned Farm — Before Level 64 Farming','Player-Owned Farm — After Level 64 Farming']},
   {id:'mining', label:'Mining & Smithing', match:['Mining & Smithing Training']},
   {id:'arch', label:'Archaeology', match:['Archaeology Training — Mysteries (in order)','Archaeology Training — Collections (in order)','Archaeology Training — Methods By Level','Archaeology — Artefact Farming Route (Levels 1-42)','Archaeology — Artefact Farming Route (Levels 42-70)','Archaeology — Artefact Farming Route (Levels 70-90)','Archaeology — Artefact Farming Route (Levels 90-99)','Archaeology — Artefact Farming Route (Levels 99-120+)']},
-  {id:'pvm', label:'PvM Progression', match:['PvM — Bosses with Limited Learning Value','PvM — Unlock Guide: General Unlocks','PvM — Useful Links']},
+  {id:'pvm', label:'PvM Progression', match:['PvM — Unlock Guide: General Unlocks','PvM — Useful Links']},
   {id:'necro-gear', label:'Necromancy Gear', match:['Necromancy Gear — Armour Progression','Necromancy Gear — Weapon Progression (Death Skull equipment)','Necromancy Gear — Moonlit Rites (moonstone jewellery)']},
   {id:'diaries', label:'Achievement Diaries', match:['Achievement Diaries — Ardougne (Easy)','Achievement Diaries — Ardougne (Medium)','Achievement Diaries — Ardougne (Hard)','Achievement Diaries — Ardougne (Elite)','Achievement Diaries — Daemonheim (Easy)','Achievement Diaries — Daemonheim (Medium)','Achievement Diaries — Daemonheim (Hard)','Achievement Diaries — Daemonheim (Elite)','Achievement Diaries — Desert (Easy)','Achievement Diaries — Desert (Medium)','Achievement Diaries — Desert (Hard)','Achievement Diaries — Desert (Elite)','Achievement Diaries — Falador (Easy)','Achievement Diaries — Falador (Medium)','Achievement Diaries — Falador (Hard)','Achievement Diaries — Falador (Elite)','Achievement Diaries — Fremennik (Easy)','Achievement Diaries — Fremennik (Medium)','Achievement Diaries — Fremennik (Hard)','Achievement Diaries — Fremennik (Elite)','Achievement Diaries — Karamja (Easy)','Achievement Diaries — Karamja (Medium)','Achievement Diaries — Karamja (Hard)','Achievement Diaries — Karamja (Elite)','Achievement Diaries — Lumbridge (Beginner)','Achievement Diaries — Lumbridge (Easy)','Achievement Diaries — Lumbridge (Medium)','Achievement Diaries — Lumbridge (Hard)','Achievement Diaries — Morytania (Easy)','Achievement Diaries — Morytania (Medium)','Achievement Diaries — Morytania (Hard)','Achievement Diaries — Morytania (Elite)',"Achievement Diaries — Seers' Village (Easy)","Achievement Diaries — Seers' Village (Medium)","Achievement Diaries — Seers' Village (Hard)","Achievement Diaries — Seers' Village (Elite)",'Achievement Diaries — Tirannwn (Easy)','Achievement Diaries — Tirannwn (Medium)','Achievement Diaries — Tirannwn (Hard)','Achievement Diaries — Tirannwn (Elite)','Achievement Diaries — Underworld (Easy)','Achievement Diaries — Underworld (Medium)','Achievement Diaries — Underworld (Hard)','Achievement Diaries — Underworld (Elite)','Achievement Diaries — Varrock (Easy)','Achievement Diaries — Varrock (Medium)','Achievement Diaries — Varrock (Hard)','Achievement Diaries — Varrock (Elite)','Achievement Diaries — Wilderness (Easy)','Achievement Diaries — Wilderness (Medium)','Achievement Diaries — Wilderness (Hard)','Achievement Diaries — Wilderness (Elite)']},
   {id:'solo', label:'Solo Goals', match:null},
@@ -3231,7 +3243,7 @@ function renderAll(){
     const navLink = document.createElement('a');
     navLink.href = '#' + slugify(catName);
     navLink.textContent = catName.replace(/^Part \d+ — /,'').replace(/^Player-Owned Farm — /,'POF: ').replace(/^Archaeology Training — /,'Arch: ');
-    nav.appendChild(navLink);
+    if(activeTab !== 'diaries') nav.appendChild(navLink);
 
     const catEl = document.createElement('div');
     catEl.className = 'category';
