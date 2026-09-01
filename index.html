@@ -225,9 +225,12 @@
   .tab-btn{
     background:var(--panel);border:1px solid var(--line);color:var(--text-dim);
     border-radius:8px;padding:10px 14px;font-size:13px;cursor:pointer;
-    text-align:left;display:flex;justify-content:space-between;align-items:center;gap:8px;
+    text-align:left;display:flex;flex-direction:column;gap:3px;
     border-left:3px solid transparent;
   }
+  .tab-btn-main{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%}
+  .tab-btn-subtitle{font-size:10px;color:var(--text-dim);opacity:.75;font-style:italic;line-height:1.3}
+  .tab-btn.active .tab-btn-subtitle{color:var(--gold-dim);opacity:1}
   .tab-btn.active{
     background:var(--panel-2);color:var(--gold);border-color:var(--gold-dim);
     border-left:3px solid var(--gold);
@@ -257,6 +260,7 @@
   }
   .overview-table th{background:var(--panel-2);color:var(--gold);font-family:'Cinzel',serif;font-weight:600}
   .overview-label{text-align:left!important;color:var(--text-dim)}
+  .overview-label-subtitle{font-size:10px;color:var(--text-dim);opacity:.7;font-style:italic;margin-top:2px}
   .overview-full{color:var(--green);font-weight:700}
   .diary-dashboard{max-width:1000px;margin:16px auto 0;padding:0 20px}
   .diary-dashboard-title{color:var(--gold);font-size:13px;margin-bottom:8px;font-family:'Cinzel',serif}
@@ -303,6 +307,8 @@
     font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--blue);
     border:1px solid var(--blue);border-radius:10px;padding:1px 7px;margin-left:8px;
   }
+  .cat-wiki-link{color:var(--gold-dim);text-decoration:none;font-size:14px;margin-left:8px;vertical-align:middle}
+  .cat-wiki-link:hover{color:var(--gold)}
 
   .task-row{
     display:flex;align-items:flex-start;gap:10px;
@@ -433,6 +439,16 @@
 
   .empty-note{padding:14px 16px;color:var(--text-dim);font-size:13px;font-style:italic}
   .info-note{padding:10px 16px;color:var(--text-dim);font-size:12px;font-style:italic;border-bottom:1px solid #262c33;line-height:1.5}
+  .requirements-card{
+    margin:10px 16px;padding:12px 14px;background:var(--panel-2);
+    border:1px solid var(--gold-dim);border-radius:8px;
+  }
+  .requirements-title{color:var(--gold);font-size:13px;font-weight:600;margin-bottom:8px}
+  .requirements-group-label{color:var(--text-dim);font-size:11px;text-transform:uppercase;letter-spacing:.04em;margin:10px 0 4px}
+  .requirements-group-label:first-of-type{margin-top:0}
+  .requirement-row{display:flex;align-items:center;gap:8px;font-size:13px;padding:3px 0}
+  .check-box.small{width:16px;height:16px;font-size:11px;flex-shrink:0}
+  .requirements-items-list{color:var(--text-dim);font-size:12px;line-height:1.6}
 </style>
 </head>
 <body>
@@ -1376,6 +1392,18 @@ function seedData(){
     {
       name: 'Achievement Diaries — Ardougne (Easy)',
       note: 'From the wiki\'s Ardougne step-by-step guide. Needs Biohazard, Gertrude\'s Cat, Monk\'s Friend, Plague City, Tower of Life. Reward is Ardougne cloak 1.',
+      requirements: {
+        skills: ['16 Thieving', '10 Construction'],
+        quests: ['Biohazard', "Gertrude's Cat", "Monk's Friend", 'Plague City', 'Tower of Life'],
+        ironman: [
+          '27 Crafting, 27 Magic, and 33 Magic OR 40 Smithing to produce a gold bar — skip these if you get an emerald ring or ring of duelling as a drop instead',
+        ],
+        items: [
+          '~350 coins', '1 silk or vial of stench', '1 full-grown or overgrown cat', '1 unicorn horn',
+          '1 cowhide', '1 ring of duelling', 'A weapon', 'Ardougne teleport runes (2 water + 2 law) or lodestone access',
+          'Ironman extras (skip if ring of duelling drops): 1 gold bar, 1 emerald, 1 cosmic rune, 3 air runes or an air-providing staff',
+        ],
+      },
       tasks: [
         {n:'Steal silk from the silk stall in Ardougne Market (keep it for later)'},
         {n:'Picklock the door east of the gem stall, upstairs'},
@@ -1405,6 +1433,20 @@ function seedData(){
     {
       name: 'Achievement Diaries — Ardougne (Medium)',
       note: 'From the wiki\'s Ardougne step-by-step guide. Adds Enlightened Journey, A Fairy Tale II (partial), Kennith\'s Concerns, Meeting History, Sea Slug, The Hand in the Sand. Reward is Ardougne cloak 2.',
+      requirements: {
+        skills: ['46 Mining', '38 Strength', '39 Agility', '3 Fishing', '21 Ranged', '38 Thieving', '50 Firemaking', '51 Magic', '49 Farming', '57 Herblore', '49 Crafting (for The Hand in the Sand)'],
+        quests: ['Enlightened Journey', "A Fairy Tale II - Cure a Queen (partial)", "Kennith's Concerns", 'Meeting History', 'Plague City', 'Sea Slug', 'The Hand in the Sand', 'Tower of Life'],
+        ironman: [
+          '59 Fletching and 30 Smithing — skip these if you get a mithril grapple as a drop instead',
+        ],
+        items: [
+          '1 raw swordfish', '1 raw chicken', '2 water runes (or staff of water) + 2 law runes',
+          '1 lunar staff or dramen staff (unless A Fairy Tale III done)', 'At least 1 pure essence',
+          '3 watermelon seeds (10 curry leaves optional)', 'Grappling supplies: 1 mithril grapple + crossbow, or an enhanced grappling hook',
+          '10 yew logs (1 if the Castle Wars balloon route is unlocked)', '1 enchanted key',
+          'Ironman extras (skip if mithril grapple drops): 1 mithril bar, 1 mithril bolt, 1 rope',
+        ],
+      },
       tasks: [
         {n:'Steal a nature rune from a chest in Ardougne'},
         {n:'Cross the River Dougne on the log balance shortcut'},
@@ -1427,6 +1469,19 @@ function seedData(){
     {
       name: 'Achievement Diaries — Ardougne (Hard)',
       note: 'From the wiki\'s Ardougne step-by-step guide. Needs Back to my Roots, Catapult Construction, Legends\' Quest, Lunar Diplomacy, Monkey Madness, Tower of Life, Watchtower. Before starting: plant/check a jade vine (~12 hours to grow, then up to 2.5 more to go wild). Reward is Ardougne cloak 3.',
+      requirements: {
+        skills: ['65 Thieving', '71 Magic [B]', '59 Hunter', '63 combat level', '59 Slayer', '72 Woodcutting', '57 Farming', '57 Agility OR 82 Thieving', '45 Herblore', '500 music tracks unlocked'],
+        quests: ['Back to my Roots', 'Catapult Construction', "Legends' Quest", 'Lunar Diplomacy', 'Monkey Madness', 'Tower of Life', 'Watchtower'],
+        ironman: [
+          '72 Crafting (dragonstone necklace) or 74 Crafting (dragonstone bracelet) or 72 Thieving (steal one) — skip if you get a dragonstone bracelet as a drop instead',
+        ],
+        items: [
+          'Raw cave eel', 'Giant frog legs', 'A weapon', 'A knife or item with "Slash"', 'A hatchet',
+          'A jade vine grown in the garden', 'A grown papaya or palm tree at Tree Gnome Village',
+          'Small fishing net', 'Rope', 'A Karamja monkey greegree', 'Combat bracelet or skills necklace',
+          '8 earth + 3 law + 2 astral + 2 water runes', 'Gloves of silence', 'A lockpick (hair clip also works)',
+        ],
+      },
       tasks: [
         {n:'Kill your own jade vine', q:'Back to my Roots', note:'Wear dragonhide + prayer-boosting gear, bring food, prayer pots, antipoison, secateurs, a hatchet.'},
         {n:'Get a zookeeper to put you in the Ardougne Zoo monkey cage', note:'Wear a monkey greegree and talk to a monkey minder.'},
@@ -1450,6 +1505,18 @@ function seedData(){
     {
       name: 'Achievement Diaries — Ardougne (Elite)',
       note: 'From the wiki\'s Ardougne step-by-step guide. Needs Rune Mysteries. Reward is Ardougne cloak 4.',
+      requirements: {
+        skills: ['80 Smithing', '81 Fishing [B]', '82 Thieving [B]', '10 Crafting', '83 Fletching', '75 Runecrafting', '93 Summoning'],
+        quests: ['Rune Mysteries', 'Enter the Abyss (miniquest)'],
+        ironman: [
+          '93 Cooking [B]',
+          '90 Fishing (if catching the rocktail yourself; lower if fishing from the swarm) or 73 Mining (not needed if fishing from the swarm)',
+        ],
+        items: [
+          'At least 1 pure essence', '1 Giant pouch', '1 lockpick or hairclip', '1 bane bar', '1 magic logs',
+          '1 raw beef or raw bear meat', '1 abyssal titan pouch', 'Equipment for the Fishing Trawler (or a fire + rocktail for ironmen)',
+        ],
+      },
       tasks: [
         {n:'Spin sinew into a crossbow string in south-east Witchaven (bane crossbow, part 2 of 3)'},
         {n:'Craft runes at Ourania Altar using an Abyssal Titan filled from a Giant pouch', note:'Same action as the Medium achievement — it completes both.'},
@@ -1462,6 +1529,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Daemonheim (Easy)',
       note: 'From the wiki\'s Daemonheim (Dungeoneering) step-by-step guide — condensed, with the ironman-specific branch followed wherever the guide splits by account type. Easy needs any Fremennik saga (Three\'s Company recommended). Medium/Hard need the unabridged Three\'s Company, plus Vengeance/Nadir/Thok It To \'Em/Thok Your Block Off sagas for Hard. Ironmen additionally need Waterfall Quest (Medium) and Salt in the Wound + A Clockwork Syringe partial (Hard). Rewards are Daemonheim passive buffs, claimed in order.',
+      requirements: {
+        skills: ['23 Dungeoneering', '7 Smithing [B] or 8 Crafting [B]', '10 Divination [B]'],
+        quests: [],
+        ironman: [],
+        items: ['All required items can be obtained within Daemonheim itself — nothing to gather beforehand.'],
+      },
       tasks: [
         {n:'Get to Daemonheim: cross the Wilderness wall east of Fort Forinthry, follow the path north to the entrance'},
         {n:'Get a ring of kinship from the Dungeoneering tutor (or your bank, if you already have one)'},
@@ -1482,6 +1555,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Daemonheim (Medium)',
       note: 'From the wiki\'s Daemonheim (Dungeoneering) step-by-step guide — condensed, with the ironman-specific branch followed wherever the guide splits by account type. Easy needs any Fremennik saga (Three\'s Company recommended). Medium/Hard need the unabridged Three\'s Company, plus Vengeance/Nadir/Thok It To \'Em/Thok Your Block Off sagas for Hard. Ironmen additionally need Waterfall Quest (Medium) and Salt in the Wound + A Clockwork Syringe partial (Hard). Rewards are Daemonheim passive buffs, claimed in order.',
+      requirements: {
+        skills: ['45 Divination [B]', '43 Fletching [B]', '40 Thieving [B]', '40 Hunter [B]', '40 Farming [B]', '36 Herblore [B]', '35 Dungeoneering', '32 Magic [B]', '30 Attack', '30 Ranged'],
+        quests: [],
+        ironman: ['Waterfall Quest'],
+        items: ['All required items can be obtained within Daemonheim, except for the Marm\'s Armoury achievement (bought with Dungeoneering tokens).'],
+      },
       tasks: [
         {n:'With an empty inventory and nothing equipped, complete the unabridged Three\'s Company saga via Skaldrun'},
         {n:'Buy the gem bag from the Rewards Trader'},
@@ -1500,6 +1579,14 @@ function seedData(){
     {
       name: 'Achievement Diaries — Daemonheim (Hard)',
       note: 'From the wiki\'s Daemonheim (Dungeoneering) step-by-step guide — condensed, with the ironman-specific branch followed wherever the guide splits by account type. Easy needs any Fremennik saga (Three\'s Company recommended). Medium/Hard need the unabridged Three\'s Company, plus Vengeance/Nadir/Thok It To \'Em/Thok Your Block Off sagas for Hard. Ironmen additionally need Waterfall Quest (Medium) and Salt in the Wound + A Clockwork Syringe partial (Hard). Rewards are Daemonheim passive buffs, claimed in order.',
+      requirements: {
+        skills: ['75 Construction [B]', '75 Strength', '68 Farming', '71 Dungeoneering', '70 Divination [B]', '69 Cooking', '65 Prayer', '60 Attack', '55 Agility', '54 Runecrafting [B]', '30 Magic', '30 Ranged'],
+        quests: ['A Clockwork Syringe (partial)', 'Salt in the Wound'],
+        ironman: [
+          '74 Smithing, 74 Thieving, 76 Defence, 65 Summoning, 61 Slayer [B] — all needed to complete A Clockwork Syringe',
+        ],
+        items: ['All required items, apart from the ring of kinship, can be obtained within Daemonheim.'],
+      },
       tasks: [
         {n:'Complete abandoned floors on low complexity until you find and click the collection of swords'},
         {n:'Complete furnished floors on low complexity until you find and click the damaged device'},
@@ -1523,6 +1610,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Daemonheim (Elite)',
       note: 'From the wiki\'s Daemonheim (Dungeoneering) step-by-step guide — condensed, with the ironman-specific branch followed wherever the guide splits by account type. Easy needs any Fremennik saga (Three\'s Company recommended). Medium/Hard need the unabridged Three\'s Company, plus Vengeance/Nadir/Thok It To \'Em/Thok Your Block Off sagas for Hard. Ironmen additionally need Waterfall Quest (Medium) and Salt in the Wound + A Clockwork Syringe partial (Hard). Rewards are Daemonheim passive buffs, claimed in order.',
+      requirements: {
+        skills: ['95 Dungeoneering', '90 Cooking [B]', '98 Crafting [B]', '95 Smithing [B]', '80 Constitution', '86 Divination [B]', '90 Magic'],
+        quests: [],
+        ironman: [],
+        items: ['All required items can be obtained within Daemonheim itself.'],
+      },
       tasks: [
         {n:'Complete any floors on high complexity'},
         {n:'Smelt 2 promethium bars and smith a promethium full helm'},
@@ -1536,6 +1629,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Desert (Easy)',
       note: 'From the wiki\'s Desert achievements step-by-step guide. Easy needs Diamond in the Rough, Stolen Hearts, One Piercing Note, and (ironman-only) Icthlarin\'s Little Helper started. Medium needs Eagles\' Peak, The Feud, Spirits of the Elid, A Fairy Tale II (started), Missing My Mummy. Hard needs Dream Mentor, Dealing with Scabaras, Smoking Kills, Do No Evil, Enakhra\'s Lament, Desert Treasure, Contact!, Deadliest Catch, 450 Dominion Tower kills, and broad ammo unlocked (300 Slayer points). Elite needs Smoking Kills, Desert Treasure, One Piercing Note, Restless Ghost, Diamond in the Rough, Do No Evil, As a First Resort, and every Dominion Tower achievement done. Rewards are Desert amulets 1-4, claimed in order.',
+      requirements: {
+        skills: ['5 Hunter', '14 Runecrafting', '21 Thieving', '7 Magic'],
+        quests: ['Diamond in the Rough', 'Stolen Hearts', 'One Piercing Note'],
+        ironman: ["Icthlarin's Little Helper (started)"],
+        items: ['Desert clothing (buyable during walkthrough — black variants don\'t work)', 'Bird snare', 'Coins for magic carpet', 'Empty waterskin', 'Rune essence / pure essence', 'Progress hat for Mage Training Arena (obtainable during walkthrough)', 'Fire talisman, wicked hood, or equivalent (skip if using the Abyss)'],
+      },
       tasks: [
         {n:'Use a ring of duelling to reach Het\'s Oasis and view the memorial board'},
         {n:'Head west to the fire altar and craft some fire runes'},
@@ -1555,6 +1654,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Desert (Medium)',
       note: 'From the wiki\'s Desert achievements step-by-step guide. Easy needs Diamond in the Rough, Stolen Hearts, One Piercing Note, and (ironman-only) Icthlarin\'s Little Helper started. Medium needs Eagles\' Peak, The Feud, Spirits of the Elid, A Fairy Tale II (started), Missing My Mummy. Hard needs Dream Mentor, Dealing with Scabaras, Smoking Kills, Do No Evil, Enakhra\'s Lament, Desert Treasure, Contact!, Deadliest Catch, 450 Dominion Tower kills, and broad ammo unlocked (300 Slayer points). Elite needs Smoking Kills, Desert Treasure, One Piercing Note, Restless Ghost, Diamond in the Rough, Do No Evil, As a First Resort, and every Dominion Tower achievement done. Rewards are Desert amulets 1-4, claimed in order.',
+      requirements: {
+        skills: ['45 Prayer', '3 Defence', '30 Woodcutting', '25 Summoning', '45 Mining', '33 Crafting', '49 Farming', '57 Herblore', '30 Agility', '37 Ranged', '19 Strength'],
+        quests: ["Eagles' Peak", 'The Feud', 'Spirits of the Elid', 'A Fairy Tale II - Cure a Queen (started)', 'Missing My Mummy'],
+        ironman: ['59 Fletching, 30 Smithing — skip these if you get a mithril grapple as a drop instead'],
+        items: ['Crossbow (skip if Lumbridge hidey-hole built or using enhanced grappling hook)', 'Mithril grapple (same skip condition)', 'Dramen staff or equivalent (for fairy rings)', 'Pyramid top (acquired during walkthrough)', 'Molten glass', 'Clean harralander', 'A Summoning pouch + 51 spirit shards', 'Blue charm', 'Potato cactus (obtainable during walkthrough)', 'Rope (obtainable during walkthrough)', '3 potions of dye / cowhides / snake skins / grey wolf furs / sheep shears (for So Su Me, if no other option)'],
+      },
       tasks: [
         {n:'Repair/grab a rope near the eagles at Eagles\' Peak, then use it to take the desert eagle'},
         {n:'Do an easy runedoku with Ali Morrisane in Al Kharid (examine a small casket)'},
@@ -1573,6 +1678,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Desert (Hard)',
       note: 'From the wiki\'s Desert achievements step-by-step guide. Easy needs Diamond in the Rough, Stolen Hearts, One Piercing Note, and (ironman-only) Icthlarin\'s Little Helper started. Medium needs Eagles\' Peak, The Feud, Spirits of the Elid, A Fairy Tale II (started), Missing My Mummy. Hard needs Dream Mentor, Dealing with Scabaras, Smoking Kills, Do No Evil, Enakhra\'s Lament, Desert Treasure, Contact!, Deadliest Catch, 450 Dominion Tower kills, and broad ammo unlocked (300 Slayer points). Elite needs Smoking Kills, Desert Treasure, One Piercing Note, Restless Ghost, Diamond in the Rough, Do No Evil, As a First Resort, and every Dominion Tower achievement done. Rewards are Desert amulets 1-4, claimed in order.',
+      requirements: {
+        skills: ['70 Magic', '67 Hunter', '70 Fishing', '50 Runecrafting', '52 Fletching', '70 Cooking', '68 Crafting', '65 Slayer', '55 Farming', '70 Thieving', '75 Dungeoneering'],
+        quests: ['A Tail of Two Cats', 'Back to the Freezer (partial)', 'Contact!', 'Deadliest Catch', 'Dealing with Scabaras', 'Desert Treasure', 'Dream Mentor', "Do No Evil", "Enakhra's Lament", 'Gower Quest (partial)', 'Hermit Permits (partial)', 'Smoking Kills'],
+        ironman: ['450 kills in the Dominion Tower — needed for the dreadnips'],
+        items: ['1 astral rune, 1 fire rune, 2 death runes, 7 water runes', 'Dreadnips (450 Dominion Tower kills)', 'Face mask or full slayer helmet', '2 empty waterskins', 'Cactus seed', 'Onion', 'Bowl', 'A light source', 'Bucket of water', 'Tomato', 'Pot of flour', 'Raw ugthanki meat', 'Enchanted water tiara', 'Broad bolts materials (unf broad bolts + feathers) or broad arrow materials (broad arrowheads + arrow shafts + feathers) — needs 300 Slayer points', 'A cramulet (Monkeyspeak/Ghostspeak/Catspeak/Cabbagespeak/Camulet)', 'Keris dagger', 'Any staff or wand'],
+      },
       tasks: [
         {n:'Plant a cactus seed in the Al Kharid cactus patch (~9 hours to grow, or use a leafy growth potion)'},
         {n:'Switch to the lunar spellbook and gather water/death/fire/astral runes plus 2 waterskins and feathers'},
@@ -1594,6 +1705,14 @@ function seedData(){
     {
       name: 'Achievement Diaries — Desert (Elite)',
       note: 'From the wiki\'s Desert achievements step-by-step guide. Easy needs Diamond in the Rough, Stolen Hearts, One Piercing Note, and (ironman-only) Icthlarin\'s Little Helper started. Medium needs Eagles\' Peak, The Feud, Spirits of the Elid, A Fairy Tale II (started), Missing My Mummy. Hard needs Dream Mentor, Dealing with Scabaras, Smoking Kills, Do No Evil, Enakhra\'s Lament, Desert Treasure, Contact!, Deadliest Catch, 450 Dominion Tower kills, and broad ammo unlocked (300 Slayer points). Elite needs Smoking Kills, Desert Treasure, One Piercing Note, Restless Ghost, Diamond in the Rough, Do No Evil, As a First Resort, and every Dominion Tower achievement done. Rewards are Desert amulets 1-4, claimed in order.',
+      requirements: {
+        skills: ['77 Slayer', '89 Crafting', '91 Thieving', '80 Agility', '81 Mining', '85 Herblore'],
+        quests: ['Smoking Kills', 'Desert Treasure', 'One Piercing Note', 'The Restless Ghost', 'Diamond in the Rough', 'Do No Evil', 'As a First Resort'],
+        ironman: [
+          'All Dominion Tower achievements complete (excluding Rumble Mode) — needs The Chosen Commander, The Void Stares Back, Blood Runs Deep, The Curse of Arrav, Fight Arena, Lair of Tarn Razorlor, Nomad\'s Requiem, Recipe for Disaster: Defeating the Culinaromancer, Spirits of the Elid, Vampyre Slayer, Love Story, While Guthix Sleeps, My Arm\'s Big Adventure',
+        ],
+        items: ['Full slayer helmet', 'Ancient staff', 'Dominion marker (stage 4)', 'Holy Cithara', 'Ankh', 'Scabaras mask', '2 vials', '2 clean lantadyme', '2 dragon scale dust', '2 phoenix feathers', '1 robust glass'],
+      },
       tasks: [
         {n:'Kill a desert strykewyrm while wielding an ancient staff and wearing a full slayer helmet'},
         {n:'Play the Holy Cithara inside the Abbey of St. Elspeth Citharede'},
@@ -1608,6 +1727,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Falador (Easy)',
       note: 'From the wiki\'s Falador achievements step-by-step guide. Quests: Medium needs Recruitment Drive, Wanted!, The Knight\'s Sword, Garden of Tranquillity (started), Gertrude\'s Cat. Hard needs A Fairy Tale II (started), The Slug Menace, The Hand in the Sand, the Mogre lore activity, Elemental Workshop I. Elite needs Lunar Diplomacy + The Temple at Senntisten. Rewards come as Falador shields 1-4, claimed in order.',
+      requirements: {
+        skills: ['25 Defence', '16 Construction'],
+        quests: [],
+        ironman: ['20 Mining, 20 Smithing, 23 Crafting — skip these if you already have a mind tiara'],
+        items: ['1,650 coins', 'A spade', 'A tinderbox', 'Cheese', 'A bucket', 'Ranged/Magic equipment or halberd to kill a duck (unless it\'s already on land)', 'A mind talisman', 'A tiara', 'Runes + a magical weapon for casting an elemental spell'],
+      },
       tasks: [
         {n:'(Easy) Go to Falador west bank and take your items out'},
         {n:'(Easy) Make a Mind tiara at the mind altar'},
@@ -1631,6 +1756,16 @@ function seedData(){
     {
       name: 'Achievement Diaries — Falador (Medium)',
       note: 'From the wiki\'s Falador achievements step-by-step guide. Quests: Medium needs Recruitment Drive, Wanted!, The Knight\'s Sword, Garden of Tranquillity (started), Gertrude\'s Cat. Hard needs A Fairy Tale II (started), The Slug Menace, The Hand in the Sand, the Mogre lore activity, Elemental Workshop I. Elite needs Lunar Diplomacy + The Temple at Senntisten. Rewards come as Falador shields 1-4, claimed in order.',
+      requirements: {
+        skills: ['10 Prayer', '10 Mining', '10 Smithing', '19 Ranged', '20 Defence', '23 Farming', '26 Agility', '36 Crafting', '37 Strength', '40 Thieving', '49 Firemaking'],
+        quests: ['Recruitment Drive', 'Wanted!', "The Knight's Sword", 'Garden of Tranquillity (started)', "Gertrude's Cat"],
+        ironman: [
+          '20 Smithing (bullseye lantern), 49 Crafting (lantern lens), 47 Farming (watermelon for scarecrow) — unless the Lorehound drops a bullseye lantern instead',
+          '30 Farming — skip if you get willow branches from Spirit implings instead',
+          '59 Fletching, 30 Smithing — skip these if you get a mithril grapple as a drop instead',
+        ],
+        items: ['Swamp tar', '6 willow branches', 'Grappling gear: crossbow (mithril+) + mithril grapple, or an enhanced grappling hook', 'A bullseye lantern (gem lanterns work too)', '3 sweetcorn seeds', 'A scarecrow', 'Full initiate armour', 'A ring of charos (a)', 'Gear to kill a level 47 ice giant and a level 30 black knight', 'Blurite bar', 'A pet cat of any type'],
+      },
       tasks: [
         {n:'(Medium) Pickpocket a Falador Guard right outside the west bank', lvl:'10 Prayer, 10 Mining, 19 Ranged, 20 Defence, 23 Farming, 26 Agility, 36 Crafting, 37 Strength, 40 Thieving, 49 Firemaking'},
         {n:'(Medium) Crawl under the wall on the south-west side of Falador (both directions)'},
@@ -1651,6 +1786,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Falador (Hard)',
       note: 'From the wiki\'s Falador achievements step-by-step guide. Quests: Medium needs Recruitment Drive, Wanted!, The Knight\'s Sword, Garden of Tranquillity (started), Gertrude\'s Cat. Hard needs A Fairy Tale II (started), The Slug Menace, The Hand in the Sand, the Mogre lore activity, Elemental Workshop I. Elite needs Lunar Diplomacy + The Temple at Senntisten. Rewards come as Falador shields 1-4, claimed in order.',
+      requirements: {
+        skills: ['16 Construction', '30 Defence', '56 Runecrafting', '56 Summoning', '60 Mining', '70 Prayer', '72 Slayer [B]', '60 Farming [B]', '70 Woodcutting'],
+        quests: ['A Fairy Tale II - Cure a Queen (started)', 'The Slug Menace', 'The Hand in the Sand', 'Mogre (lore activity)'],
+        ironman: [],
+        items: ['Spade', 'A Lunar staff or Dramen staff (unless A Fairy Tale III done)', 'Full proselyte armour', 'An omni-tiara, mind tiara, mind talisman, or charged wicked hood', '28/25 essence (rune or pure)', 'A cape', 'Fishing explosive', 'An Ibis pouch', '5,020 coins (or 5,000 + pink dye)', 'Gear for fighting a Skeletal Wyvern', '1 yew sapling or magic sapling + protection (10 cactus spine for yew, or 25 coconut for magic)'],
+      },
       tasks: [
         {n:'(Hard) Plant a magic tree in Falador Park (grows over several hours — start this early)', note:'A magic tree is better than yew since it also covers an Elite requirement later.'},
         {n:'(Hard) Use the fairy ring at Mudskipper Point (code AIQ) to reach the fishing spot'},
@@ -1667,6 +1808,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Falador (Elite)',
       note: 'From the wiki\'s Falador achievements step-by-step guide. Quests: Medium needs Recruitment Drive, Wanted!, The Knight\'s Sword, Garden of Tranquillity (started), Gertrude\'s Cat. Hard needs A Fairy Tale II (started), The Slug Menace, The Hand in the Sand, the Mogre lore activity, Elemental Workshop I. Elite needs Lunar Diplomacy + The Temple at Senntisten. Rewards come as Falador shields 1-4, claimed in order.',
+      requirements: {
+        skills: ['90 Fishing [B]', '93 Cooking [B]', '80 Mining', '75 Farming', '80 Woodcutting', '80 Summoning', '80 Magic [B]', '95 Prayer'],
+        quests: ['Lunar Diplomacy', 'The Temple at Senntisten'],
+        ironman: [],
+        items: ['Fishing rod', '1 living mineral', 'Magic seed', 'A hydra familiar', '1 Hydra scroll (Regrowth)', 'String Jewellery runes: 10 earth, 5 water, 2 astral', 'Unstrung amulet, or 1 gold bar + amulet mould'],
+      },
       tasks: [
         {n:'(Elite) Catch and cook a Rocktail (90 Fishing, 93 Cooking, cook on any range in Falador)'},
         {n:'(Elite) Mine a concentrated gold rock in the Living Rock Caverns (80 Mining)'},
@@ -1680,6 +1827,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Fremennik (Easy)',
       note: 'From the wiki\'s Fremennik achievements step-by-step guide, organized geographically the same way the guide is (Fremennik Isles → Barbarian Outpost → Rellekka → Fremennik Province → Lunar Isle/Miscellania/Waterbirth). Medium needs The Fremennik Trials, The Fremennik Isles (partial), Garden of Tranquillity, A Fairy Tale II. Hard/Elite need Lunar Diplomacy, Royal Trouble, The Fremennik Trials, all four Barbarian Training sections, Bar Crawl, Tai Bwo Wannai Trio, Blood Runs Deep. Rewards are Fremennik sea boots 1-4, claimed in order.',
+      requirements: {
+        skills: ['10 Slayer'],
+        quests: [],
+        ironman: [],
+        items: ['No runes or arrows carried (for the Barbarian Assault tutorial)', 'Some combat gear', 'Antipoison (recommended)', 'A games necklace (recommended)'],
+      },
       tasks: [
         {n:'Teleport to Barbarian Outpost with a games necklace'},
         {n:'Talk to Captain Cain and exhaust all options in the Barbarian Assault tutorial'},
@@ -1698,6 +1851,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Fremennik (Medium)',
       note: 'From the wiki\'s Fremennik achievements step-by-step guide, organized geographically the same way the guide is (Fremennik Isles → Barbarian Outpost → Rellekka → Fremennik Province → Lunar Isle/Miscellania/Waterbirth). Medium needs The Fremennik Trials, The Fremennik Isles (partial), Garden of Tranquillity, A Fairy Tale II. Hard/Elite need Lunar Diplomacy, Royal Trouble, The Fremennik Trials, all four Barbarian Training sections, Bar Crawl, Tai Bwo Wannai Trio, Blood Runs Deep. Rewards are Fremennik sea boots 1-4, claimed in order.',
+      requirements: {
+        skills: ['55 Hunter [B]', '48 Cooking', '42 Thieving', '33 Crafting', '20 Defence'],
+        quests: ['The Fremennik Trials', 'The Fremennik Isles (partial)', 'Garden of Tranquillity (partial)', 'A Fairy Tale II - Cure a Queen (fairy ring access)'],
+        ironman: [],
+        items: ['Dramen/Lunar staff (unless A Fairy Tale III done)', 'Pet rock', '3 molten glass', 'Yak-hide armour (body and legs)', 'A raw bass', 'Ring of Charos (a)', 'Enchanted lyre (or a regular lyre)', 'A bucket of milk (or just a bucket)', '500 coins', 'Teasing stick'],
+      },
       tasks: [
         {n:'Travel to Neitiznot, climb the north-east tower ladder, and talk to a guard to start a shouting match'},
         {n:'Equip yak-hide armour and kill an ice troll male (not a runt or female)'},
@@ -1716,6 +1875,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Fremennik (Hard)',
       note: 'From the wiki\'s Fremennik achievements step-by-step guide, organized geographically the same way the guide is (Fremennik Isles → Barbarian Outpost → Rellekka → Fremennik Province → Lunar Isle/Miscellania/Waterbirth). Medium needs The Fremennik Trials, The Fremennik Isles (partial), Garden of Tranquillity, A Fairy Tale II. Hard/Elite need Lunar Diplomacy, Royal Trouble, The Fremennik Trials, all four Barbarian Training sections, Bar Crawl, Tai Bwo Wannai Trio, Blood Runs Deep. Rewards are Fremennik sea boots 1-4, claimed in order.',
+      requirements: {
+        skills: ['65 Magic', '60 Mining', '55 Fishing', '54 Woodcutting', '52 Crafting (61 needed for Lunar Diplomacy)', '52 Firemaking', '50 Defence', '35 Strength', '35 Agility'],
+        quests: ['Bar Crawl (miniquest)', 'Lunar Diplomacy', 'Royal Trouble', 'The Fremennik Trials'],
+        ironman: ['High combat level recommended for How to Maim Your Dragon (killing a mithril dragon)'],
+        items: ['Gear to kill 3 level 74/92 dagannoths + a level 160 mithril dragon', 'Rockshell, spined, or skeletal armour (helm+body+legs)', 'Chewed bones or mangled bones', 'Arctic pine logs', 'Bake pie runes (1 astral, 5 fire, 4 water)', 'Any uncooked pie', 'Coins to pay Etceterian woodcutters', 'Suggested: games necklace, lyre charges or a Rellekka house'],
+      },
       tasks: [
         {n:'Cut an Arctic Pine log on the Fremennik Isles (save it for later)'},
         {n:'Complete a lap of the Barbarian Outpost Agility Course'},
@@ -1736,6 +1901,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Fremennik (Elite)',
       note: 'From the wiki\'s Fremennik achievements step-by-step guide, organized geographically the same way the guide is (Fremennik Isles → Barbarian Outpost → Rellekka → Fremennik Province → Lunar Isle/Miscellania/Waterbirth). Medium needs The Fremennik Trials, The Fremennik Isles (partial), Garden of Tranquillity, A Fairy Tale II. Hard/Elite need Lunar Diplomacy, Royal Trouble, The Fremennik Trials, all four Barbarian Training sections, Bar Crawl, Tai Bwo Wannai Trio, Blood Runs Deep. Rewards are Fremennik sea boots 1-4, claimed in order.',
+      requirements: {
+        skills: ['96 Fishing [B]', '93 Slayer [B]', '90 Agility [B]', '50 Smithing', '85 Crafting [B]', '85 Firemaking [B]', '82 Runecrafting [B] (40 [B] if using catalytic anima stones)', '80 Herblore [B]', '76 Strength [B]', '75 Attack'],
+        quests: ['Bar Crawl (miniquest)', 'Lunar Diplomacy', 'The Fremennik Trials', 'Tai Bwo Wannai Trio', 'Blood Runs Deep', 'Master Otto'],
+        ironman: [],
+        items: ['Agile top', 'Full inventory of pure essence', 'Gear to kill an ice strykewyrm', 'Fire cape/TokHaar-Kal, or the purchased slayer ability to hit ice strykewyrms', 'Magic logs', 'Mangled bones or chewed bones', 'Magic logs + a rune bar', '2-dose super ranging potion + 1 caviar', 'Balmung'],
+      },
       tasks: [
         {n:'Complete a lap of the Barbarian Outpost Advanced Course wearing your agile top'},
         {n:'Complete Barbarian Herblore if needed, then make a super ranging mix with caviar at Otto\'s Grotto'},
@@ -1749,6 +1920,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Karamja (Easy)',
       note: 'Easy/Medium/Elite are from the wiki\'s step-by-step walkthrough; Hard tier is now the full official achievement list (10/10), since the walkthrough only covered 1 of those. Medium needs Dragon Slayer, Shilo Village, Jungle Potion, Tai Bwo Wannai Trio, The Grand Tree. Hard needs Legends\' Quest, Rune Mysteries, Tai Bwo Wannai Trio, Shilo Village. Elite needs While Guthix Sleeps, Shilo Village, Smoking Kills. Rewards are Karamja gloves 1-4, in order.',
+      requirements: {
+        skills: ['15 Agility', '40 Mining'],
+        quests: [],
+        ironman: [],
+      },
       tasks: [
         {n:'Before your run: plant a fruit tree seed in the North Brimhaven patch, and place a Chameleon egg (from Cairn Isle) in an incubator', note:'Both take real time to finish — start these first.'},
         {n:'Take the charter ship from Port Sarim to Musa Point, then sail back and return'},
@@ -1765,6 +1941,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Karamja (Medium)',
       note: 'Easy/Medium/Elite are from the wiki\'s step-by-step walkthrough; Hard tier is now the full official achievement list (10/10), since the walkthrough only covered 1 of those. Medium needs Dragon Slayer, Shilo Village, Jungle Potion, Tai Bwo Wannai Trio, The Grand Tree. Hard needs Legends\' Quest, Rune Mysteries, Tai Bwo Wannai Trio, Shilo Village. Elite needs While Guthix Sleeps, Shilo Village, Smoking Kills. Rewards are Karamja gloves 1-4, in order.',
+      requirements: {
+        skills: ['40 Agility (recommended, not required)', '60 Woodcutting', '16 Cooking', '65 Fishing [B]', '27 Farming', '41 Hunter', '40 Mining'],
+        quests: ['Dragon Slayer', 'Shilo Village', 'Jungle Potion', 'Tai Bwo Wannai Trio', 'The Grand Tree'],
+        ironman: [],
+      },
       tasks: [
         {n:'Pay 875 coins and enter Brimhaven dungeon'},
         {n:'Chop the vines to the west and proceed into the dungeon'},
@@ -1777,6 +1958,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Karamja (Hard)',
       note: 'Easy/Medium/Elite are from the wiki\'s step-by-step walkthrough; Hard tier is now the full official achievement list (10/10), since the walkthrough only covered 1 of those. Medium needs Dragon Slayer, Shilo Village, Jungle Potion, Tai Bwo Wannai Trio, The Grand Tree. Hard needs Legends\' Quest, Rune Mysteries, Tai Bwo Wannai Trio, Shilo Village. Elite needs While Guthix Sleeps, Shilo Village, Smoking Kills. Rewards are Karamja gloves 1-4, in order.',
+      requirements: {
+        skills: ['100 combat level', '44 Runecrafting', '50 Strength', '53 Agility [B]', '30 Cooking', '34 Woodcutting', '42 Ranged', '50 Slayer', '50 Thieving', '52 Mining'],
+        quests: ["Legends' Quest (started)", 'Rune Mysteries', 'Tai Bwo Wannai Trio', 'Shilo Village'],
+        ironman: [],
+      },
       tasks: [
         {n:'Flawless Victory — become the champion of the TzHaar Fight Pit (last one standing)'},
         {n:'Play Dead, Doggy — kill a Ket-Zek in the TzHaar Fight Cave (they start appearing wave 31+)'},
@@ -1793,13 +1979,23 @@ function seedData(){
     {
       name: 'Achievement Diaries — Karamja (Elite)',
       note: 'Easy/Medium/Elite are from the wiki\'s step-by-step walkthrough; Hard tier is now the full official achievement list (10/10), since the walkthrough only covered 1 of those. Medium needs Dragon Slayer, Shilo Village, Jungle Potion, Tai Bwo Wannai Trio, The Grand Tree. Hard needs Legends\' Quest, Rune Mysteries, Tai Bwo Wannai Trio, Shilo Village. Elite needs While Guthix Sleeps, Shilo Village, Smoking Kills. Rewards are Karamja gloves 1-4, in order.',
+      requirements: {
+        skills: ['91 Runecrafting [B]', '95 Summoning', '27 Hunter', '63 Herblore', '80 Cooking [B]', '32 Agility', '50 Slayer', '100 combat level'],
+        quests: ['While Guthix Sleeps', 'Shilo Village', 'Smoking Kills'],
+        ironman: [],
+      },
       tasks: [
-        {n:'With 10+ Agility Arena tickets banked, buy a clean snapdragon and combine it with a vial of water + red spider\'s eggs to make a super restore', lvl:'91 Runecrafting, 95 Summoning, 27 Hunter, 63 Herblore, 80 Cooking, 74 Agility, 50 Slayer, 100 combat level'},
+        {n:'With 10+ Agility Arena tickets banked, buy a clean snapdragon and combine it with a vial of water + red spider\'s eggs to make a super restore', lvl:'91 Runecrafting, 95 Summoning, 27 Hunter, 63 Herblore, 80 Cooking, 32 Agility, 50 Slayer, 100 combat level'},
       ]
     },
     {
       name: 'Achievement Diaries — Lumbridge (Beginner)',
       note: 'From the wiki\'s Lumbridge achievements step-by-step guide — every individual requirement, tagged by tier. Quests needed: The Restless Ghost (Beginner/Easy), Cook\'s Assistant (Medium/Hard), started Dragon Slayer (Medium). Rewards come one ring at a time in order — you can\'t skip ahead and claim a higher ring before the earlier ones.',
+      requirements: {
+        skills: [],
+        quests: ['The Restless Ghost'],
+        ironman: [],
+      },
       tasks: [
         {n:'(Beginner) Climb the ladder outside Lumbridge Castle bank\'s north wall to the highest point in Lumbridge'},
         {n:'(Beginner) Raise the flag on the roof of the Lumbridge Bank'},
@@ -1830,6 +2026,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Lumbridge (Easy)',
       note: 'From the wiki\'s Lumbridge achievements step-by-step guide — every individual requirement, tagged by tier. Quests needed: The Restless Ghost (Beginner/Easy), Cook\'s Assistant (Medium/Hard), started Dragon Slayer (Medium). Rewards come one ring at a time in order — you can\'t skip ahead and claim a higher ring before the earlier ones.',
+      requirements: {
+        skills: ['10 Mining', '25 Fishing', '20 Smithing', '5 Runecrafting', '4 Crafting'],
+        quests: ['The Restless Ghost (partial)'],
+        ironman: [],
+      },
       tasks: [
         {n:'(Easy) Access the bank in Draynor Village'},
         {n:'(Easy) Make 2 clay rings, bake them, and sell one to Morgan near Ned\'s house'},
@@ -1854,6 +2055,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Lumbridge (Medium)',
       note: 'From the wiki\'s Lumbridge achievements step-by-step guide — every individual requirement, tagged by tier. Quests needed: The Restless Ghost (Beginner/Easy), Cook\'s Assistant (Medium/Hard), started Dragon Slayer (Medium). Rewards come one ring at a time in order — you can\'t skip ahead and claim a higher ring before the earlier ones.',
+      requirements: {
+        skills: ['20 Smithing', '31 Magic', '30 Firemaking', '40 Cooking', '20 Woodcutting', '16 Crafting', '30 Fishing', '20 Mining'],
+        quests: ["Cook's Assistant", 'Started Dragon Slayer (33 QP)'],
+        ironman: ['40 Fishing — skip if you get the raw lobster as a drop instead'],
+      },
       tasks: [
         {n:'(Medium) Obtain an anti-dragon shield from Duke Horacio', q:'Dragon Slayer', note:'Only needs Dragon Slayer to be started (33 QP), not completed.'},
         {n:'(Medium) Cook a lobster on the range in Lumbridge Castle kitchen', q:"Cook's Assistant"},
@@ -1872,8 +2078,13 @@ function seedData(){
     {
       name: 'Achievement Diaries — Lumbridge (Hard)',
       note: 'From the wiki\'s Lumbridge achievements step-by-step guide — every individual requirement, tagged by tier. Quests needed: The Restless Ghost (Beginner/Easy), Cook\'s Assistant (Medium/Hard), started Dragon Slayer (Medium). Rewards come one ring at a time in order — you can\'t skip ahead and claim a higher ring before the earlier ones.',
+      requirements: {
+        skills: ['40 Smithing', '50 Crafting', '59 Magic', '50 Cooking', '45 Prayer', '57 Runecrafting (or 19 with Elemental anima stones)', '60 Firemaking'],
+        quests: ["Cook's Assistant"],
+        ironman: ['70 Woodcutting — skip if you get the yew logs as a drop instead'],
+      },
       tasks: [
-        {n:'(Hard) Hit a goblin or giant spider in the Lumbridge forest with Fire Blast', lvl:'30 Smithing, 50 Crafting, 59 Magic, 50 Cooking, 45 Prayer, 57 Runecrafting, 60 Firemaking', q:"Cook's Assistant"},
+        {n:'(Hard) Hit a goblin or giant spider in the Lumbridge forest with Fire Blast', lvl:'40 Smithing, 50 Crafting, 59 Magic, 50 Cooking, 45 Prayer, 57 Runecrafting, 60 Firemaking', q:"Cook's Assistant"},
         {n:'(Hard) Light a yew log fire on top of the Lumbridge Castle gatehouse'},
         {n:'(Hard) Smith a mithril platebody on the anvil in the jailhouse sewers'},
         {n:'(Hard) Pray at an altar with Mystic Might active'},
@@ -1884,6 +2095,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Morytania (Easy)',
       note: 'From the wiki\'s Morytania achievements step-by-step guide, real achievement names in parentheses. Easy needs Priest in Peril, Creature of Fenkenstrain, Nature Spirit, In Aid of the Myreque. Medium adds Ghosts Ahoy, Shades of Mort\'ton, A Fairy Tale II (started), In Search of the Myreque, The Darkness of Hallowvale, Haunted Mine, Dwarf Cannon. Hard adds Legacy of Seergaze, The Branches of Darkmeyer, Desert Treasure, All Fired Up. Elite adds Ritual of the Mahjarrat. Rewards are Morytania legs 1-4, claimed in order.',
+      requirements: {
+        skills: ['25 Crafting', '12 Cooking', '25 Agility', '26 Farming'],
+        quests: ['Priest in Peril', 'Creature of Fenkenstrain', 'Nature Spirit', 'In Aid of the Myreque'],
+        ironman: [],
+      },
       tasks: [
         {n:'Cast Bloom near a log in Mort Myre Swamp with a silver sickle (b) (Blooming Marvellous)'},
         {n:'Kill a Myre Blamish Snail west of Mort\'ton and craft a snelm (Chisellin\' Conchiolin)'},
@@ -1901,6 +2117,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Morytania (Medium)',
       note: 'From the wiki\'s Morytania achievements step-by-step guide, real achievement names in parentheses. Easy needs Priest in Peril, Creature of Fenkenstrain, Nature Spirit, In Aid of the Myreque. Medium adds Ghosts Ahoy, Shades of Mort\'ton, A Fairy Tale II (started), In Search of the Myreque, The Darkness of Hallowvale, Haunted Mine, Dwarf Cannon. Hard adds Legacy of Seergaze, The Branches of Darkmeyer, Desert Treasure, All Fired Up. Elite adds Ritual of the Mahjarrat. Rewards are Morytania legs 1-4, claimed in order.',
+      requirements: {
+        skills: ['45 Woodcutting', '22 Herblore [B]', '14 Cooking', '29 Hunter', '33 Magic', '35 Smithing', '45 Slayer', '53 Farming [B]', '30 Mining'],
+        quests: ['Ghosts Ahoy', "Shades of Mort'ton", 'A Fairy Tale II - Cure a Queen (partial)', 'In Aid of the Myreque', 'In Search of the Myreque', 'The Darkness of Hallowvale', 'Haunted Mine', 'Dwarf Cannon'],
+        ironman: [],
+      },
       tasks: [
         {n:'Plant a bittercap mushroom spore west of Canifis and bind an amulet of nature to it (Fun Guy But Bitter, part 1)'},
         {n:'Slay an Infernal Mage on the Slayer Tower\'s 1st floor, north-west (The Higher, The Badder)'},
@@ -1928,6 +2149,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Morytania (Hard)',
       note: 'From the wiki\'s Morytania achievements step-by-step guide, real achievement names in parentheses. Easy needs Priest in Peril, Creature of Fenkenstrain, Nature Spirit, In Aid of the Myreque. Medium adds Ghosts Ahoy, Shades of Mort\'ton, A Fairy Tale II (started), In Search of the Myreque, The Darkness of Hallowvale, Haunted Mine, Dwarf Cannon. Hard adds Legacy of Seergaze, The Branches of Darkmeyer, Desert Treasure, All Fired Up. Elite adds Ritual of the Mahjarrat. Rewards are Morytania legs 1-4, claimed in order.',
+      requirements: {
+        skills: ['50 Runecrafting', '65 Agility [B] (63 required specifically for The Branches of Darkmeyer)', '50 Construction', '70 Magic', '63 Farming', '67 Slayer', '64 Crafting', '70 Defence', '70 Fletching', '76 Woodcutting', '62 Firemaking', 'Whatever combat stats your chosen Barrows gear needs'],
+        quests: ['Legacy of Seergaze', 'Haunted Mine', 'Creature of Fenkenstrain', 'Desert Treasure', 'The Branches of Darkmeyer', 'All Fired Up'],
+        ironman: [],
+      },
       tasks: [
         {n:'With a Drakan\'s medallion, teleport to Burgh de Rott, then find Tarn\'s Lair through the Haunted Mine and ensure he\'s slain (Detarnation)'},
         {n:'Craft a Blisterwood polearm from a blisterwood log and 2 silver sickles (Raising The Stakes)'},
@@ -1945,6 +2171,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Morytania (Elite)',
       note: 'From the wiki\'s Morytania achievements step-by-step guide, real achievement names in parentheses. Easy needs Priest in Peril, Creature of Fenkenstrain, Nature Spirit, In Aid of the Myreque. Medium adds Ghosts Ahoy, Shades of Mort\'ton, A Fairy Tale II (started), In Search of the Myreque, The Darkness of Hallowvale, Haunted Mine, Dwarf Cannon. Hard adds Legacy of Seergaze, The Branches of Darkmeyer, Desert Treasure, All Fired Up. Elite adds Ritual of the Mahjarrat. Rewards are Morytania legs 1-4, claimed in order.',
+      requirements: {
+        skills: ['85 Slayer [B]', '77 Runecrafting [B]', '87 Summoning', '91 Farming [B]', '94 Herblore [B]', '96 Fishing [B]', '76 Strength [B]', '80 Firemaking'],
+        quests: ['The Branches of Darkmeyer', 'Legacy of Seergaze', 'In Aid of the Myreque', "Shades of Mort'ton", 'Ritual of the Mahjarrat', 'The Darkness of Hallowvale'],
+        ironman: [],
+      },
       tasks: [
         {n:'Kill an abyssal demon in the Slayer Tower, west of Canifis lodestone (Whip: It Good)'},
         {n:'Craft blood runes at the Blood altar with rune essence and a blood talisman (As You Might Expect)'},
@@ -1960,6 +2191,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Seers\' Village (Easy)',
       note: 'From the wiki\'s Seers\' Village step-by-step guide, real achievement names in parentheses. Needs Murder Mystery. Reward is Seer\'s headband 1.',
+      requirements: {
+        skills: ['21 Cooking', '16 Fishing', '13 Farming'],
+        quests: ['Murder Mystery (partial)'],
+        ironman: ['Royal Trouble (started, if buying the cider)', '14 Cooking (if brewing the cider)'],
+      },
       tasks: [
         {n:'Fill 5 pots with flour from the Sinclair Mansion kitchen barrel (Bunch of Flours)'},
         {n:'Use the churn in the Sinclair Mansion garden, north-west corner (Sinclair Swirling)'},
@@ -1978,6 +2214,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Seers\' Village (Medium)',
       note: 'From the wiki\'s Seers\' Village step-by-step guide. Needs Scorpion Catcher, One Small Favour (started), Elemental Workshop I. Reward is Seer\'s headband 2 — bring headband 1 to claim it.',
+      requirements: {
+        skills: ['48 Agility [B]', '46 Fishing [B]', '46 Summoning', '45 Magic [B]', '45 Firemaking', '43 Cooking [B]', '40 Ranged', '30 Mining', '18 Herblore (for One Small Favour)', '25 Crafting (for One Small Favour)', '30 Smithing (for One Small Favour)', '31 Prayer (for Scorpion Catcher)'],
+        quests: ['Scorpion Catcher', 'One Small Favour', 'Elemental Workshop I (started)'],
+        ironman: ['42 Crafting — skip if you get the required fishbowl as a drop instead'],
+      },
       tasks: [
         {n:'Jump the shortcut log near Sinclair Mansion and back (Fleeing the Scene)'},
         {n:'Catch a bass in Catherby (All Your Bass... — part 1)'},
@@ -1997,6 +2238,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Seers\' Village (Hard)',
       note: 'From the wiki\'s Seers\' Village step-by-step guide. Needs King\'s Ransom, A Fairy Tale II (fairy ring access), Family Crest, optionally Legends\' Quest. Reward is Seer\'s headband 3 — bring headband 2 to claim it.',
+      requirements: {
+        skills: ['80 Cooking [B]', '80 Fletching [B]', '76 Fishing [B]', '75 Firemaking [B]', '70 Defence', '70 Prayer', '70 Woodcutting', '56 Magic', '39 Ranged', '36 Agility', '22 Strength', '49 Farming'],
+        quests: ["King's Ransom", 'Knight Waves training ground', 'A Fairy Tale II - Cure a Queen (fairy ring access)', 'Family Crest'],
+        ironman: ['68 Magic (to enchant a dragonstone bracelet)', "Legends' Quest, or 89 Summoning for a Geyser titan to charge the combat bracelet", '74 Crafting — skip if you get the dragonstone bracelet as a drop instead'],
+      },
       tasks: [
         {n:'In Taverley dungeon, charge 5 water orbs in one trip at the water obelisk (Water Palaver)'},
         {n:'Use the grapple shortcut from the water obelisk island to Catherby Beach (Island Hopper)'},
@@ -2014,6 +2260,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Seers\' Village (Elite)',
       note: 'From the wiki\'s Seers\' Village step-by-step guide. Needs Lunar Diplomacy. Reward is Seer\'s headband 4 — bring headband 3 to claim it.',
+      requirements: {
+        skills: ['92 Herblore [B]', '85 Fletching [B]', '83 Magic [B]', '40 Smithing [B]', '70 Cooking', '40 Ranged', '35 Fishing'],
+        quests: ['Lunar Diplomacy'],
+        ironman: ['77 Hunter — skip if you get the required grenwall spikes as a drop instead'],
+      },
       tasks: [
         {n:'Fish a salmon south-west of Sinclair Mansion (It\'s a Trap! No, Wait, It\'s a Pie — part 1)'},
         {n:'Catch a tuna in Catherby (It\'s a Trap! No, Wait, It\'s a Pie — part 2)'},
@@ -2027,6 +2278,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Tirannwn (Easy)',
       note: 'From the wiki\'s Tirannwn step-by-step guide — genuinely the most complex diary in the game. Hard tier specifically requires being in the right Prifddinas district while that district\'s Voice of Seren buff is active (it rotates over real time across the 7 districts, unrelated to Ithell) — check in-game which district currently has it before attempting those steps. Easy needs Desert Treasure, A Fairy Tale II, Mourning\'s End I & II, The Path of Glouphrie, Regicide, Underground Pass. Medium adds Deadliest Catch, The Prisoner of Glouphrie, Within the Light. Hard needs Bringing Home the Bacon, Legacy of Seergaze, Plague\'s End. Elite needs Blood Runs Deep, The Branches of Darkmeyer, The Elder Kiln, Fate of the Gods, As a First Resort, One of a Kind, Ritual of the Mahjarrat, The World Wakes, The Void Stares Back, The Chosen Commander, The Firemaker\'s Curse, plus the Grand ranging potion recipe unlocked. Rewards are Tirannwn quivers 1-4, in order.',
+      requirements: {
+        skills: ['5 Defence', '52 Magic', '10 Mining', '56 Slayer', '50 Thieving'],
+        quests: ['Desert Treasure', 'A Fairy Tale II - Cure a Queen', "Mourning's End Part I", "Mourning's End Part II", 'The Path of Glouphrie', 'Regicide', 'Underground Pass', 'Within the Light (not required, but recommended for Temple of Light teleport)'],
+        ironman: [],
+      },
       tasks: [
         {n:'Switch to the Ancient spellbook, then spirit-tree teleport from Varrock to Poison Waste'},
         {n:'Enter the sewer west of the spirit tree and kill a Warped terrorbird or Warped tortoise'},
@@ -2049,6 +2305,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Tirannwn (Medium)',
       note: 'From the wiki\'s Tirannwn step-by-step guide — genuinely the most complex diary in the game. Hard tier specifically requires being in the right Prifddinas district while that district\'s Voice of Seren buff is active (it rotates over real time across the 7 districts, unrelated to Ithell) — check in-game which district currently has it before attempting those steps. Easy needs Desert Treasure, A Fairy Tale II, Mourning\'s End I & II, The Path of Glouphrie, Regicide, Underground Pass. Medium adds Deadliest Catch, The Prisoner of Glouphrie, Within the Light. Hard needs Bringing Home the Bacon, Legacy of Seergaze, Plague\'s End. Elite needs Blood Runs Deep, The Branches of Darkmeyer, The Elder Kiln, Fate of the Gods, As a First Resort, One of a Kind, Ritual of the Mahjarrat, The World Wakes, The Void Stares Back, The Chosen Commander, The Firemaker\'s Curse, plus the Grand ranging potion recipe unlocked. Rewards are Tirannwn quivers 1-4, in order.',
+      requirements: {
+        skills: ['56 Agility', '57 Farming', '76 Fishing [B]', '75 Fletching', '77 Hunter [B]', '65 Runecrafting [B]', '40 Strength', '64 Summoning', '70 Woodcutting [B]', '48 Herblore'],
+        quests: ['Deadliest Catch', "Mourning's End Part I", "Mourning's End Part II", 'The Prisoner of Glouphrie', 'Regicide', 'Underground Pass', 'Within the Light', "Started A Fairy Tale II - Cure a Queen OR Plague's End (to hop onto Poison Waste island)"],
+        ironman: [],
+      },
       tasks: [
         {n:'Charter to Tyras Camp and buy a halberd from the quartermaster'},
         {n:'Teleport to Prifddinas, plant and pick a papaya in the Meilyr district fruit patch'},
@@ -2068,6 +2329,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Tirannwn (Hard)',
       note: 'From the wiki\'s Tirannwn step-by-step guide — genuinely the most complex diary in the game. Hard tier specifically requires being in the right Prifddinas district while that district\'s Voice of Seren buff is active (it rotates over real time across the 7 districts, unrelated to Ithell) — check in-game which district currently has it before attempting those steps. Easy needs Desert Treasure, A Fairy Tale II, Mourning\'s End I & II, The Path of Glouphrie, Regicide, Underground Pass. Medium adds Deadliest Catch, The Prisoner of Glouphrie, Within the Light. Hard needs Bringing Home the Bacon, Legacy of Seergaze, Plague\'s End. Elite needs Blood Runs Deep, The Branches of Darkmeyer, The Elder Kiln, Fate of the Gods, As a First Resort, One of a Kind, Ritual of the Mahjarrat, The World Wakes, The Void Stares Back, The Chosen Commander, The Firemaker\'s Curse, plus the Grand ranging potion recipe unlocked. Rewards are Tirannwn quivers 1-4, in order.',
+      requirements: {
+        skills: ['75 Farming [B]', '77 Agility', '70 Attack', '81 Divination', '77 Herblore', '74 Hunter', '70 Ranged', '85 Slayer', '88 Summoning', '80 Woodcutting [B]', '75 Crafting', '120 combat level'],
+        quests: ['Bringing Home the Bacon', 'Desert Treasure', 'Legacy of Seergaze', 'Regicide', "Plague's End"],
+        ironman: ['54 Cooking'],
+      },
       tasks: [
         {n:'Climb to Prifddinas lodestone\'s 1st floor with a bacon mound, bread, and chocolate bar, and give them to Seren'},
         {n:'Ithell district: speak to Lady Ithell, mine soft clay with a bracelet of clay equipped'},
@@ -2098,6 +2364,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Tirannwn (Elite)',
       note: 'From the wiki\'s Tirannwn step-by-step guide — genuinely the most complex diary in the game. Hard tier specifically requires being in the right Prifddinas district while that district\'s Voice of Seren buff is active (it rotates over real time across the 7 districts, unrelated to Ithell) — check in-game which district currently has it before attempting those steps. Easy needs Desert Treasure, A Fairy Tale II, Mourning\'s End I & II, The Path of Glouphrie, Regicide, Underground Pass. Medium adds Deadliest Catch, The Prisoner of Glouphrie, Within the Light. Hard needs Bringing Home the Bacon, Legacy of Seergaze, Plague\'s End. Elite needs Blood Runs Deep, The Branches of Darkmeyer, The Elder Kiln, Fate of the Gods, As a First Resort, One of a Kind, Ritual of the Mahjarrat, The World Wakes, The Void Stares Back, The Chosen Commander, The Firemaker\'s Curse, plus the Grand ranging potion recipe unlocked. Rewards are Tirannwn quivers 1-4, in order.',
+      requirements: {
+        skills: ['95 Dungeoneering', '95 Slayer', '95 Thieving [B]', 'At least level 90 in every other non-elite skill', 'At least one skill at level 99, or the Quest Cape'],
+        quests: ['Blood Runs Deep', 'The Branches of Darkmeyer', 'The Elder Kiln', 'Fate of the Gods', "Plague's End", 'Regicide', 'As a First Resort', 'One of a Kind', 'Ritual of the Mahjarrat', 'The World Wakes', 'The Void Stares Back', 'The Chosen Commander', "The Firemaker's Curse"],
+        ironman: [],
+      },
       tasks: [
         {n:'Home teleport to Prifddinas, activate the crest of Seren head override'},
         {n:'Climb to the Tower of Voices and bow or curtsy in front of Seren'},
@@ -2117,6 +2388,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Underworld (Easy)',
       note: 'From the wiki\'s Underworld (City of Um) step-by-step guide — this one leans hard into Necromancy specifically, and connects directly to the Necromancy Gear tab above. Easy needs Kili Row, Rune Mythos. Medium adds nothing new beyond Rune Mythos. Hard needs Curse of the Empty Lord, Kili Row, the Mystical Moonstone achievement, That Old Black Magic (ironmen also need Extinction). Elite needs Housing of Parliament, Icthlarin\'s Little Helper, Kili\'s Knowledge VII, Nomad\'s Elegy, \'Phite Club, Requiem for a Dragon, Soul Searching, The Temple at Senntisten. Rewards are Underworld Grimoires 1-4, in order.',
+      requirements: {
+        skills: ['10 Prayer', '24 Necromancy', '15 Crafting or 15 Smithing'],
+        quests: ['Kili Row', 'Rune Mythos'],
+        ironman: [],
+        items: ['At least 3 coins', 'An item for focus storage (pure essence or bones)', '200 weak necroplasm', '7 basic ghostly ink', 'A death guard and conduit', '1 ectoplasm', '20 lesser necroplasm', 'A vial of water', '1 ashes', '1 impure essence', 'Lesser ensouled cloth or lesser ensouled bar'],
+      },
       tasks: [
         {n:'Craft a spirit rune at the spirit altar in the Necromantic Rune Temple'},
         {n:'Buy 7+ basic ghostly ink, 200 weak necroplasm, and 4 basic ritual candles from Soul Supplies'},
@@ -2137,6 +2414,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Underworld (Medium)',
       note: 'From the wiki\'s Underworld (City of Um) step-by-step guide — this one leans hard into Necromancy specifically, and connects directly to the Necromancy Gear tab above. Easy needs Kili Row, Rune Mythos. Medium adds nothing new beyond Rune Mythos. Hard needs Curse of the Empty Lord, Kili Row, the Mystical Moonstone achievement, That Old Black Magic (ironmen also need Extinction). Elite needs Housing of Parliament, Icthlarin\'s Little Helper, Kili\'s Knowledge VII, Nomad\'s Elegy, \'Phite Club, Requiem for a Dragon, Soul Searching, The Temple at Senntisten. Rewards are Underworld Grimoires 1-4, in order.',
+      requirements: {
+        skills: ['11 Herblore [B]', '50 Necromancy', '40 Runecrafting', '37 Defence', '32 Slayer [B]', '45 Crafting or 45 Smithing'],
+        quests: ['Rune Mythos', "Kili's Knowledge III"],
+        ironman: [],
+        items: ['A broken memento or fragile memento', '1 Marrentill potion (unfinished)', '1 cadava berries', '15 spirit rune', '10 bone rune', '1 impure essence', '3 ectoplasm', '8 basic ghostly ink', '2 regular ghostly ink', '4 basic ritual candle', '3 lesser ensouled bar or 1 lesser ensouled thread, 20 spirit rune, and 1-2 lesser ensouled cloth'],
+      },
       tasks: [
         {n:'Cast the City of Um Teleport incantation'},
         {n:'Combine cadava berries + marrentill potion (unfinished) into a necromancy potion, in the City of Um'},
@@ -2155,6 +2438,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Underworld (Hard)',
       note: 'From the wiki\'s Underworld (City of Um) step-by-step guide — this one leans hard into Necromancy specifically, and connects directly to the Necromancy Gear tab above. Easy needs Kili Row, Rune Mythos. Medium adds nothing new beyond Rune Mythos. Hard needs Curse of the Empty Lord, Kili Row, the Mystical Moonstone achievement, That Old Black Magic (ironmen also need Extinction). Elite needs Housing of Parliament, Icthlarin\'s Little Helper, Kili\'s Knowledge VII, Nomad\'s Elegy, \'Phite Club, Requiem for a Dragon, Soul Searching, The Temple at Senntisten. Rewards are Underworld Grimoires 1-4, in order.',
+      requirements: {
+        skills: ['82 Fletching', '74 Farming', '80 Necromancy', '66 Fishing', '66 Cooking', '68 Magic', '70 Smithing', '60 Runecrafting', '79 Crafting', '68 Hunter'],
+        quests: ['Curse of the Empty Lord (miniquest)', 'Kili Row', 'Mystical Moonstone (achievement)', 'That Old Black Magic'],
+        ironman: ['70 Mining', 'Extinction'],
+        items: ['5 tempered fungal shaft', '1 morchella mushroom spore', 'Fishing bait (unless baitless fishing unlocked)', '1 necrite ore', '1 phasmatite', '1 impure essence', '1 uncut moonstone', '1 ensouled bar', '1 cosmic rune + 15 earth runes + 15 water runes (or staves)', 'Full ghostly robe outfit', 'A siphon and conduit (Necromancy weapons)'],
+      },
       tasks: [
         {n:'Keep the ghostly robe outfit on you and catch any ghost impling you spot along the way', note:'Catch it in an impling jar too if you want the separate um pop achievement from Austin.'},
         {n:'Home teleport to the City of Um, then listen to any member of the band east of the plaza'},
@@ -2172,6 +2461,12 @@ function seedData(){
     {
       name: 'Achievement Diaries — Underworld (Elite)',
       note: 'From the wiki\'s Underworld (City of Um) step-by-step guide — this one leans hard into Necromancy specifically, and connects directly to the Necromancy Gear tab above. Easy needs Kili Row, Rune Mythos. Medium adds nothing new beyond Rune Mythos. Hard needs Curse of the Empty Lord, Kili Row, the Mystical Moonstone achievement, That Old Black Magic (ironmen also need Extinction). Elite needs Housing of Parliament, Icthlarin\'s Little Helper, Kili\'s Knowledge VII, Nomad\'s Elegy, \'Phite Club, Requiem for a Dragon, Soul Searching, The Temple at Senntisten. Rewards are Underworld Grimoires 1-4, in order.',
+      requirements: {
+        skills: ['86 Archaeology', '96 Herblore', '90 Necromancy', '95 Prayer', '90 Runecrafting'],
+        quests: ['Housing of Parliament', "Icthlarin's Little Helper", "Kili's Knowledge VII", "Nomad's Elegy", "'Phite Club", 'Requiem for a Dragon', 'Soul Searching', 'The Temple at Senntisten'],
+        ironman: [],
+        items: ['1 each of extreme attack/strength/ranging/defence/magic/necromancy (3-dose)', '1 clean torstol', '1 blueberry pie (needs 1 golden fleece or golden wool, 1 pie shell)', 'Lunar staff or Dramen staff (unless A Fairy Tale III done)', '20 pure essence', 'Ritual components for a Powerful ritual or Manifest ectoplasm', 'Any soul cape', '5 spirit runes', 'Catspeak amulet or equivalent', 'Ancient Curses active'],
+      },
       tasks: [
         {n:'Spot 8 owls around the City of Um as you go'},
         {n:'On a Wednesday, give Thalmund a blueberry pie, south of the Um smithy', note:'Golden fleece from Lalli near the Fremennik Slayer Dungeon → spin into golden wool → fairy ring CIS to ScapeRune → trade Evil Bob twice for blueberries → bake into a pie.'},
@@ -2187,6 +2482,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Varrock (Easy)',
       note: 'From the wiki\'s Varrock achievements step-by-step guide, with the real in-game achievement name for each step in parentheses. Medium needs all four Stronghold of Security levels done and the balloon transport unlocked first. Hard needs 153 kudos and Ancient Magicks activated before starting. Elite needs a fully-grown tree in the Varrock palace patch, a rune bar banked, and Ancient Curses active.',
+      requirements: {
+        skills: ['13 Agility', '8 Crafting', '20 Fishing', '10 Mining'],
+        quests: ['The Dig Site (recommended, not required — makes earning Kudos easier)'],
+        ironman: [],
+      },
       tasks: [
         {n:'Enter and exit Edgeville Dungeon (On the Ragged Edge)'},
         {n:'Reach the 2nd level of the Stronghold of Security (Making Learning Fun!)', note:'Worth continuing through all 4 levels now — Medium tier needs it done.'},
@@ -2212,6 +2512,17 @@ function seedData(){
     {
       name: 'Achievement Diaries — Varrock (Medium)',
       note: 'From the wiki\'s Varrock achievements step-by-step guide, with the real in-game achievement name for each step in parentheses. Medium needs all four Stronghold of Security levels done and the balloon transport unlocked first. Hard needs 153 kudos and Ancient Magicks activated before starting. Elite needs a fully-grown tree in the Varrock palace patch, a rune bar banked, and Ancient Curses active.',
+      requirements: {
+        skills: ['21 Agility', '30 combat level', '40 Construction', '40 Firemaking', '49 Farming', '57 Herblore', '25 Magic [B]', '42 Mining', '35 Runecrafting', '40 Thieving', '33 quest points'],
+        quests: [
+          'Creature of Fenkenstrain', 'Diamond in the Rough', 'The Dig Site', 'Dragon Slayer', 'Enlightened Journey',
+          'A Fairy Tale I - Growing Pains', 'Started A Fairy Tale II - Cure a Queen', 'Garden of Tranquillity',
+          "Gertrude's Cat", "Icthlarin's Little Helper", 'Priest in Peril', 'Partial completion of Rat Catchers',
+          'The Restless Ghost', 'Rune Mysteries', "Started A Soul's Bane", 'Tree Gnome Village',
+          'Partial completion of What Lies Below', 'Found a clean necklace, or partial completion of The Temple at Senntisten',
+        ],
+        ironman: ['49 Magic [B] to make a Dig Site pendant, or 50 Magic to obtain Ali\'s pendant'],
+      },
       tasks: [
         {n:'Perform the four Stronghold of Security emotes: Idea, Stomp, Flap, Slap Head (Unlocking Your Emotions)'},
         {n:'Wear Ring of charos (a), ask Gertrude for a new cat, choose its colour (A Lick of Paint)'},
@@ -2237,6 +2548,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Varrock (Hard)',
       note: 'From the wiki\'s Varrock achievements step-by-step guide, with the real in-game achievement name for each step in parentheses. Medium needs all four Stronghold of Security levels done and the balloon transport unlocked first. Hard needs 153 kudos and Ancient Magicks activated before starting. Elite needs a fully-grown tree in the Varrock palace patch, a rune bar banked, and Ancient Curses active.',
+      requirements: {
+        skills: ['51 Agility', '32 Cooking', "67 Construction [B] (40 if using someone else's lectern)", '66 Crafting', '70 Farming [B]', '66 Magic', '40 Smithing', '57 Woodcutting'],
+        quests: ['Family Crest', 'Desert Treasure'],
+        ironman: ['69 Hunter', '85 Cooking — skip if you get the wild pie as a drop from Hunter instead'],
+      },
       tasks: [
         {n:'Craft an air battlestaff at a lectern (Battle of the Elements)'},
         {n:'Make a Varrock teleport tablet on the lectern (Keeping Tabs on Varrock)'},
@@ -2256,6 +2572,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Varrock (Elite)',
       note: 'From the wiki\'s Varrock achievements step-by-step guide, with the real in-game achievement name for each step in parentheses. Medium needs all four Stronghold of Security levels done and the balloon transport unlocked first. Hard needs 153 kudos and Ancient Magicks activated before starting. Elite needs a fully-grown tree in the Varrock palace patch, a rune bar banked, and Ancient Curses active.',
+      requirements: {
+        skills: ['95 Cooking [B]', '65 Dungeoneering', '15 Farming [B]', '92 Firemaking', '69 Fletching', '80 Magic', '65 Smithing (for Devious Minds)', '66 Mining (for Nomad\'s Requiem)', '92 Prayer', '78 Runecrafting [B] (lower with a ring of imbuing)', '66 Thieving (for The Curse of Arrav)', '80 Woodcutting'],
+        quests: ['All Fired Up', 'The Temple at Senntisten', "Nomad's Requiem", 'What Lies Below', 'Land of the Goblins'],
+        ironman: [],
+      },
       tasks: [
         {n:'Make and bake a raw summer pie at the Cooking Guild (Red, Red Pies of Summer)'},
         {n:'Chop your grown tree in the Varrock palace patch until the inferno adze incinerates a log (It All Adze Up)'},
@@ -2271,6 +2592,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Wilderness (Easy)',
       note: 'From the wiki\'s Wilderness step-by-step guide, organized by location the same way the guide is. This is genuine PvP territory — everything here happens in the actual Wilderness, where other players can attack you. Hard needs Summer\'s End. Before starting: plant a limpwurt seed at the western ruins flower patch, plant a bloodweed seed at the herb patch north of the Crater, grab a hellhound Slayer contract from Erskine (finish it later), and talk to Mami Rimba about bakriminel bolts. Rewards are Wilderness swords 1-4, in order — the sword itself scales in power with how many tiers you\'ve done, no separate reclaim needed unless you die and lose it.',
+      requirements: {
+        skills: [],
+        quests: [],
+        ironman: [],
+      },
       tasks: [
         {n:'Teleport to the Wilderness Crater lodestone with Home Teleport'},
         {n:'Enter the Chaos Tunnels from a Wilderness entrance'},
@@ -2284,6 +2610,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Wilderness (Medium)',
       note: 'From the wiki\'s Wilderness step-by-step guide, organized by location the same way the guide is. This is genuine PvP territory — everything here happens in the actual Wilderness, where other players can attack you. Hard needs Summer\'s End. Before starting: plant a limpwurt seed at the western ruins flower patch, plant a bloodweed seed at the herb patch north of the Crater, grab a hellhound Slayer contract from Erskine (finish it later), and talk to Mami Rimba about bakriminel bolts. Rewards are Wilderness swords 1-4, in order — the sword itself scales in power with how many tiers you\'ve done, no separate reclaim needed unless you die and lose it.',
+      requirements: {
+        skills: ['52 Agility', '55 Cooking', '57 Farming', '15 Fishing', '57 Herblore', '67 Hunter', '60 Magic', '32 Thieving', '57 Woodcutting', '55 Crafting'],
+        quests: [],
+        ironman: [],
+      },
       tasks: [
         {n:'Use a waka canoe from Edgeville to reach the Wilderness'},
         {n:'North of your landing, harvest the bloodweed patch and make a luck potion with crushed dragonstone'},
@@ -2300,6 +2631,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Wilderness (Hard)',
       note: 'From the wiki\'s Wilderness step-by-step guide, organized by location the same way the guide is. This is genuine PvP territory — everything here happens in the actual Wilderness, where other players can attack you. Hard needs Summer\'s End. Before starting: plant a limpwurt seed at the western ruins flower patch, plant a bloodweed seed at the herb patch north of the Crater, grab a hellhound Slayer contract from Erskine (finish it later), and talk to Mami Rimba about bakriminel bolts. Rewards are Wilderness swords 1-4, in order — the sword itself scales in power with how many tiers you\'ve done, no separate reclaim needed unless you die and lose it.',
+      requirements: {
+        skills: ['57 Farming', '65 Herblore', '66 Magic'],
+        quests: ["Summer's End"],
+        ironman: [],
+      },
       tasks: [
         {n:'Charge an orb at the Obelisk of Air, through Edgeville Dungeon past the black demons'},
         {n:'Activate and teleport from every Wilderness obelisk, starting at level 13'},
@@ -2315,6 +2651,11 @@ function seedData(){
     {
       name: 'Achievement Diaries — Wilderness (Elite)',
       note: 'From the wiki\'s Wilderness step-by-step guide, organized by location the same way the guide is. This is genuine PvP territory — everything here happens in the actual Wilderness, where other players can attack you. Hard needs Summer\'s End. Before starting: plant a limpwurt seed at the western ruins flower patch, plant a bloodweed seed at the herb patch north of the Crater, grab a hellhound Slayer contract from Erskine (finish it later), and talk to Mami Rimba about bakriminel bolts. Rewards are Wilderness swords 1-4, in order — the sword itself scales in power with how many tiers you\'ve done, no separate reclaim needed unless you die and lose it.',
+      requirements: {
+        skills: ['83 Agility', '57 Farming', '93 Fletching', '82 Herblore', '88 Hunter', '94 Slayer', '85 Woodcutting'],
+        quests: [],
+        ironman: [],
+      },
       tasks: [
         {n:'Craft bakriminel bolts from scratch by the bloodwood tree next to the chaos altar'},
         {n:'Capture a charming moth on the east coast of level 27 Wilderness, north-east of the salamander spot'},
@@ -2329,6 +2670,32 @@ function seedData(){
   const tasks = [];
   let order = 0;
   for(const cat of cats){
+    // Requirements go first, in their own visually-distinct block, so a person can
+    // confirm they're ready before looking at the actual task list below.
+    if(cat.requirements){
+      const req = cat.requirements;
+      (req.skills || []).forEach(s=>{
+        tasks.push({
+          id: uid(), category: cat.name, name: s, quest: null, materials: null, matList: null,
+          banked: {}, link: null, notes: '', order: order++, solo: false, owner: null,
+          recurring: null, killTrack: false, kills: {}, checks: {}, isRequirement: true, reqGroup: 'skill'
+        });
+      });
+      (req.quests || []).forEach(qn=>{
+        tasks.push({
+          id: uid(), category: cat.name, name: qn, quest: qn, materials: null, matList: null,
+          banked: {}, link: null, notes: '', order: order++, solo: false, owner: null,
+          recurring: null, killTrack: false, kills: {}, checks: {}, isRequirement: true, reqGroup: 'quest'
+        });
+      });
+      (req.ironman || []).forEach(s=>{
+        tasks.push({
+          id: uid(), category: cat.name, name: s, quest: null, materials: null, matList: null,
+          banked: {}, link: null, notes: '', order: order++, solo: false, owner: null,
+          recurring: null, killTrack: false, kills: {}, checks: {}, isRequirement: true, reqGroup: 'ironman'
+        });
+      });
+    }
     for(const item of cat.tasks){
       const isObj = typeof item === 'object';
       let name = isObj ? item.n : item;
@@ -2349,21 +2716,26 @@ function seedData(){
         recurring: cat.recurring || null,
         killTrack: isObj ? !!item.killTrack : false,
         kills: {},
-        checks: {}
+        checks: {},
+        isRequirement: false
       });
     }
   }
   const catNotes = {};
   cats.forEach(c => { if(c.note) catNotes[c.name] = c.note; });
-  return { members, tasks, catNotes, catOrder: cats.map(c=>c.name) };
+  const catRequirementItems = {};
+  cats.forEach(c => { if(c.requirements && c.requirements.items) catRequirementItems[c.name] = c.requirements.items; });
+  return { members, tasks, catNotes, catRequirementItems, catOrder: cats.map(c=>c.name) };
 }
 
 let CAT_NOTES = {};
+let CAT_REQUIREMENT_ITEMS = {};
 let CAT_ORDER = [];
 
 async function load(){
   const seedRef = seedData();
   CAT_NOTES = seedRef.catNotes;
+  CAT_REQUIREMENT_ITEMS = seedRef.catRequirementItems;
   CAT_ORDER = seedRef.catOrder;
 
   const cloud = await cloudLoad();
@@ -2544,7 +2916,7 @@ function computeTotalCompletedForMe(){
   if(!me) return 0;
   let count = 0;
   state.tasks.forEach(t=>{
-    if(t.killTrack) return;
+    if(t.killTrack || t.isRequirement) return;
     const isSolo = t.category.startsWith('Solo Goals —');
     if(isSolo && t.owner !== me) return;
     if(t.recurring){ if(isRecurDone(t, me)) count++; }
@@ -2793,12 +3165,12 @@ function categoriesInOrder(){
 
 const TAB_DEFS = [
   {id:'overview', label:'Team Overview', match:null, synthetic:true},
-  {id:'part1', label:'Progression Guide - Part 1', match:['Part 1 — Getting Started (Quests & Unlocks)']},
-  {id:'part2', label:'Progression Guide - Part 2', match:['Part 2 — Mid-Game Combat Training']},
-  {id:'part3', label:'Progression Guide - Part 3', match:['Part 3 — Mid-Game Questing']},
-  {id:'part4', label:'Progression Guide - Part 4', match:['Part 4 — Endgame Combat Training']},
-  {id:'part5', label:'Progression Guide - Part 5', match:['Part 5 — End-Game Skilling & Quests']},
-  {id:'part6', label:'Progression Guide - Part 6', match:['Part 6 — Final Bossing Preparation']},
+  {id:'part1', label:'Progression Guide - Part 1', subtitle:'Getting Started (Quests & Unlocks)', match:['Part 1 — Getting Started (Quests & Unlocks)']},
+  {id:'part2', label:'Progression Guide - Part 2', subtitle:'Mid-Game Combat Training', match:['Part 2 — Mid-Game Combat Training']},
+  {id:'part3', label:'Progression Guide - Part 3', subtitle:'Mid-Game Questing', match:['Part 3 — Mid-Game Questing']},
+  {id:'part4', label:'Progression Guide - Part 4', subtitle:'Endgame Combat Training', match:['Part 4 — Endgame Combat Training']},
+  {id:'part5', label:'Progression Guide - Part 5', subtitle:'End-Game Skilling & Quests', match:['Part 5 — End-Game Skilling & Quests']},
+  {id:'part6', label:'Progression Guide - Part 6', subtitle:'Final Bossing Preparation', match:['Part 6 — Final Bossing Preparation']},
   {id:'recurring', label:'Dailies/Weeklies/Monthlies', match:['Dailies','Weeklies','Monthlies']},
   {id:'farm', label:'Player-Owned Farm', match:['Player-Owned Farm — Before Level 64 Farming','Player-Owned Farm — After Level 64 Farming']},
   {id:'mining', label:'Mining & Smithing', match:['Mining & Smithing Training']},
@@ -2828,7 +3200,7 @@ function tabPercentForMember(tabId, cats, member){
     const isSolo = catName.startsWith('Solo Goals —');
     const catTasks = state.tasks.filter(t=>t.category===catName);
     catTasks.forEach(t=>{
-      if(t.killTrack) return; // a counter, not a completable item
+      if(t.killTrack || t.isRequirement) return; // a counter, not a completable item
       if(isSolo && t.owner !== member) return; // only count that member's own solo goals
       total++;
       if(t.recurring ? isRecurDone(t, member) : !!t.checks[member]) done++;
@@ -2845,7 +3217,7 @@ function overallPercentForMember(member, allCats){
   allCats.forEach(catName=>{
     if(catName.startsWith('Solo Goals —')) return; // solo goals vary per-person, excluded from the shared comparison
     state.tasks.filter(t=>t.category===catName).forEach(t=>{
-      if(t.killTrack) return;
+      if(t.killTrack || t.isRequirement) return;
       total++;
       if(t.recurring ? isRecurDone(t, member) : !!t.checks[member]) done++;
     });
@@ -2982,7 +3354,7 @@ function percentForCategoriesAndMember(catNames, member){
   catNames.forEach(catName=>{
     const isSolo = catName.startsWith('Solo Goals —');
     state.tasks.filter(t=>t.category===catName).forEach(t=>{
-      if(t.killTrack) return;
+      if(t.killTrack || t.isRequirement) return;
       if(isSolo && t.owner !== member) return;
       total++;
       if(t.recurring ? isRecurDone(t, member) : !!t.checks[member]) done++;
@@ -3114,7 +3486,18 @@ function renderTeamOverview(main, allCats){
 
   TAB_DEFS.filter(t=>t.id!=='overview').forEach(def=>{
     const tr = document.createElement('tr');
-    tr.appendChild(cell('td', def.label, 'overview-label'));
+    const labelTd = document.createElement('td');
+    labelTd.className = 'overview-label';
+    const labelMain = document.createElement('div');
+    labelMain.textContent = def.label;
+    labelTd.appendChild(labelMain);
+    if(def.subtitle){
+      const labelSub = document.createElement('div');
+      labelSub.className = 'overview-label-subtitle';
+      labelSub.textContent = def.subtitle;
+      labelTd.appendChild(labelSub);
+    }
+    tr.appendChild(labelTd);
     state.members.forEach(m=>{
       const pct = tabPercentForMember(def.id, allCats, m);
       tr.appendChild(cell('td', pct===null ? '—' : pct+'%', pct===100 ? 'overview-full' : ''));
@@ -3173,6 +3556,14 @@ function renderTeamOverview(main, allCats){
 
 function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
 
+function diaryWikiLink(catName){
+  const m = catName.match(/^Achievement Diaries — (.+?) \(([^)]+)\)$/);
+  if(!m) return null;
+  const region = m[1], tier = m[2];
+  const regionSlug = region.replace(/ /g,'_').replace(/'/g,'%27');
+  return 'https://runescape.wiki/w/' + tier + '_' + regionSlug + '_achievements';
+}
+
 const MATERIAL_LINKS = {
   'Bone rune': 'https://runescape.wiki/w/Bone_rune',
   'Spirit rune': 'https://runescape.wiki/w/Spirit_rune',
@@ -3208,7 +3599,24 @@ function renderAll(){
     const pct = def.synthetic ? null : tabPercentForMe(tabId, allCats);
     const btn = document.createElement('button');
     btn.className = 'tab-btn' + (tabId===activeTab ? ' active' : '');
-    btn.innerHTML = def.label + (pct!==null ? ' <span class="tab-pct">'+pct+'%</span>' : '');
+    const mainRow = document.createElement('div');
+    mainRow.className = 'tab-btn-main';
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = def.label;
+    mainRow.appendChild(labelSpan);
+    if(pct !== null){
+      const pctSpan = document.createElement('span');
+      pctSpan.className = 'tab-pct';
+      pctSpan.textContent = pct + '%';
+      mainRow.appendChild(pctSpan);
+    }
+    btn.appendChild(mainRow);
+    if(def.subtitle){
+      const sub = document.createElement('div');
+      sub.className = 'tab-btn-subtitle';
+      sub.textContent = def.subtitle;
+      btn.appendChild(sub);
+    }
     btn.addEventListener('click', ()=>{
       activeTab = tabId;
       localSet('active-tab-v1', activeTab);
@@ -3254,21 +3662,51 @@ function renderAll(){
     catEl.id = slugify(catName);
 
     const doneCount = allItems.filter(t=>{
-      if(t.killTrack) return false;
+      if(t.killTrack || t.isRequirement) return false;
       if(isSolo){ return t.checks[t.owner]; }
       if(recurType){ return state.members.length>0 && state.members.every(m=>isRecurDone(t,m)); }
       return state.members.length>0 && state.members.every(m=>t.checks[m]);
     }).length;
-    const completableCount = allItems.filter(t=>!t.killTrack).length;
+    const completableCount = allItems.filter(t=>!t.killTrack && !t.isRequirement).length;
 
     const head = document.createElement('div');
     head.className = 'category-head';
-    head.innerHTML =
-      '<div><h2>' + catName + (recurType ? '<span class="recur-badge">'+recurType+'</span>' : '') + '</h2></div>' +
-      '<div style="display:flex;align-items:center;gap:10px">' +
-        '<span class="count">' + doneCount + '/' + completableCount + '</span>' +
-        '<span class="chevron">▾</span>' +
-      '</div>';
+    const headLeft = document.createElement('div');
+    const h2 = document.createElement('h2');
+    h2.textContent = catName;
+    if(recurType){
+      const badge = document.createElement('span');
+      badge.className = 'recur-badge';
+      badge.textContent = recurType;
+      h2.appendChild(badge);
+    }
+    const wikiLink = diaryWikiLink(catName);
+    if(wikiLink){
+      const a = document.createElement('a');
+      a.href = wikiLink;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.className = 'cat-wiki-link';
+      a.title = 'View this tier on the wiki';
+      a.textContent = '↗';
+      a.addEventListener('click', (e)=>{ e.stopPropagation(); });
+      h2.appendChild(a);
+    }
+    headLeft.appendChild(h2);
+    const headRight = document.createElement('div');
+    headRight.style.display = 'flex';
+    headRight.style.alignItems = 'center';
+    headRight.style.gap = '10px';
+    const countSpan = document.createElement('span');
+    countSpan.className = 'count';
+    countSpan.textContent = doneCount + '/' + completableCount;
+    const chevron = document.createElement('span');
+    chevron.className = 'chevron';
+    chevron.textContent = '▾';
+    headRight.appendChild(countSpan);
+    headRight.appendChild(chevron);
+    head.appendChild(headLeft);
+    head.appendChild(headRight);
     head.addEventListener('click', ()=>{ catEl.classList.toggle('collapsed'); });
     catEl.appendChild(head);
 
@@ -3282,14 +3720,68 @@ function renderAll(){
       body.appendChild(note);
     }
 
-    if(items.length===0){
+    const reqItems = items.filter(t=>t.isRequirement);
+    const regularItems = items.filter(t=>!t.isRequirement);
+
+    if(reqItems.length > 0 || (CAT_REQUIREMENT_ITEMS[catName] && CAT_REQUIREMENT_ITEMS[catName].length)){
+      const reqCard = document.createElement('div');
+      reqCard.className = 'requirements-card';
+      const reqTitle = document.createElement('div');
+      reqTitle.className = 'requirements-title';
+      reqTitle.textContent = '✅ Requirements — are you ready for this tier?';
+      reqCard.appendChild(reqTitle);
+
+      [{key:'skill', label:'Skill levels'}, {key:'quest', label:'Quests'}, {key:'ironman', label:'Ironman-specific'}].forEach(g=>{
+        const groupItems = reqItems.filter(t=>t.reqGroup===g.key);
+        if(!groupItems.length) return;
+        const groupLabel = document.createElement('div');
+        groupLabel.className = 'requirements-group-label';
+        groupLabel.textContent = g.label;
+        reqCard.appendChild(groupLabel);
+        groupItems.forEach(task=>{
+          const row = document.createElement('div');
+          row.className = 'requirement-row';
+          if(me){
+            const done = !!task.checks[me];
+            const box = document.createElement('div');
+            box.className = 'check-box small' + (done ? ' checked' : '');
+            box.textContent = '✓';
+            box.addEventListener('click', ()=>{
+              if(task.checks[me]) delete task.checks[me];
+              else task.checks[me] = new Date().toISOString();
+              scheduleSave(); renderAll();
+            });
+            row.appendChild(box);
+          }
+          const label = document.createElement('span');
+          label.textContent = task.name;
+          row.appendChild(label);
+          reqCard.appendChild(row);
+        });
+      });
+
+      if(CAT_REQUIREMENT_ITEMS[catName] && CAT_REQUIREMENT_ITEMS[catName].length){
+        const itemsLabel = document.createElement('div');
+        itemsLabel.className = 'requirements-group-label';
+        itemsLabel.textContent = 'Items to bring (reference only, not tracked)';
+        reqCard.appendChild(itemsLabel);
+        const itemsList = document.createElement('div');
+        itemsList.className = 'requirements-items-list';
+        itemsList.textContent = CAT_REQUIREMENT_ITEMS[catName].join(' • ');
+        reqCard.appendChild(itemsList);
+      }
+
+      body.appendChild(reqCard);
+    }
+
+    if(regularItems.length===0){
       const empty = document.createElement('div');
       empty.className = 'empty-note';
       empty.textContent = allItems.length > 0 ? 'All done here — nice work! (toggle "Hide completed" off to see them)' : (isSolo ? 'No solo goals yet for this section.' : 'Nothing here yet.');
       body.appendChild(empty);
     }
 
-    items.forEach((task)=>{
+    regularItems.forEach((task)=>{
       const idx = allItems.indexOf(task);
       const row = document.createElement('div');
       row.className = 'task-row';
