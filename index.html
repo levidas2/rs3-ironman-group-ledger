@@ -2766,25 +2766,36 @@ function setLoadingText(msg){
   if(el) el.textContent = msg;
 }
 
-async function load(){
-  setLoadingText('Building the task list…');
+async function load(isBackground){
+  if(!isBackground) setLoadingText('Building the task list…');
   const seedRef = seedData();
   CAT_NOTES = seedRef.catNotes;
   CAT_REQUIREMENT_ITEMS = seedRef.catRequirementItems;
   CAT_ORDER = seedRef.catOrder;
 
-  setLoadingText('Syncing with the shared board…');
+  if(!isBackground) setLoadingText('Syncing with the shared board…');
   const cloud = await cloudLoad();
 
   if(cloud.error){
-    // We could not confirm what's actually in the shared store. Refusing to touch
-    // anything — no seeding, no saving — rather than risk what happened before:
-    // a failed load silently getting treated as "empty" and overwriting real data.
+    if(isBackground){
+      // This is a routine background refresh, not the first load — there's already a
+      // fully-rendered, working board on screen. A transient network hiccup or a
+      // moment of Apps Script downtime here is not a reason to blank out real data
+      // the person is actively looking at. Leave state exactly as it is, quietly
+      // flag that this refresh didn't go through, and let the next scheduled poll
+      // (or the next tab-focus) try again.
+      markSyncFailed(cloud.reason);
+      return false;
+    }
+    // First load of the session: we could not confirm what's actually in the shared
+    // store. Refusing to touch anything — no seeding, no saving — rather than risk
+    // what happened before: a failed load silently getting treated as "empty" and
+    // overwriting real data.
     state.loadFailed = true;
     state.members = seedRef.members;
     state.tasks = [];
     showLoadFailedBanner(cloud.reason);
-    return;
+    return false;
   }
   state.loadFailed = false;
   hideLoadFailedBanner();
@@ -2833,7 +2844,7 @@ async function load(){
     }
   });
 
-  setLoadingText('Merging in the latest updates…');
+  if(!isBackground) setLoadingText('Merging in the latest updates…');
   // Merge in anything new from seedData (new categories, new tasks added by an update)
   // without touching or duplicating anything that already exists. Matched by
   // category + exact task name, so renaming a task "adopts" it as fully custom.
@@ -2887,6 +2898,7 @@ async function load(){
   if(!me || !state.members.includes(me)){
     me = state.members[0] || null;
   }
+  return true;
 }
 
 let saveTimer = null;
@@ -4324,14 +4336,23 @@ function markSynced(){
   const el = document.getElementById('syncIndicator');
   if(el) el.textContent = '● synced ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
 }
+function markSyncFailed(reason){
+  const el = document.getElementById('syncIndicator');
+  if(el){
+    el.textContent = '● refresh failed, retrying…';
+    el.title = reason ? ('Last background sync failed: ' + reason) : 'Last background sync failed';
+  }
+}
 async function backgroundSync(){
   if(isUserActivelyEditing()) return;
-  await load();
-  renderAll();
-  if(!state.loadFailed){
+  const ok = await load(true);
+  if(ok){
+    renderAll();
     markSynced();
     checkForCatchUpCelebrations();
   }
+  // On failure, load(true) already left state untouched and flagged the sync
+  // indicator — no re-render needed, since nothing about the board actually changed.
 }
 document.addEventListener('visibilitychange', ()=>{
   if(document.visibilityState === 'visible') backgroundSync();
