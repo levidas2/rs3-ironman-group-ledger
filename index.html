@@ -626,6 +626,7 @@ async function cloudSave(members, tasks, force){
     if(remote && !remote.error && !remote.empty && Array.isArray(remote.tasks)){
       finalTasks = mergeCheckData(tasks, remote.tasks);
       state.tasks = finalTasks; // reflect the merge locally too, not just on the server
+      if(!isUserActivelyEditing()) renderAll();
     }
   }
   try{
@@ -2902,16 +2903,25 @@ async function load(isBackground){
 }
 
 let saveTimer = null;
+let saveInFlight = false;
 function scheduleSave(){
+  // Set true as soon as a change is pending, not just once the network call starts —
+  // a background sync landing during the 350ms debounce window is just as capable of
+  // clobbering the not-yet-saved change as one landing during the request itself.
+  saveInFlight = true;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(saveNow, 350);
 }
 async function saveNow(){
+  saveInFlight = true;
   const ok = await cloudSave(state.members, state.tasks);
+  saveInFlight = false;
   flashStatus(ok ? 'Saved' : 'Save failed — try again');
 }
 async function saveMembers(){
+  saveInFlight = true;
   const ok = await cloudSave(state.members, state.tasks);
+  saveInFlight = false;
   flashStatus(ok ? 'Saved' : 'Save failed — try again');
 }
 async function saveMe(){
@@ -4344,7 +4354,14 @@ function markSyncFailed(reason){
   }
 }
 async function backgroundSync(){
-  if(isUserActivelyEditing()) return;
+  // Skip while the person is typing, AND while a checkbox/edit-triggered save is
+  // pending or in flight. This second condition is the important one for the
+  // "checked box disappears then reappears" bug: without it, a background sync
+  // could fetch the server's still-stale (pre-save) copy and overwrite the local
+  // optimistic checkmark before the real save had a chance to land, then the
+  // checkmark would only reappear once something else happened to trigger a
+  // re-render. This just has the background sync wait its turn instead.
+  if(isUserActivelyEditing() || saveInFlight) return;
   const ok = await load(true);
   if(ok){
     renderAll();
